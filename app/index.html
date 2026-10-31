@@ -143,6 +143,21 @@ h3{font-size:16px;margin:0}
   .card{box-shadow:none;break-inside:avoid}
   .wrap{padding-bottom:0}
 }
+
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.head{gap:8px}.head>div:nth-child(2){flex:1;min-width:0}.head small{font-size:12px}.net{font-size:11px!important}
+.ring{width:70px;min-width:70px;flex:none;font-size:11px}.ring b{font-size:18px}
+.quick-entry{display:block;width:100%;margin:0 0 16px;text-align:center;background:var(--bad);color:var(--card)}
+.readiness p{margin:8px 0}.readiness small{display:block;color:var(--muted)}
+.hazard-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.hazard-picker button{flex:1 1 95px;min-height:44px;padding:8px;font-size:14px}
+.hazard-picker [aria-pressed="true"]{background:var(--accent);color:var(--card)}
+.quick-steps{font-size:18px;font-weight:600}.quick-steps li{padding:8px 0}
+.hz summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+.source-list li{margin-bottom:12px}.src a{overflow-wrap:anywhere}
+.stock-review{margin-top:8px;font-size:13px}.stock-review button{font-size:13px;margin-top:4px}
+@media print{.hazard-picker,.quick-entry{display:none!important}.hazard-panel[hidden]{display:block!important}}
 </style>
 </head>
 <body>
@@ -154,7 +169,7 @@ h3{font-size:16px;margin:0}
       <small>Panduan darurat · Malang Selatan</small>
       <small id="net" class="net" hidden></small>
     </div>
-    <div class="ring"><b id="pct">0%</b>siap<div class="bar"><i id="pbar" style="width:0"></i></div></div>
+    <div class="ring"><b id="pct">0%</b>checklist selesai<div class="bar"><i id="pbar" style="width:0"></i></div></div>
   </div>
 </header>
 
@@ -162,6 +177,7 @@ h3{font-size:16px;margin:0}
 
 <!-- 1. KELUARGA -->
 <section id="t-fam" class="on">
+  <button class="btn quick-entry" data-go="t-act">Buka tindakan darurat</button>
   <h2>Keluarga Anda</h2>
   <p class="lead">Isi jumlah anggota keluarga. Semua jumlah stok di daftar akan dihitung otomatis.</p>
   <div class="card">
@@ -172,6 +188,7 @@ h3{font-size:16px;margin:0}
     <div class="stats" id="stats"></div>
   </div>
   <div class="note"><b>Mulai dari 3 hari</b> (standar BNPB / 72 jam), lalu naikkan bertahap ke 7 hari. Tidak perlu belanja sekaligus — cicil tiap gajian, jangan panic buying.</div>
+  <div class="card readiness" id="readiness" aria-live="polite"></div>
   <div class="card" id="soon"></div>
   <div class="card">
     <h3>Kenapa Malang Selatan perlu siaga?</h3>
@@ -188,7 +205,7 @@ h3{font-size:16px;margin:0}
 <!-- 2. CHECKLIST -->
 <section id="t-list">
   <h2>Daftar Stok</h2>
-  <p class="lead">Centang yang sudah ada. Isi tanggal kedaluwarsa supaya diingatkan saat perlu rotasi.</p>
+  <p class="lead">Centang setelah jumlah yang tersedia memenuhi kebutuhan di bawah. Periksa kembali jika kebutuhan berubah. Tanggal kedaluwarsa membantu menentukan stok yang perlu diganti.</p>
   <div class="tools noprint">
     <button class="btn" id="openAll">Buka semua</button>
     <button class="btn" id="printBtn">Cetak / PDF</button>
@@ -206,8 +223,10 @@ h3{font-size:16px;margin:0}
 <!-- 4. SAAT BENCANA -->
 <section id="t-act" class="hz">
   <h2>Saat Bencana</h2>
-  <p class="lead">Baca sekarang, saat tenang. Saat kejadian tidak ada waktu membaca.</p>
+  <p class="lead">Pilih bencana untuk melihat tiga tindakan utama. Ikuti arahan petugas setempat.</p>
+  <div id="hazardPicker" class="hazard-picker" role="group" aria-label="Pilih jenis bencana"></div>
   <div id="hazards"></div>
+  <button class="btn" data-go="t-info">Buka kontak &amp; titik kumpul</button>
 </section>
 
 <!-- 5. KONTAK -->
@@ -231,7 +250,10 @@ h3{font-size:16px;margin:0}
     <button class="btn" id="themeBtn">Ganti tema</button>
     <button class="btn" id="resetBtn" style="color:var(--bad)">Hapus semua data</button>
   </div>
-  <p class="src">Disusun dari panduan BNPB (Buku Saku <i>Tanggap Tangkas Tangguh</i>, <i>Keluarga Siaga Bencana</i> 2026), dokumen KRB Jawa Timur 2022–2026, dan panduan kesiapsiagaan pemerintah. Ini panduan umum — ikuti selalu arahan resmi BPBD Kab. Malang dan BMKG. Detail sumber ada di <code>riset/RISET.md</code>.</p>
+  <div class="card src" id="sources"><h3>Sumber resmi &amp; batas panduan</h3>
+  <p>Rujukan ditinjau 31 Oktober 2026. Ringkasan ini bukan peringatan bencana langsung. Arahan BMKG, BPBD, dan petugas setempat tetap menjadi acuan saat kejadian. Tautan luar memerlukan internet; ringkasan tetap tersedia offline.</p>
+  <ul id="sourceList" class="source-list"></ul>
+  <p>Jumlah belanja adalah estimasi aplikasi, bukan standar kebutuhan yang seragam untuk setiap keluarga. Sesuaikan dengan kondisi anggota keluarga. Nomor darurat umum belum diuji sambung; cakupan layanan dapat berbeda antarwilayah.</p></div>
 </section>
 
 </div>
@@ -248,10 +270,11 @@ h3{font-size:16px;margin:0}
 // ---------- state ----------
 const KEY = 'siaga-keluarga-v1';
 const clone = o => JSON.parse(JSON.stringify(o));
-const DEF = {fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3, done:{}, exp:{}, open:{}, info:{}, members:[], tab:'t-fam'};
+const DEF = {fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3, done:{}, confirmed:{}, exp:{}, open:{}, info:{}, members:[], tab:'t-fam'};
 let S;
 try { S = Object.assign(clone(DEF), JSON.parse(localStorage.getItem(KEY)) || {}); }
 catch { S = clone(DEF); }
+S.confirmed = S.confirmed || {};
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
 
 // family context used by quantity formulas
@@ -391,12 +414,12 @@ const HAZ = [
  {ic:'🌏', t:'Gempa bumi', big:'Merunduk · Berlindung · Berpegangan', when:'Saat guncangan', a:[
   'Merunduk, berlindung di bawah meja kuat, lindungi kepala & leher, pegang kaki meja.',
   'Jauhi kaca, lemari, dan benda yang bisa jatuh.',
-  'Di rumah 1 lantai & dekat pintu: boleh langsung keluar ke area terbuka. Jangan lari di tangga saat masih berguncang.',
+  'Jangan gunakan lift. Hindari tangga saat masih berguncang; perhatikan jalur keluar yang aman.',
   'Di luar: jauhi tiang listrik, pohon, tebing, dan bangunan.'],
   after:['Pakai alas kaki, ambil tas siaga, keluar ke titik kumpul.','Matikan gas & listrik bila aman. Jangan nyalakan api bila tercium bau gas.','Waspada gempa susulan. Jangan masuk rumah yang retak parah.','Cek anggota keluarga & tetangga. Kabari kontak luar kota.']},
- {ic:'🌊', t:'Tsunami', tag:'warga pesisir: Donomulyo, Bantur, Gedangan, Sumbermanjing Wetan, Tirtoyudo, Ampelgading', big:'Gempa kuat atau lama (sulit berdiri / > ±20 detik) = LANGSUNG LARI ke tempat tinggi. Jangan tunggu sirene.', a:[
+ {ic:'🌊', t:'Tsunami', tag:'warga pesisir: Donomulyo, Bantur, Gedangan, Sumbermanjing Wetan, Tirtoyudo, Ampelgading', big:'Di pesisir setelah gempa kuat atau lama: segera evakuasi ke tempat tinggi. Jangan tunggu sirene.', a:[
   'Tanda alam: air laut surut tiba-tiba, suara gemuruh dari laut.',
-  'Lari ke bukit / tempat tinggi atau menjauh dari pantai sejauh mungkin. Jalan kaki atau motor — mobil mudah macet.',
+  'Lari ke bukit / tempat tinggi atau menjauh dari pantai sejauh mungkin. Ikuti jalur evakuasi setempat dan hindari kemacetan kendaraan.',
   'Bila terjebak: naik ke lantai atas bangunan beton yang kokoh.',
   'Tsunami datang beberapa gelombang — jangan turun sampai ada pernyataan aman dari BMKG/BPBD.']},
  {ic:'🌧️', t:'Banjir & longsor', tag:'November–Maret', a:[
@@ -412,20 +435,20 @@ const HAZ = [
   'Abu tebal di atap bisa membuat atap roboh — bersihkan dengan hati-hati, pakai masker.',
   'Cuci sayur & buah yang terkena abu sebelum diolah.']},
  {ic:'⚡', t:'Blackout massal', tag:'contoh: blackout Jawa–Bali 4 Agustus 2019, ±14 juta pelanggan, pulih ±30–36 jam',
-  big:'Sinyal HP bisa hilang dalam ±3 jam (baterai cadangan BTS habis). Kabari keluarga SEKARANG, selagi sinyal masih ada.', when:'Jam-jam pertama', a:[
+  big:'Jaringan komunikasi dapat terganggu. Kabari keluarga selagi tersedia dan hemat baterai.', when:'Jam-jam pertama', a:[
   'Cek dulu: hanya rumah Anda (MCB turun) atau satu lingkungan? Tanya tetangga, dengarkan radio.',
   'Kabari keluarga & sepakati: kalau tidak bisa dihubungi, kumpul di titik kumpul / rumah pada jam tertentu.',
   'Isi semua ember & bak dari tandon — pompa air listrik berhenti, pasokan PDAM bisa terganggu.',
   'Cabut kulkas, TV, pompa, dan komputer dari stop kontak. Sisakan 1 lampu tercolok sebagai tanda listrik kembali.',
   'Jangan buka-buka kulkas & freezer.',
   'Hemat baterai HP: mode hemat daya, kecilkan layar, matikan data bila tidak perlu.'],
-  afterT:'Bila padam lebih dari sehari', after:[
-  'Urutan makan: isi kulkas dulu (aman ±4 jam bila pintu tertutup) → freezer (penuh ±48 jam, setengah ±24 jam) → stok kering. Ragu? Buang.',
-  'Genset hanya di luar ruangan. Jangan pakai kompor arang / briket di dalam rumah — keracunan CO tidak berbau.',
+  afterT:'Keamanan selama listrik padam', after:[
+  'Jaga pintu kulkas tertutup. Setelah 4 jam tanpa listrik atau sumber dingin, buang makanan mudah rusak. Jangan mencicipi untuk menguji keamanan.',
+  'Genset hanya di luar, setidaknya sekitar 6 meter dari pintu, jendela, dan ventilasi. Jangan pakai kompor arang / briket di dalam rumah — keracunan CO tidak berbau.',
   'Utamakan senter. Lilin jangan ditinggal, jauhkan dari gorden & anak — kebakaran sering terjadi saat blackout.',
   'ATM, QRIS, SPBU, dan minimarket tanpa genset bisa tutup — pakai uang tunai, hemat BBM.',
   'Anggota yang butuh alat medis listrik (oksigen, nebulizer): bawa lebih awal ke puskesmas/RS yang punya genset.',
-  'Isi daya HP dari motor/mobil atau panel surya. Pakai radio untuk kabar resmi.',
+  'Isi daya HP dari kendaraan hanya di area terbuka, bukan garasi tertutup, atau gunakan panel surya. Pakai radio untuk kabar resmi.',
   'Kunci rumah, ronda bersama tetangga, cek tetangga lansia.']},
 ];
 
@@ -447,8 +470,11 @@ const esc = s => String(s??'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;'
 const visible = (x, c) => !x.show || x.show(c);
 function expStatus(date){
   if(!date) return null;
-  const days = Math.round((new Date(date) - new Date(new Date().toDateString())) / 864e5);
-  if(days < 0) return ['bad','kedaluwarsa'];
+  const parts = date.split('-').map(Number);
+  if(parts.length !== 3 || parts.some(x => !Number.isFinite(x))) return null;
+  const today = new Date();
+  const days = Math.round((Date.UTC(parts[0], parts[1]-1, parts[2]) - Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())) / 864e5);
+  if(days <= 0) return ['bad','kedaluwarsa'];
   if(days <= 60) return ['warn',`${days} hari lagi`];
   return ['ok','aman'];
 }
@@ -474,18 +500,18 @@ function renderSoon(){
   const list = [];
   CATS.forEach(cat => cat.items.forEach(it => {
     const st = expStatus(S.exp[it.id]);
-    if(st && st[0] !== 'ok') list.push(`<li><b>${esc(it.t)}</b> — <span class="badge ${st[0]}">${st[1]}</span></li>`);
+    if(S.done[it.id] && visible(cat, ctx()) && visible(it, ctx()) && st && st[0] !== 'ok') list.push(`<li><b>${esc(it.t)}</b> — <span class="badge ${st[0]}">${st[1]}</span></li>`);
   }));
   $('#soon').innerHTML = `<h3>Perlu rotasi</h3>` + (list.length
     ? `<ul style="margin:8px 0 0;padding-left:20px">${list.join('')}</ul>`
-    : `<p class="lead" style="margin:6px 0 0">Tidak ada stok yang mendekati kedaluwarsa. Isi tanggal di tab Stok agar diingatkan.</p>`);
+    : `<p class="lead" style="margin:6px 0 0">Belum ada peringatan dari tanggal yang tercatat pada stok tercentang. Stok tanpa tanggal belum dapat diperiksa. Pengingat muncul saat aplikasi dibuka.</p>`);
 }
 
 function renderList(){
   const c = ctx();
   $('#cats').innerHTML = CATS.filter(cat => visible(cat, c)).map(cat => {
     const items = cat.items.filter(it => visible(it, c));
-    const n = items.filter(it => S.done[it.id]).length;
+    const n = items.filter(it => stockState(it, c) === 'ok').length;
     const closed = S.open[cat.id] === false;
     return `<div class="cat${closed?' closed':''}" data-cat="${cat.id}"><div class="card">
       <div class="cat-h" role="button" tabindex="0" aria-expanded="${!closed}"><span style="font-size:20px">${cat.ic}</span>
@@ -494,11 +520,14 @@ function renderList(){
       <ul>${items.map(it => {
         const st = expStatus(S.exp[it.id]);
         const tip = it.tip ? it.tip(c) : '';
-        return `<li class="item${S.done[it.id]?' done':''}">
+        const status = stockState(it, c);
+        return `<li class="item${status === 'ok'?' done':''}">
           <input type="checkbox" id="c-${it.id}" data-id="${it.id}" ${S.done[it.id]?'checked':''}>
           <div class="txt"><label for="c-${it.id}" class="nm">${esc(it.t)}</label> <span class="qty">${esc(it.q(c))}</span>
           ${tip?`<div class="tip">${esc(tip)}</div>`:''}
-          ${it.exp?`<div class="exp">Kedaluwarsa <input type="date" data-exp="${it.id}" value="${esc(S.exp[it.id]||'')}">${st?`<span class="badge ${st[0]}">${st[1]}</span>`:''}</div>`:''}
+          ${status === 'review' ? `<div class="stock-review">Perlu cek ulang jumlah (termasuk centang dari versi lama).<br><button class="btn" data-confirm="${it.id}">Jumlah sudah sesuai</button></div>` : ''}
+          ${status === 'expired' ? '<div class="stock-review badge bad">Perlu diganti — tidak dihitung selesai</div>' : ''}
+          ${it.exp?`<div class="exp">Kedaluwarsa <input aria-label="Kedaluwarsa ${esc(it.t)}" type="date" data-exp="${it.id}" value="${esc(S.exp[it.id]||'')}">${st?`<span class="badge ${st[0]}">${st[1]}</span>`:''}</div>`:''}
           </div></li>`;}).join('')}</ul></div></div>`;
   }).join('');
 }
@@ -510,20 +539,53 @@ function renderPlan(){
       <div class="cat-h"><h3>${p.t}</h3><span class="cnt${all?' full':''}">${p.items.filter(([id])=>S.done['plan-'+id]).length}/${p.items.length}</span></div>
       <ul>${p.items.map(([id,t,tip]) => `<li class="item${S.done['plan-'+id]?' done':''}">
         <input type="checkbox" id="c-plan-${id}" data-id="plan-${id}" ${S.done['plan-'+id]?'checked':''}>
-        <div class="txt"><label for="c-plan-${id}" class="nm">${esc(t)}</label>${tip?`<div class="tip">${esc(tip)}</div>`:''}</div></li>`).join('')}</ul>
+        <div class="txt"><label for="c-plan-${id}" class="nm">${esc(t)}</label>${tip?`<div class="tip">${esc(tip)}</div>`:''}
+          ${status === 'review' ? `<div class="stock-review">Perlu cek ulang jumlah (termasuk centang dari versi lama).<br><button class="btn" data-confirm="${it.id}">Jumlah sudah sesuai</button></div>` : ''}
+          ${status === 'expired' ? '<div class="stock-review badge bad">Perlu diganti — tidak dihitung selesai</div>' : ''}</div></li>`).join('')}</ul>
     </div></div></div>`;
   }).join('');
 }
 
-function renderHaz(){
-  $('#hazards').innerHTML = HAZ.map(h => `<div class="card">
-    <h3><span>${h.ic}</span>${h.t}</h3>${h.tag?`<div class="tag" style="margin:-4px 0 8px">${esc(h.tag)}</div>`:''}
-    ${h.big?`<div class="big">${esc(h.big)}</div>`:''}
-    ${h.when?`<b style="font-size:14px">${h.when}</b>`:''}
-    <ul>${h.a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
-    ${h.after?`<b style="font-size:14px;display:block;margin-top:8px">${h.afterT||'Setelah guncangan'}</b><ul>${h.after.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
-  </div>`).join('');
+const SOURCES = {
+  bmkg: {title:'BMKG — Antisipasi Gempa Bumi', url:'https://www.bmkg.go.id/gempabumi/mitigasi/antisipasi-gempabumi', scope:'Tindakan saat dan setelah gempa.'},
+  bnpb: {title:'BNPB — Buku Saku Tanggap Tangkas Tangguh (PDF)', url:'https://bnpb.go.id/storage/app/media/Buku%20BNPB/Buku%20Saku%20Bencana%20BNPB.pdf', scope:'Tas siaga 3 hari, tsunami, banjir, longsor, dan erupsi. Lihat bab sesuai bencana.'},
+  cdc: {title:'CDC — Keselamatan saat listrik padam', url:'https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-during-a-power-outage.html', scope:'Keamanan pangan, genset, dan risiko karbon monoksida; panduan berbahasa Inggris.'},
+  bpbd: {title:'BPBD Kabupaten Malang', url:'https://bpbd.malangkab.go.id/', scope:'Informasi daerah; konfirmasikan jalur evakuasi dan titik aman dengan desa/BPBD.'},
+};
+const QUICK = [
+  {sources:['bmkg'], steps:['Lindungi kepala dan leher; berlindung di bawah meja yang kuat.', 'Jauhi kaca dan benda yang dapat jatuh.', 'Setelah guncangan, keluar dengan tertib melalui jalur aman.']},
+  {sources:['bnpb'], steps:['Di pesisir setelah gempa kuat atau lama: evakuasi, jangan tunggu sirene.', 'Ikuti jalur ke tempat tinggi, menjauhi pantai.', 'Tetap di tempat aman sampai petugas menyatakan aman.']},
+  {sources:['bnpb'], steps:['Menjauh dari lereng yang retak atau menunjukkan tanda longsor.', 'Evakuasi lebih awal ke tempat aman sesuai arahan petugas.', 'Jangan menyeberangi arus banjir.']},
+  {sources:['bnpb'], steps:['Berlindung di dalam; tutup pintu dan jendela.', 'Jika harus keluar, gunakan masker dan pelindung mata.', 'Ikuti arahan evakuasi petugas; jauhi wilayah terlarang.']},
+  {sources:['cdc'], steps:['Gunakan senter dan hemat daya telepon.', 'Jaga kulkas tertutup; perhatikan keamanan makanan.', 'Jalankan genset hanya di luar, sekitar 6 meter dari bukaan rumah.']},
+];
+function sourceLinks(ids){
+  return ids.map(id => `<a href="${SOURCES[id].url}" target="_blank" rel="noopener noreferrer">${SOURCES[id].title}</a>`).join(' · ');
 }
+function selectHazard(index){
+  document.querySelectorAll('[data-hazard]').forEach((b,i)=>b.setAttribute('aria-pressed', i===index));
+  document.querySelectorAll('.hazard-panel').forEach((p,i)=>p.hidden=i!==index);
+  const heading = $('#hazard-'+index+' h3'); heading.focus({preventScroll:true});
+}
+function renderHaz(){
+  $('#hazardPicker').innerHTML = HAZ.map((h,i)=>`<button class="btn" data-hazard="${i}" aria-pressed="${i===0}" aria-controls="hazard-${i}">${["Gempa", "Tsunami", "Banjir / longsor", "Abu vulkanik", "Listrik padam"][i]}</button>`).join('');
+  $('#hazards').innerHTML = HAZ.map((h,i) => `<article class="card hazard-panel" id="hazard-${i}" ${i?'hidden':''} style="margin-top:14px">
+    <h3 tabindex="-1">${h.ic} ${h.t}</h3>
+    <ol class="quick-steps">${QUICK[i].steps.map(step=>`<li>${esc(step)}</li>`).join('')}</ol>
+    <details><summary>Detail panduan ${h.t}</summary>
+    ${h.tag?`<p class="tag">${esc(h.tag)}</p>`:''}
+    ${h.big?`<div class="big">${esc(h.big)}</div>`:''}
+    ${h.when?`<b>${h.when}</b>`:''}
+    <ul>${h.a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+    ${h.after?`<b>${h.afterT||'Setelah guncangan'}</b><ul>${h.after.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    </details><p class="src">Rujukan: ${sourceLinks(QUICK[i].sources)}<br>Ditinjau 31 Oktober 2026 · tautan perlu internet.</p>
+  </article>`).join('');
+  $('#sourceList').innerHTML = Object.values(SOURCES).map(source=>`<li><a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a><br>${source.scope}</li>`).join('');
+}
+// Expand details for a complete printed emergency guide, then restore the view.
+let printDetails = [];
+addEventListener('beforeprint', () => { printDetails = [...document.querySelectorAll('#hazards details')].map(d=>[d,d.open]); printDetails.forEach(([d])=>d.open=true); });
+addEventListener('afterprint', () => printDetails.forEach(([d,open])=>d.open=open));
 
 function renderInfo(){
   $('#nums').innerHTML = NUMS.map(([n,t]) => `<a class="num" href="tel:${n}"><b>${n}</b><small>${t}</small></a>`).join('');
@@ -540,13 +602,27 @@ function renderMembers(){
     || '<p class="lead">Belum ada. Tambahkan nama, nomor HP, golongan darah, dan obat/alergi tiap anggota.</p>';
 }
 
+function stockState(it, c = ctx()){
+  if(!S.done[it.id]) return 'missing';
+  if(expStatus(S.exp[it.id])?.[0] === 'bad') return 'expired';
+  if(S.confirmed[it.id] !== it.q(c)) return 'review';
+  return 'ok';
+}
 function progress(){
   const c = ctx();
-  const ids = CATS.filter(x=>visible(x,c)).flatMap(cat => cat.items.filter(it=>visible(it,c)).map(it=>it.id))
-    .concat(PHASES.flatMap(p => p.items.map(([id]) => 'plan-'+id)));
-  const p = Math.round(ids.filter(id => S.done[id]).length / ids.length * 100);
+  const items = CATS.filter(x=>visible(x,c)).flatMap(cat => cat.items.filter(it=>visible(it,c)));
+  const plans = PHASES.flatMap(p => p.items.map(([id]) => 'plan-'+id));
+  const stock = items.filter(it => stockState(it,c) === 'ok').length;
+  const plan = plans.filter(id => S.done[id]).length;
+  const review = items.filter(it => stockState(it,c) === 'review').length;
+  const expired = items.filter(it => stockState(it,c) === 'expired').length;
+  const undated = items.filter(it => S.done[it.id] && it.exp && !S.exp[it.id]).length;
+  const p = Math.floor((stock + plan) / (items.length + plans.length) * 100);
   $('#pct').textContent = p + '%';
   $('#pbar').style.width = p + '%';
+  $('#readiness').innerHTML = `<h3>Progres checklist</h3><p><b>${stock}/${items.length}</b> stok dikonfirmasi · <b>${plan}/${plans.length}</b> persiapan selesai</p>
+    <p>${review} perlu cek ulang · ${expired} kedaluwarsa / jatuh tempo hari ini · ${undated} belum bertanggal</p>
+    <small>Persentase mencatat pekerjaan yang selesai, bukan jaminan aman. Stok dihitung setelah jumlah dikonfirmasi dan tidak kedaluwarsa menurut tanggal yang diisi. Jumlah fisik dan kondisi barang tetap perlu diperiksa.</small>`;
 }
 
 function renderAll(){ renderFam(); renderSoon(); renderList(); renderPlan(); progress(); }
@@ -556,11 +632,16 @@ function showTab(id){
   document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === id));
   document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.t === id));
   window.scrollTo(0,0);
+  const heading = document.querySelector('#'+id+' h2'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); }
 }
 
 // ---------- events ----------
 document.addEventListener('click', e => {
   const t = e.target;
+  const go = t.closest('[data-go]'); if(go) return showTab(go.dataset.go);
+  const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(+hz.dataset.hazard);
+  const confirmStock = t.closest('[data-confirm]');
+  if(confirmStock){ const it = CATS.flatMap(c=>c.items).find(x=>x.id===confirmStock.dataset.confirm); S.confirmed[it.id] = it.q(ctx()); save(); return renderAll(); }
   const tab = t.closest('nav button'); if(tab) return showTab(tab.dataset.t);
   const st = t.closest('#famCtl button');
   if(st){ S.fam[st.dataset.k] = Math.max(0, Math.min(20, S.fam[st.dataset.k] + +st.dataset.v));
@@ -588,8 +669,11 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('change', e => {
   const t = e.target;
-  if(t.dataset.id){ S.done[t.dataset.id] = t.checked; save(); renderAll(); }
-  if(t.dataset.exp){ S.exp[t.dataset.exp] = t.value; save(); renderSoon(); renderList(); }
+  if(t.dataset.id){ S.done[t.dataset.id] = t.checked;
+    const it = CATS.flatMap(c=>c.items).find(x=>x.id===t.dataset.id);
+    if(it){ if(t.checked) S.confirmed[it.id] = it.q(ctx()); else delete S.confirmed[it.id]; }
+    save(); renderAll(); }
+  if(t.dataset.exp){ S.exp[t.dataset.exp] = t.value; save(); renderSoon(); renderList(); progress(); }
   if(t.id === 'importIn' && t.files[0]){
     t.files[0].text().then(txt => { S = Object.assign(clone(DEF), JSON.parse(txt)); save(); renderAll(); renderInfo(); alert('Data dipulihkan.'); })
       .catch(() => alert('File cadangan tidak valid.'));
@@ -604,6 +688,9 @@ document.addEventListener('input', e => {
 // ---------- init ----------
 if(S.theme) document.documentElement.dataset.theme = S.theme;
 renderAll(); renderHaz(); renderInfo(); showTab(S.tab || 't-fam');
+
+document.addEventListener('visibilitychange', () => { if(!document.hidden){ renderSoon(); renderList(); progress(); } });
+setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);
 
 // ---------- offline (PWA) ----------
 let offlineReady = false, installEvt = null;

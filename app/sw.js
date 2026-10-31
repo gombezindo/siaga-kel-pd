@@ -1,7 +1,7 @@
 // Service worker: keeps the whole app available offline.
 // Page: network-first (gets updates when online, falls back to cache offline).
 // Other files: cache-first. Bump VERSION when adding/removing precached files.
-const VERSION = 'siaga-v1';
+const VERSION = 'siaga-v2';
 const FILES = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
 
@@ -21,7 +21,7 @@ self.addEventListener('fetch', e => {
 
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req)
-      .then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./', copy)); return res; })
+      .then(res => { if(!res.ok) throw new Error('Page unavailable'); const copy = res.clone(); caches.open(VERSION).then(c => c.put('./', copy)); return res; })
       .catch(() => caches.match('./')));
     return;
   }
