@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#c2410c">
 <title>Siaga Keluarga</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Siaga Keluarga">
 <style>
 :root{
   --bg:#f7f5f2; --card:#ffffff; --ink:#1c1917; --muted:#6b645d; --line:#e7e2dc;
@@ -37,6 +42,9 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
 .logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
 .head h1{font-size:18px;margin:0;line-height:1.2}
 .head small{color:var(--muted);font-size:13px}
+.net{display:block;font-size:12px;font-weight:600;color:var(--ok)}
+.net.off{color:var(--warn)}
+.net[hidden]{display:none}
 .ring{margin-left:auto;text-align:right;font-size:13px;color:var(--muted);min-width:90px}
 .ring b{display:block;font-size:20px;color:var(--ink)}
 .bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:4px}
@@ -144,6 +152,7 @@ h3{font-size:16px;margin:0}
     <div>
       <h1>Siaga Keluarga</h1>
       <small>Panduan darurat · Malang Selatan</small>
+      <small id="net" class="net" hidden></small>
     </div>
     <div class="ring"><b id="pct">0%</b>siap<div class="bar"><i id="pbar" style="width:0"></i></div></div>
   </div>
@@ -216,6 +225,7 @@ h3{font-size:16px;margin:0}
     <button class="btn" id="addMem">+ Tambah anggota</button>
   </div>
   <div class="tools noprint">
+    <button class="btn pri" id="installBtn" hidden>Pasang di HP</button>
     <button class="btn" id="exportBtn">Simpan cadangan (.json)</button>
     <label class="btn">Pulihkan cadangan<input type="file" id="importIn" accept=".json" hidden></label>
     <button class="btn" id="themeBtn">Ganti tema</button>
@@ -594,6 +604,30 @@ document.addEventListener('input', e => {
 // ---------- init ----------
 if(S.theme) document.documentElement.dataset.theme = S.theme;
 renderAll(); renderHaz(); renderInfo(); showTab(S.tab || 't-fam');
+
+// ---------- offline (PWA) ----------
+let offlineReady = false, installEvt = null;
+function netStatus(){
+  const el = $('#net');
+  if(!navigator.onLine){ el.textContent = '● Offline — semua fitur tetap jalan'; el.className = 'net off'; el.hidden = false; }
+  else if(offlineReady){ el.textContent = '✓ Siap dipakai tanpa internet'; el.className = 'net'; el.hidden = false; }
+  else el.hidden = true;
+}
+addEventListener('online', netStatus);
+addEventListener('offline', netStatus);
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => { offlineReady = true; netStatus(); })
+    .catch(() => {});
+}
+netStatus();
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('#installBtn').hidden = false; });
+addEventListener('appinstalled', () => { $('#installBtn').hidden = true; });
+$('#installBtn').addEventListener('click', () => {
+  if(!installEvt) return;
+  installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; $('#installBtn').hidden = true; });
+});
 </script>
 </body>
 </html>
