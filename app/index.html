@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#c2410c">
+<title>Siaga Keluarga</title>
+<style>
+:root{
+  --bg:#f7f5f2; --card:#ffffff; --ink:#1c1917; --muted:#6b645d; --line:#e7e2dc;
+  --accent:#c2410c; --accent-soft:#fff1e8; --ok:#15803d; --ok-soft:#e9f7ee;
+  --warn:#b45309; --warn-soft:#fff6e0; --bad:#b91c1c; --bad-soft:#fdecec;
+  --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141210; --card:#1e1b18; --ink:#f3efe9; --muted:#a8a097; --line:#332e29;
+    --accent:#fb923c; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
+    --warn:#fbbf24; --warn-soft:#2a2210; --bad:#f87171; --bad-soft:#2c1515;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141210; --card:#1e1b18; --ink:#f3efe9; --muted:#a8a097; --line:#332e29;
+  --accent:#fb923c; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
+  --warn:#fbbf24; --warn-soft:#2a2210; --bad:#f87171; --bad-soft:#2c1515;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 110px}
+
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.head{max-width:760px;margin:0 auto;padding:14px 16px 12px;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.head h1{font-size:18px;margin:0;line-height:1.2}
+.head small{color:var(--muted);font-size:13px}
+.ring{margin-left:auto;text-align:right;font-size:13px;color:var(--muted);min-width:90px}
+.ring b{display:block;font-size:20px;color:var(--ink)}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+
+nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav .tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav button{background:none;border:0;padding:10px 2px 9px;font-size:12px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:20px;line-height:1}
+nav button[aria-selected="true"]{color:var(--accent);font-weight:700}
+
+section{display:none;padding-top:18px}
+section.on{display:block}
+h2{font-size:22px;margin:4px 0 4px}
+h3{font-size:16px;margin:0}
+.lead{color:var(--muted);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.note{background:var(--accent-soft);border-radius:var(--radius);padding:12px 14px;font-size:14px;margin-bottom:14px}
+.note b{color:var(--accent)}
+
+.fam{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:560px){.fam{grid-template-columns:repeat(4,1fr)}}
+.step{border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.step label{display:block;font-size:13px;color:var(--muted)}
+.step .ctl{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
+.step button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:18px;cursor:pointer}
+.step output{font-size:22px;font-weight:700;min-width:24px}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:12px}
+.seg button{flex:1;border:0;background:none;padding:8px;border-radius:9px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.stat{background:var(--bg);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:20px}
+.stat small{color:var(--muted);font-size:12px}
+
+.cat{margin-bottom:14px}
+.cat-h{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none}
+.cat-h .cnt{margin-left:auto;font-size:13px;color:var(--muted)}
+.cat-h .cnt.full{color:var(--ok);font-weight:700}
+.cat .card{padding:0;overflow:hidden}
+.cat ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.cat.closed ul{display:none}
+.item{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:flex-start}
+.item:last-child{border-bottom:0}
+.item input[type=checkbox]{width:22px;height:22px;margin:2px 0 0;accent-color:var(--accent);flex:none;cursor:pointer}
+.item .txt{flex:1;min-width:0}
+.item .nm{font-weight:600}
+.item.done .nm{text-decoration:line-through;color:var(--muted)}
+.item .qty{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:0 6px;margin-left:4px}
+.item .tip{font-size:13px;color:var(--muted)}
+.exp{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.exp input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:3px 6px;font-size:13px}
+.badge{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px}
+.badge.bad{color:var(--bad);background:var(--bad-soft)}
+.badge.warn{color:var(--warn);background:var(--warn-soft)}
+.badge.ok{color:var(--ok);background:var(--ok-soft)}
+
+.phase{position:relative;padding-left:26px;margin-bottom:6px}
+.phase:before{content:"";position:absolute;left:8px;top:28px;bottom:-6px;width:2px;background:var(--line)}
+.phase:last-child:before{display:none}
+.phase .dot{position:absolute;left:0;top:16px;width:18px;height:18px;border-radius:50%;background:var(--card);border:3px solid var(--accent)}
+.phase.all .dot{background:var(--accent)}
+
+.hz .card h3{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:17px}
+.hz ol,.hz ul{margin:0;padding-left:20px}
+.hz li{margin-bottom:6px}
+.hz .tag{font-size:12px;color:var(--muted);font-weight:400}
+.big{font-size:15px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-weight:600}
+
+.nums{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:560px){.nums{grid-template-columns:repeat(4,1fr)}}
+.num{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.num b{display:block;font-size:22px;color:var(--accent)}
+.num small{color:var(--muted);font-size:13px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.field input,.field textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px}
+.field textarea{min-height:64px;resize:vertical}
+.mem{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;display:grid;gap:8px}
+.mem .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mem input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 9px;font-size:14px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.del{color:var(--bad);font-size:13px;padding:5px 10px;justify-self:end}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.src{font-size:13px;color:var(--muted)}
+.src a{color:var(--accent)}
+
+@media print{
+  header,nav,.tools,.noprint{display:none!important}
+  section{display:block!important;page-break-before:always}
+  section:first-of-type{page-break-before:auto}
+  .cat.closed ul{display:block}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;break-inside:avoid}
+  .wrap{padding-bottom:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="logo" aria-hidden="true">S</div>
+    <div>
+      <h1>Siaga Keluarga</h1>
+      <small>Panduan darurat · Malang Selatan</small>
+    </div>
+    <div class="ring"><b id="pct">0%</b>siap<div class="bar"><i id="pbar" style="width:0"></i></div></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 1. KELUARGA -->
+<section id="t-fam" class="on">
+  <h2>Keluarga Anda</h2>
+  <p class="lead">Isi jumlah anggota keluarga. Semua jumlah stok di daftar akan dihitung otomatis.</p>
+  <div class="card">
+    <div class="fam" id="famCtl"></div>
+    <div class="seg" id="daysCtl" role="group" aria-label="Durasi stok">
+      <button data-d="3">3 hari</button><button data-d="5">5 hari</button><button data-d="7">7 hari</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="note"><b>Mulai dari 3 hari</b> (standar BNPB / 72 jam), lalu naikkan bertahap ke 7 hari. Tidak perlu belanja sekaligus — cicil tiap gajian, jangan panic buying.</div>
+  <div class="card" id="soon"></div>
+  <div class="card">
+    <h3>Kenapa Malang Selatan perlu siaga?</h3>
+    <ul style="margin:8px 0 0;padding-left:20px">
+      <li><b>Gempa</b> — dekat zona megathrust selatan Jawa (gempa M6,1 tahun 2021).</li>
+      <li><b>Tsunami</b> — Kab. Malang urutan ke-5 potensi tsunami terbesar di Jatim.</li>
+      <li><b>Banjir &amp; longsor</b> — musim hujan November–Maret.</li>
+      <li><b>Abu Semeru</b> — wilayah timur (Ampelgading, Tirtoyudo, Dampit).</li>
+      <li><b>Krisis air</b> — wilayah kapur (karst) saat kemarau.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2. CHECKLIST -->
+<section id="t-list">
+  <h2>Daftar Stok</h2>
+  <p class="lead">Centang yang sudah ada. Isi tanggal kedaluwarsa supaya diingatkan saat perlu rotasi.</p>
+  <div class="tools noprint">
+    <button class="btn" id="openAll">Buka semua</button>
+    <button class="btn" id="printBtn">Cetak / PDF</button>
+  </div>
+  <div id="cats"></div>
+</section>
+
+<!-- 3. JAUH HARI -->
+<section id="t-plan">
+  <h2>Persiapan Jauh Hari</h2>
+  <p class="lead">Stok saja tidak cukup. Menurut riset, <b>rencana keluarga</b> adalah faktor paling menentukan kesiapan rumah tangga. Kerjakan bertahap.</p>
+  <div id="phases"></div>
+</section>
+
+<!-- 4. SAAT BENCANA -->
+<section id="t-act" class="hz">
+  <h2>Saat Bencana</h2>
+  <p class="lead">Baca sekarang, saat tenang. Saat kejadian tidak ada waktu membaca.</p>
+  <div id="hazards"></div>
+</section>
+
+<!-- 5. KONTAK -->
+<section id="t-info">
+  <h2>Kontak &amp; Rencana</h2>
+  <p class="lead">Ketuk nomor untuk menelepon. Catat juga di kertas — HP bisa mati.</p>
+  <div class="nums" id="nums"></div>
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:12px">Rencana keluarga kami</h3>
+    <div id="infoFields"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px">Anggota keluarga</h3>
+    <div id="members"></div>
+    <button class="btn" id="addMem">+ Tambah anggota</button>
+  </div>
+  <div class="tools noprint">
+    <button class="btn" id="exportBtn">Simpan cadangan (.json)</button>
+    <label class="btn">Pulihkan cadangan<input type="file" id="importIn" accept=".json" hidden></label>
+    <button class="btn" id="themeBtn">Ganti tema</button>
+    <button class="btn" id="resetBtn" style="color:var(--bad)">Hapus semua data</button>
+  </div>
+  <p class="src">Disusun dari panduan BNPB (Buku Saku <i>Tanggap Tangkas Tangguh</i>, <i>Keluarga Siaga Bencana</i> 2026), dokumen KRB Jawa Timur 2022–2026, dan panduan kesiapsiagaan pemerintah. Ini panduan umum — ikuti selalu arahan resmi BPBD Kab. Malang dan BMKG. Detail sumber ada di <code>riset/RISET.md</code>.</p>
+</section>
+
+</div>
+
+<nav><div class="tabs" role="tablist">
+  <button role="tab" data-t="t-fam" aria-selected="true"><span>👪</span>Keluarga</button>
+  <button role="tab" data-t="t-list"><span>✅</span>Stok</button>
+  <button role="tab" data-t="t-plan"><span>🗓️</span>Jauh Hari</button>
+  <button role="tab" data-t="t-act"><span>⚠️</span>Saat Bencana</button>
+  <button role="tab" data-t="t-info"><span>📞</span>Kontak</button>
+</div></nav>
+
+<script>
+// ---------- state ----------
+const KEY = 'siaga-keluarga-v1';
+const clone = o => JSON.parse(JSON.stringify(o));
+const DEF = {fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3, done:{}, exp:{}, open:{}, info:{}, members:[], tab:'t-fam'};
+let S;
+try { S = Object.assign(clone(DEF), JSON.parse(localStorage.getItem(KEY)) || {}); }
+catch { S = clone(DEF); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+
+// family context used by quantity formulas
+function ctx(){
+  const f = S.fam, d = S.days;
+  return {d, dew:f.dewasa, anak:f.anak, bal:f.balita, lan:f.lansia,
+    n: f.dewasa+f.anak+f.balita+f.lansia,
+    besar: f.dewasa+f.lansia,           // adults incl. elderly
+    nonBal: f.dewasa+f.anak+f.lansia};  // everyone except toddlers
+}
+const ceil = Math.ceil;
+const air = c => c.n*3*c.d;             // L drink+cook, ±3 L/person/day
+const airHigiene = c => c.n*10*c.d;     // L washing/toilet
+
+// ---------- checklist data ----------
+const CATS = [
+ {id:'air', ic:'💧', t:'Air', items:[
+  {id:'galon', t:'Galon air minum (segel, belum dibuka)', q:c=>`${ceil(air(c)/19)} galon`, tip:c=>`≈ ${air(c)} L untuk minum & masak (3 L/orang/hari). Jangan dijatah — minum sesuai kebutuhan.`, exp:1},
+  {id:'botol', t:'Botol air 600 ml–1,5 L untuk dibawa', q:c=>`${c.n*2} botol`, exp:1},
+  {id:'drum', t:'Drum / ember tertutup untuk mandi & WC', q:c=>`± ${airHigiene(c)} L`, tip:()=>'Penting di wilayah kapur saat kemarau. Tutup rapat agar tidak jadi sarang nyamuk / kena abu.'},
+  {id:'jernih', t:'Tablet penjernih air / kaporit cair / saringan portabel', q:()=>'1 set', exp:1},
+ ]},
+ {id:'mkn', ic:'🍚', t:'Makanan siap makan', sub:'Prioritas — listrik & gas bisa putus', items:[
+  {id:'biskuit', t:'Biskuit / crackers', q:c=>`${ceil(c.nonBal*c.d/2)} bungkus besar`, tip:()=>'Simpan dalam kaleng/toples kedap. Umur simpan ± 6 bulan.', exp:1},
+  {id:'roti', t:'Roti kering / roti gambang', q:c=>`${ceil(c.nonBal*c.d/3)} bungkus`, exp:1},
+  {id:'kaleng', t:'Sarden / kornet / ikan kaleng (tutup tarik)', q:c=>`${ceil(c.nonBal*c.d/2)} kaleng`, tip:()=>'Makanan kaleng tahan ± 2 tahun. Pilih tutup tarik, atau siapkan pembuka kaleng.', exp:1},
+  {id:'abon', t:'Abon, kering tempe, kacang, kurma', q:c=>`${ceil(c.n*c.d/7)} bungkus`, exp:1},
+  {id:'uht', t:'Susu UHT kotak', q:c=>`${c.besar*c.d + c.anak*c.d*2} kotak`, exp:1},
+  {id:'buah', t:'Buah tahan lama (pisang, jeruk, salak)', q:()=>'rotasi mingguan'},
+ ]},
+ {id:'masak', ic:'🔥', t:'Bahan masak', items:[
+  {id:'beras', t:'Beras', q:c=>`${(Math.round((c.besar*0.35+c.anak*0.2+c.bal*0.1)*c.d*10)/10).toLocaleString('id-ID')} kg`, exp:1},
+  {id:'mie', t:'Mi instan (pelengkap, bukan makanan utama)', q:c=>`${ceil(c.nonBal*c.d/3)} bungkus`, exp:1},
+  {id:'telur', t:'Telur (tahan ± 2 minggu tanpa kulkas)', q:c=>`${c.nonBal*c.d} butir`},
+  {id:'bumbu', t:'Gula, garam, minyak, teh/kopi, madu, oatmeal', q:()=>'1 paket', exp:1},
+  {id:'kompor', t:'Kompor portabel + gas kaleng', q:c=>`${ceil(c.n/4)*c.d} kaleng gas`, tip:()=>'Atau tabung LPG cadangan. Jangan dipakai di ruang tertutup.'},
+  {id:'korek', t:'Korek api & pemantik dalam plastik ziplock', q:()=>'2–3'},
+  {id:'alatmkn', t:'Pembuka kaleng, piring/gelas/sendok, panci kecil', q:()=>'1 set'},
+ ]},
+ {id:'khusus', ic:'🍼', t:'Bayi & lansia', show:c=>c.bal+c.lan>0, items:[
+  {id:'formula', t:'Susu formula', q:c=>`${c.bal*ceil(c.d/3.5)} kaleng (400 g)`, show:c=>c.bal>0, exp:1},
+  {id:'mpasi', t:'MPASI instan / bubur bayi', q:c=>`${c.bal*c.d*2} sachet`, show:c=>c.bal>0, exp:1},
+  {id:'popok', t:'Popok sekali pakai', q:c=>`${c.bal*c.d*7} buah`, show:c=>c.bal>0},
+  {id:'botolbayi', t:'Botol susu, termos air panas, tisu basah bayi', q:()=>'1 set', show:c=>c.bal>0},
+  {id:'lunak', t:'Makanan lunak lansia (bubur instan, oat)', q:c=>`${c.lan*c.d*2} porsi`, show:c=>c.lan>0, exp:1},
+  {id:'alatlansia', t:'Kacamata cadangan, alat bantu dengar + baterai, tongkat', q:()=>'sesuai kebutuhan', show:c=>c.lan>0},
+ ]},
+ {id:'obat', ic:'💊', t:'Obat & kesehatan', items:[
+  {id:'rutin', t:'Obat rutin keluarga (darah tinggi, diabetes, dll.)', q:()=>'min. 14 hari', tip:()=>'Minta resep cadangan ke dokter / puskesmas. Simpan juga salinan resepnya.', exp:1},
+  {id:'umum', t:'Paracetamol (dewasa + sirup anak), oralit, obat diare, maag, alergi', q:()=>'1 set', exp:1},
+  {id:'p3k', t:'Kotak P3K: plester, perban, kasa, betadine, alkohol, gunting, termometer', q:()=>'1 kotak', exp:1},
+  {id:'n95', t:'Masker N95 / KN95 (abu Semeru & debu reruntuhan)', q:c=>`${c.nonBal*c.d} buah`, tip:()=>'N95 tidak dirancang untuk bayi/balita — lindungi mereka di dalam ruangan.'},
+  {id:'kacamata', t:'Kacamata pelindung (abu vulkanik)', q:c=>`${c.nonBal} buah`},
+  {id:'higiene', t:'Sabun, sikat & pasta gigi, pembalut, hand sanitizer, tisu basah', q:()=>'1 paket'},
+  {id:'plastik', t:'Kantong plastik besar (sampah / toilet darurat)', q:()=>'20 lembar'},
+ ]},
+ {id:'alat', ic:'🔦', t:'Peralatan', items:[
+  {id:'senter', t:'Senter / lampu LED isi ulang', q:c=>`${c.n} buah`},
+  {id:'baterai', t:'Baterai cadangan (AA/AAA)', q:()=>'1 pak', exp:1},
+  {id:'powerbank', t:'Powerbank terisi penuh + kabel charger', q:()=>'min. 2'},
+  {id:'radio', t:'Radio kecil (baterai / engkol)', q:()=>'1'},
+  {id:'peluit', t:'Peluit — untuk minta tolong bila tertimpa reruntuhan', q:c=>`${c.n} buah`},
+  {id:'terpal', t:'Terpal + tali rafia', q:()=>'1 + 10 m'},
+  {id:'jas', t:'Jas hujan', q:c=>`${c.nonBal} buah`},
+  {id:'selimut', t:'Selimut / sarung (malam di Malang Selatan dingin)', q:c=>`${c.n} lembar`},
+  {id:'pisau', t:'Pisau lipat / multitool, lakban, sarung tangan kerja', q:()=>'1 set'},
+  {id:'sepatu', t:'Sandal / sepatu kuat di dekat tempat tidur', q:c=>`${c.n} pasang`, tip:()=>'Setelah gempa, lantai penuh pecahan kaca.'},
+ ]},
+ {id:'listrik', ic:'⚡', t:'Blackout massal', sub:'Listrik padam berhari-hari', items:[
+  {id:'surya', t:'Lampu tenaga surya / panel surya kecil untuk isi daya HP', q:()=>'1–2', tip:()=>'Tetap berguna bila padam lebih lama dari daya tahan powerbank.'},
+  {id:'chargermotor', t:'Charger USB untuk motor / mobil', q:()=>'1', tip:()=>'Kendaraan bisa jadi sumber isi daya HP & powerbank.'},
+  {id:'cooler', t:'Cooler box + ice pack / botol air beku di freezer', q:()=>'1', tip:()=>'Botol air beku membantu freezer tetap dingin lebih lama, dan jadi air minum setelah mencair.'},
+  {id:'timba', t:'Timba + tali untuk sumur (bila pompa air pakai listrik)', q:()=>'1 set', tip:()=>'Pompa air listrik mati saat blackout — tanpa ini tidak ada air.'},
+  {id:'surge', t:'Stop kontak dengan pengaman lonjakan listrik', q:()=>'untuk kulkas & TV', tip:()=>'Lonjakan saat listrik kembali bisa merusak alat elektronik.'},
+  {id:'genset', t:'Genset (opsional) + detektor CO bertenaga baterai', q:()=>'opsional', tip:()=>'Genset WAJIB di luar ruangan, jauh dari jendela & pintu. Asap knalpot (CO) tidak berbau dan bisa mematikan.'},
+  {id:'jerigen', t:'Jerigen khusus BBM (maks. ±5 L), disimpan di luar rumah', q:()=>'opsional', tip:()=>'SPBU tanpa genset tidak bisa memompa BBM. Jauhkan dari api & anak.'},
+ ]},
+ {id:'dok', ic:'📄', t:'Dokumen & uang', items:[
+  {id:'fotokopi', t:'Fotokopi KK, KTP, akta, BPJS, ijazah, sertifikat tanah, buku tabungan', q:()=>'map kedap air'},
+  {id:'scan', t:'Scan dokumen ke Google Drive / kirim WA ke diri sendiri', q:()=>'1×'},
+  {id:'tunai', t:'Uang tunai pecahan kecil (ATM & QRIS bisa mati)', q:c=>`± Rp ${(c.n*150).toLocaleString('id-ID')} rb`},
+  {id:'kertas', t:'Daftar nomor penting ditulis di kertas', q:()=>'1 lembar / tas', tip:()=>'Cetak dari tab Kontak.'},
+ ]},
+ {id:'tas', ic:'🎒', t:'Tas siaga bencana', sub:'Siap angkut dalam 5 menit — taruh dekat pintu', items:[
+  {id:'ransel', t:'Ransel tahan air, 1 per orang dewasa', q:c=>`${Math.max(1,c.besar)} tas`},
+  {id:'isi', t:'Isi: air 1,5 L, makanan 1–2 hari, obat pribadi, senter, peluit, masker, baju ganti, jas hujan, powerbank, fotokopi dokumen, uang tunai', q:()=>'per tas'},
+  {id:'anaktas', t:'Tas kecil anak: snack, air, mainan kecil, kartu nama + nomor orang tua', q:c=>`${c.anak} tas`, show:c=>c.anak>0},
+  {id:'letak', t:'Semua anggota tahu letak tas', q:()=>'✔'},
+ ]},
+];
+
+// ---------- long-term plan ----------
+const PHASES = [
+ {id:'p1', t:'Minggu ini', items:[
+  ['wa','Buat grup WA keluarga + daftar kontak yang ditulis di kertas'],
+  ['titik','Tentukan 2 titik kumpul: dekat rumah (lapangan terbuka) & di luar lingkungan (sekolah / masjid / rumah saudara)'],
+  ['jalur','Tanya jalur evakuasi & tempat aman ke kantor desa atau BPBD Kab. Malang','Jalur tsunami Malang Selatan belum terdokumentasi lengkap online — tanyakan langsung.'],
+  ['apps','Pasang aplikasi InfoBMKG (gempa, cuaca) & MAGMA Indonesia (status Semeru)'],
+  ['kontakluar','Pilih 1 kontak keluarga di luar kota sebagai "pusat kabar"','Saat jaringan lokal padat, telepon ke luar kota sering lebih mudah tersambung.'],
+  ['tangki','Biasakan tangki motor/mobil selalu minimal setengah','Saat blackout, SPBU tanpa genset tidak bisa memompa BBM.'],
+ ]},
+ {id:'p2', t:'Bulan ini', items:[
+  ['stok3','Lengkapi stok 3 hari (tab Stok)'],
+  ['tassiap','Siapkan tas siaga tiap anggota'],
+  ['ikat','Ikat lemari, rak, dan TV ke dinding; pindahkan barang berat dari rak atas'],
+  ['tempat','Pindahkan tempat tidur menjauh dari jendela kaca & lemari tinggi'],
+  ['matikan','Tunjukkan ke semua anggota cara mematikan MCB listrik, regulator gas, dan kran air utama'],
+  ['obatcad','Minta resep cadangan obat rutin'],
+  ['pompa','Cek sumber air saat listrik mati: kalau pompa pakai listrik, siapkan timba sumur atau tandon di tempat tinggi'],
+  ['alatmedis','Ada anggota yang butuh alat medis listrik? Tanyakan ke puskesmas/RS terdekat mana yang punya genset'],
+ ]},
+ {id:'p3', t:'1–3 bulan', items:[
+  ['stok7','Naikkan stok bertahap ke 7 hari'],
+  ['tandon','Siapkan tandon / drum air tertutup (penting di wilayah kapur saat kemarau)'],
+  ['p3kbelajar','Belajar P3K dasar: hentikan perdarahan, balut luka, posisi pemulihan','Bisa ikut pelatihan PMI atau puskesmas.'],
+  ['dana','Mulai dana darurat (target 3 bulan pengeluaran)'],
+  ['suryaplan','Pertimbangkan lampu / panel surya kecil sebagai cadangan daya saat blackout'],
+  ['tetangga','Kenali tetangga yang butuh bantuan saat evakuasi (lansia, difabel, ibu hamil)'],
+ ]},
+ {id:'p4', t:'Tiap 6 bulan', items:[
+  ['simulasi','Simulasi evakuasi keluarga — sekali siang, sekali malam (lampu mati)','Panduan menganjurkan minimal 2× setahun.'],
+  ['rotasi','Rotasi stok: pakai yang mendekati kedaluwarsa, ganti baru (prinsip FIFO)'],
+  ['cekobat','Cek tanggal obat & baterai, isi ulang powerbank'],
+  ['updok','Perbarui fotokopi dokumen bila ada perubahan'],
+ ]},
+ {id:'p5', t:'Tiap tahun', items:[
+  ['struktur','Cek rumah dengan tukang/ahli: retak di kolom, balok, sambungan dinding','Rumah sesuai standar tahan gempa jauh lebih kecil risikonya.'],
+  ['talang','Sebelum musim hujan (Oktober): bersihkan talang, got, dan saluran air'],
+  ['lereng','Bila rumah di lereng: cek retakan tanah, pohon miring, rembesan air baru'],
+  ['bpjs','Pastikan BPJS / asuransi aktif'],
+  ['rencana','Perbarui rencana keluarga bila ada anggota baru, pindah rumah, atau pindah sekolah/kerja'],
+ ]},
+];
+
+// ---------- hazards ----------
+const HAZ = [
+ {ic:'🌏', t:'Gempa bumi', big:'Merunduk · Berlindung · Berpegangan', when:'Saat guncangan', a:[
+  'Merunduk, berlindung di bawah meja kuat, lindungi kepala & leher, pegang kaki meja.',
+  'Jauhi kaca, lemari, dan benda yang bisa jatuh.',
+  'Di rumah 1 lantai & dekat pintu: boleh langsung keluar ke area terbuka. Jangan lari di tangga saat masih berguncang.',
+  'Di luar: jauhi tiang listrik, pohon, tebing, dan bangunan.'],
+  after:['Pakai alas kaki, ambil tas siaga, keluar ke titik kumpul.','Matikan gas & listrik bila aman. Jangan nyalakan api bila tercium bau gas.','Waspada gempa susulan. Jangan masuk rumah yang retak parah.','Cek anggota keluarga & tetangga. Kabari kontak luar kota.']},
+ {ic:'🌊', t:'Tsunami', tag:'warga pesisir: Donomulyo, Bantur, Gedangan, Sumbermanjing Wetan, Tirtoyudo, Ampelgading', big:'Gempa kuat atau lama (sulit berdiri / > ±20 detik) = LANGSUNG LARI ke tempat tinggi. Jangan tunggu sirene.', a:[
+  'Tanda alam: air laut surut tiba-tiba, suara gemuruh dari laut.',
+  'Lari ke bukit / tempat tinggi atau menjauh dari pantai sejauh mungkin. Jalan kaki atau motor — mobil mudah macet.',
+  'Bila terjebak: naik ke lantai atas bangunan beton yang kokoh.',
+  'Tsunami datang beberapa gelombang — jangan turun sampai ada pernyataan aman dari BMKG/BPBD.']},
+ {ic:'🌧️', t:'Banjir & longsor', tag:'November–Maret', a:[
+  'Hujan deras berjam-jam di daerah lereng: siaga, siapkan tas, pantau kabar desa.',
+  'Tanda longsor: retakan baru di tanah/dinding, pohon & tiang miring, mata air tiba-tiba keruh atau hilang, suara gemuruh. Segera menjauh.',
+  'Banjir: matikan listrik dari MCB, naikkan barang & dokumen, evakuasi lebih awal.',
+  'Jangan menyeberangi arus — air setinggi lutut bisa menyeret orang dewasa.']},
+ {ic:'🌋', t:'Hujan abu Semeru', tag:'pantau MAGMA Indonesia', a:[
+  'Pakai masker N95 & kacamata. Lindungi bayi/balita di dalam rumah.',
+  'Tutup bak, sumur, tandon, dan wadah makanan. Putus talang penampung air hujan sebelum abu turun.',
+  'Tutup jendela & ventilasi dengan kain basah / plastik.',
+  'Jangan kucek mata — bilas dengan air bersih mengalir.',
+  'Abu tebal di atap bisa membuat atap roboh — bersihkan dengan hati-hati, pakai masker.',
+  'Cuci sayur & buah yang terkena abu sebelum diolah.']},
+ {ic:'⚡', t:'Blackout massal', tag:'contoh: blackout Jawa–Bali 4 Agustus 2019, ±14 juta pelanggan, pulih ±30–36 jam',
+  big:'Sinyal HP bisa hilang dalam ±3 jam (baterai cadangan BTS habis). Kabari keluarga SEKARANG, selagi sinyal masih ada.', when:'Jam-jam pertama', a:[
+  'Cek dulu: hanya rumah Anda (MCB turun) atau satu lingkungan? Tanya tetangga, dengarkan radio.',
+  'Kabari keluarga & sepakati: kalau tidak bisa dihubungi, kumpul di titik kumpul / rumah pada jam tertentu.',
+  'Isi semua ember & bak dari tandon — pompa air listrik berhenti, pasokan PDAM bisa terganggu.',
+  'Cabut kulkas, TV, pompa, dan komputer dari stop kontak. Sisakan 1 lampu tercolok sebagai tanda listrik kembali.',
+  'Jangan buka-buka kulkas & freezer.',
+  'Hemat baterai HP: mode hemat daya, kecilkan layar, matikan data bila tidak perlu.'],
+  afterT:'Bila padam lebih dari sehari', after:[
+  'Urutan makan: isi kulkas dulu (aman ±4 jam bila pintu tertutup) → freezer (penuh ±48 jam, setengah ±24 jam) → stok kering. Ragu? Buang.',
+  'Genset hanya di luar ruangan. Jangan pakai kompor arang / briket di dalam rumah — keracunan CO tidak berbau.',
+  'Utamakan senter. Lilin jangan ditinggal, jauhkan dari gorden & anak — kebakaran sering terjadi saat blackout.',
+  'ATM, QRIS, SPBU, dan minimarket tanpa genset bisa tutup — pakai uang tunai, hemat BBM.',
+  'Anggota yang butuh alat medis listrik (oksigen, nebulizer): bawa lebih awal ke puskesmas/RS yang punya genset.',
+  'Isi daya HP dari motor/mobil atau panel surya. Pakai radio untuk kabar resmi.',
+  'Kunci rumah, ronda bersama tetangga, cek tetangga lansia.']},
+];
+
+const NUMS = [['112','Darurat terpadu'],['117','BNPB'],['115','Basarnas (SAR)'],['119','Ambulans / SPGDT'],['110','Polisi'],['113','Pemadam kebakaran'],['123','PLN'],['118','Ambulans']];
+const INFO = [
+ ['titik1','Titik kumpul 1 (dekat rumah)','mis. lapangan desa'],
+ ['titik2','Titik kumpul 2 (di luar lingkungan)','mis. masjid / sekolah / rumah saudara'],
+ ['jalur','Jalur evakuasi / tempat tinggi terdekat','tanyakan ke kantor desa', true],
+ ['bpbd','Nomor BPBD Kab. Malang','isi dari sumber resmi'],
+ ['rt','Ketua RT / RW','nama & nomor'],
+ ['pkm','Puskesmas / RS terdekat','nama & nomor'],
+ ['luar','Kontak keluarga di luar kota','nama & nomor'],
+ ['catatan','Catatan lain','mis. siapa menjemput anak dari sekolah', true],
+];
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s??'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const visible = (x, c) => !x.show || x.show(c);
+function expStatus(date){
+  if(!date) return null;
+  const days = Math.round((new Date(date) - new Date(new Date().toDateString())) / 864e5);
+  if(days < 0) return ['bad','kedaluwarsa'];
+  if(days <= 60) return ['warn',`${days} hari lagi`];
+  return ['ok','aman'];
+}
+
+// ---------- render ----------
+function renderFam(){
+  const labels = {dewasa:'Dewasa', anak:'Anak (3–12)', balita:'Balita (0–2)', lansia:'Lansia'};
+  $('#famCtl').innerHTML = Object.keys(labels).map(k => `
+    <div class="step"><label>${labels[k]}</label>
+      <div class="ctl"><button data-k="${k}" data-v="-1" aria-label="Kurangi ${labels[k]}">−</button>
+      <output>${S.fam[k]}</output>
+      <button data-k="${k}" data-v="1" aria-label="Tambah ${labels[k]}">+</button></div></div>`).join('');
+  document.querySelectorAll('#daysCtl button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.d === S.days));
+  const c = ctx();
+  $('#stats').innerHTML = `
+    <div class="stat"><b>${air(c)} L</b><small>air minum & masak (${ceil(air(c)/19)} galon)</small></div>
+    <div class="stat"><b>${airHigiene(c)} L</b><small>air mandi & WC</small></div>
+    <div class="stat"><b>${CATS.find(x=>x.id==='masak').items[0].q(c)}</b><small>beras</small></div>
+    <div class="stat"><b>${c.n} orang</b><small>untuk ${c.d} hari</small></div>`;
+}
+
+function renderSoon(){
+  const list = [];
+  CATS.forEach(cat => cat.items.forEach(it => {
+    const st = expStatus(S.exp[it.id]);
+    if(st && st[0] !== 'ok') list.push(`<li><b>${esc(it.t)}</b> — <span class="badge ${st[0]}">${st[1]}</span></li>`);
+  }));
+  $('#soon').innerHTML = `<h3>Perlu rotasi</h3>` + (list.length
+    ? `<ul style="margin:8px 0 0;padding-left:20px">${list.join('')}</ul>`
+    : `<p class="lead" style="margin:6px 0 0">Tidak ada stok yang mendekati kedaluwarsa. Isi tanggal di tab Stok agar diingatkan.</p>`);
+}
+
+function renderList(){
+  const c = ctx();
+  $('#cats').innerHTML = CATS.filter(cat => visible(cat, c)).map(cat => {
+    const items = cat.items.filter(it => visible(it, c));
+    const n = items.filter(it => S.done[it.id]).length;
+    const closed = S.open[cat.id] === false;
+    return `<div class="cat${closed?' closed':''}" data-cat="${cat.id}"><div class="card">
+      <div class="cat-h" role="button" tabindex="0" aria-expanded="${!closed}"><span style="font-size:20px">${cat.ic}</span>
+        <div><h3>${cat.t}</h3>${cat.sub?`<small style="color:var(--muted)">${cat.sub}</small>`:''}</div>
+        <span class="cnt${n===items.length?' full':''}">${n}/${items.length}</span></div>
+      <ul>${items.map(it => {
+        const st = expStatus(S.exp[it.id]);
+        const tip = it.tip ? it.tip(c) : '';
+        return `<li class="item${S.done[it.id]?' done':''}">
+          <input type="checkbox" id="c-${it.id}" data-id="${it.id}" ${S.done[it.id]?'checked':''}>
+          <div class="txt"><label for="c-${it.id}" class="nm">${esc(it.t)}</label> <span class="qty">${esc(it.q(c))}</span>
+          ${tip?`<div class="tip">${esc(tip)}</div>`:''}
+          ${it.exp?`<div class="exp">Kedaluwarsa <input type="date" data-exp="${it.id}" value="${esc(S.exp[it.id]||'')}">${st?`<span class="badge ${st[0]}">${st[1]}</span>`:''}</div>`:''}
+          </div></li>`;}).join('')}</ul></div></div>`;
+  }).join('');
+}
+
+function renderPlan(){
+  $('#phases').innerHTML = PHASES.map(p => {
+    const all = p.items.every(([id]) => S.done['plan-'+id]);
+    return `<div class="phase${all?' all':''}"><span class="dot"></span><div class="cat"><div class="card">
+      <div class="cat-h"><h3>${p.t}</h3><span class="cnt${all?' full':''}">${p.items.filter(([id])=>S.done['plan-'+id]).length}/${p.items.length}</span></div>
+      <ul>${p.items.map(([id,t,tip]) => `<li class="item${S.done['plan-'+id]?' done':''}">
+        <input type="checkbox" id="c-plan-${id}" data-id="plan-${id}" ${S.done['plan-'+id]?'checked':''}>
+        <div class="txt"><label for="c-plan-${id}" class="nm">${esc(t)}</label>${tip?`<div class="tip">${esc(tip)}</div>`:''}</div></li>`).join('')}</ul>
+    </div></div></div>`;
+  }).join('');
+}
+
+function renderHaz(){
+  $('#hazards').innerHTML = HAZ.map(h => `<div class="card">
+    <h3><span>${h.ic}</span>${h.t}</h3>${h.tag?`<div class="tag" style="margin:-4px 0 8px">${esc(h.tag)}</div>`:''}
+    ${h.big?`<div class="big">${esc(h.big)}</div>`:''}
+    ${h.when?`<b style="font-size:14px">${h.when}</b>`:''}
+    <ul>${h.a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+    ${h.after?`<b style="font-size:14px;display:block;margin-top:8px">${h.afterT||'Setelah guncangan'}</b><ul>${h.after.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+  </div>`).join('');
+}
+
+function renderInfo(){
+  $('#nums').innerHTML = NUMS.map(([n,t]) => `<a class="num" href="tel:${n}"><b>${n}</b><small>${t}</small></a>`).join('');
+  $('#infoFields').innerHTML = INFO.map(([k,l,ph,area]) => `<div class="field"><label for="i-${k}">${l}</label>
+    ${area?`<textarea id="i-${k}" data-info="${k}" placeholder="${ph}">${esc(S.info[k])}</textarea>`
+          :`<input id="i-${k}" data-info="${k}" placeholder="${ph}" value="${esc(S.info[k])}">`}</div>`).join('');
+  renderMembers();
+}
+function renderMembers(){
+  $('#members').innerHTML = S.members.map((m,i) => `<div class="mem">
+    <div class="row"><input data-m="${i}" data-f="nama" placeholder="Nama" value="${esc(m.nama)}"><input data-m="${i}" data-f="hp" placeholder="No. HP" inputmode="tel" value="${esc(m.hp)}"></div>
+    <div class="row"><input data-m="${i}" data-f="goldar" placeholder="Gol. darah" value="${esc(m.goldar)}"><input data-m="${i}" data-f="obat" placeholder="Obat / alergi" value="${esc(m.obat)}"></div>
+    <button class="btn del" data-del="${i}">Hapus</button></div>`).join('')
+    || '<p class="lead">Belum ada. Tambahkan nama, nomor HP, golongan darah, dan obat/alergi tiap anggota.</p>';
+}
+
+function progress(){
+  const c = ctx();
+  const ids = CATS.filter(x=>visible(x,c)).flatMap(cat => cat.items.filter(it=>visible(it,c)).map(it=>it.id))
+    .concat(PHASES.flatMap(p => p.items.map(([id]) => 'plan-'+id)));
+  const p = Math.round(ids.filter(id => S.done[id]).length / ids.length * 100);
+  $('#pct').textContent = p + '%';
+  $('#pbar').style.width = p + '%';
+}
+
+function renderAll(){ renderFam(); renderSoon(); renderList(); renderPlan(); progress(); }
+
+function showTab(id){
+  S.tab = id; save();
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === id));
+  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.t === id));
+  window.scrollTo(0,0);
+}
+
+// ---------- events ----------
+document.addEventListener('click', e => {
+  const t = e.target;
+  const tab = t.closest('nav button'); if(tab) return showTab(tab.dataset.t);
+  const st = t.closest('#famCtl button');
+  if(st){ S.fam[st.dataset.k] = Math.max(0, Math.min(20, S.fam[st.dataset.k] + +st.dataset.v));
+    if(S.fam.dewasa + S.fam.lansia === 0) S.fam.dewasa = 1; save(); return renderAll(); }
+  const d = t.closest('#daysCtl button'); if(d){ S.days = +d.dataset.d; save(); return renderAll(); }
+  const h = t.closest('#cats .cat-h');
+  if(h){ const id = h.closest('.cat').dataset.cat; S.open[id] = S.open[id] === false; save(); return renderList(); }
+  if(t.id === 'openAll'){ CATS.forEach(c => S.open[c.id] = true); save(); return renderList(); }
+  if(t.id === 'printBtn'){ CATS.forEach(c => S.open[c.id] = true); renderList(); return window.print(); }
+  if(t.id === 'addMem'){ S.members.push({}); save(); return renderMembers(); }
+  if(t.dataset.del){ S.members.splice(+t.dataset.del, 1); save(); return renderMembers(); }
+  if(t.id === 'themeBtn'){
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
+    S.theme = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = S.theme; return save(); }
+  if(t.id === 'exportBtn'){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], {type:'application/json'}));
+    a.download = 'siaga-keluarga-cadangan.json'; a.click(); return; }
+  if(t.id === 'resetBtn' && confirm('Hapus semua centang, tanggal, dan data kontak?')){
+    S = clone(DEF); save(); renderAll(); renderInfo(); return; }
+});
+document.addEventListener('keydown', e => {
+  if((e.key === 'Enter' || e.key === ' ') && e.target.closest('#cats .cat-h')){ e.preventDefault(); e.target.click(); }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if(t.dataset.id){ S.done[t.dataset.id] = t.checked; save(); renderAll(); }
+  if(t.dataset.exp){ S.exp[t.dataset.exp] = t.value; save(); renderSoon(); renderList(); }
+  if(t.id === 'importIn' && t.files[0]){
+    t.files[0].text().then(txt => { S = Object.assign(clone(DEF), JSON.parse(txt)); save(); renderAll(); renderInfo(); alert('Data dipulihkan.'); })
+      .catch(() => alert('File cadangan tidak valid.'));
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if(t.dataset.info){ S.info[t.dataset.info] = t.value; save(); }
+  if(t.dataset.m){ S.members[+t.dataset.m][t.dataset.f] = t.value; save(); }
+});
+
+// ---------- init ----------
+if(S.theme) document.documentElement.dataset.theme = S.theme;
+renderAll(); renderHaz(); renderInfo(); showTab(S.tab || 't-fam');
+</script>
+</body>
+</html>
