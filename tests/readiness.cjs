@@ -6,43 +6,119 @@ const html = fs.readFileSync(require('node:path').join(__dirname, '../app/index.
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1].split('// ---------- events ----------')[0];
 function app(saved = null){
   const nodes = new Map();
-  const context = vm.createContext({localStorage:{getItem:()=>saved, setItem:()=>{}}, addEventListener:()=>{}, document:{querySelector: key => {if(!nodes.has(key)) nodes.set(key,{style:{}}); return nodes.get(key);}}});
+  const context = vm.createContext({localStorage:{getItem:()=>saved, setItem:()=>{}}, addEventListener:()=>{},
+    document:{querySelector: key => {if(!nodes.has(key)) nodes.set(key,{style:{}}); return nodes.get(key);}},
+    location:{origin:'https://siagakel-pd.web.app', pathname:'/'},
+    TextEncoder, TextDecoder, btoa, atob, Blob, Response, CompressionStream, DecompressionStream});
   vm.runInContext(script,context);
   return {run: code => vm.runInContext(code,context), nodes};
 }
-test('legacy checks retained but require confirmation',()=>{
-  const a=app(JSON.stringify({done:{galon:true}}));
-  assert.equal(a.run('S.done.galon'),true);
-  assert.equal(a.run('stockState(CATS[0].items[0])'),'review');
+const future = days => { const d = new Date(); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); };
+
+test('shortfall follows family size and duration', ()=>{
+  const a = app();
+  assert.equal(a.run('needOf(findItem("galon"))'), 2);           // 4 people × 3 L × 3 days = 36 L
+  a.run('S.have.drum = 50');
+  assert.equal(a.run('shortOf(findItem("drum"))'), 70);           // 120 L needed
+  a.run('S.days = 7');
+  assert.equal(a.run('shortOf(findItem("drum"))'), 230);
+  assert.equal(a.run('stockState(findItem("drum"))'), 'short');
+  a.run('S.have.drum = 280');
+  assert.equal(a.run('stockState(findItem("drum"))'), 'ok');
 });
-test('quantity changes invalidate confirmation; fixed equipment stays confirmed',()=>{
-  const a=app();
-  a.run('S.done.galon=true; S.confirmed.galon=CATS[0].items[0].q(ctx())');
-  assert.equal(a.run('stockState(CATS[0].items[0])'),'ok');
-  a.run('const radio=CATS.flatMap(c=>c.items).find(it=>it.id==="radio"); S.done.radio=true; S.confirmed.radio=radio.q(ctx()); S.days=7');
-  assert.equal(a.run('stockState(radio)'), 'ok');
-  assert.equal(a.run('stockState(CATS[0].items[0])'),'review');
-  a.run('S.confirmed.galon=CATS[0].items[0].q(ctx())');
-  assert.equal(a.run('stockState(CATS[0].items[0])'),'ok');
-  a.run('S.fam.dewasa=10');
-  assert.equal(a.run('stockState(CATS[0].items[0])'),'review');
+
+test('several purchase batches; expired batches do not count', ()=>{
+  const a = app();
+  a.run(`S.batches.galon = [{q:1, e:"${future(90)}"}, {q:1, e:"2000-01-01"}]`);
+  assert.equal(a.run('haveOf(findItem("galon"))'), 1);
+  assert.equal(a.run('expiredQty(findItem("galon"))'), 1);
+  assert.equal(a.run('stockState(findItem("galon"))'), 'expired');
+  a.run(`S.batches.galon.push({q:1, e:"${future(30)}"})`);
+  assert.equal(a.run('stockState(findItem("galon"))'), 'ok');
+  assert.equal(a.run('expStatus(new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0")+"-"+String(new Date().getDate()).padStart(2,"0"))[0]'), 'bad');
 });
-test('expired and today dates excluded, missing date disclosed',()=>{
-  const a=app();
-  a.run('S.done.galon=true; S.confirmed.galon=CATS[0].items[0].q(ctx()); S.exp.galon="2000-01-01"');
-  assert.equal(a.run('stockState(CATS[0].items[0])'),'expired');
-  assert.equal(a.run('expStatus(new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0")+"-"+String(new Date().getDate()).padStart(2,"0"))[0]'),'bad');
-  a.run('delete S.exp.galon; progress()');
-  assert.match(a.nodes.get('#readiness').innerHTML,/1 belum bertanggal/);
+
+test('shopping list splits utama/tambahan and home/bag, skips optional and complete items', ()=>{
+  const a = app();
+  a.run('S.have.kompor = 1');
+  const list = a.run('shoppingList()');
+  assert.ok(list.some(s => s.id === 'galon' && s.p === 1 && s.buy === 2 && s.loc === 'rumah'));
+  assert.ok(list.some(s => s.id === 'ransel' && s.loc === 'tas'));
+  assert.ok(list.some(s => s.id === 'roti' && s.p === 2));
+  assert.ok(!list.some(s => s.id === 'kompor'));
+  assert.ok(!list.some(s => s.id === 'genset'));
+  assert.match(a.run('shoppingText(shoppingList())'), /UTAMA[\s\S]*Galon air minum[\s\S]*TAMBAHAN/);
 });
-test('full checkmarks with expired stock never show 100 percent',()=>{
-  const a=app();
-  a.run('CATS.forEach(cat=>cat.items.forEach(it=>{S.done[it.id]=true;S.confirmed[it.id]=it.q(ctx())})); PHASES.forEach(p=>p.items.forEach(([id])=>S.done["plan-"+id]=true)); progress()');
-  assert.equal(a.nodes.get('#pct').textContent,'100%');
-  a.run('S.exp.galon="2000-01-01"; progress()');
-  assert.notEqual(a.nodes.get('#pct').textContent,'100%');
+
+test('special needs add user-led items without medical guessing', ()=>{
+  const a = app();
+  assert.equal(a.run('allItems().some(it => it.id === "taspersalinan")'), false);
+  a.run('S.special.hamil = true; S.special.hewan = 2');
+  assert.equal(a.run('findItem("taspersalinan").loc'), 'tas');
+  assert.equal(a.run('allItems().some(it => it.id === "taspersalinan")'), true);
+  assert.equal(a.run('needOf(findItem("pakan"))'), 6);
 });
-test('every hazard has three quick actions and official sources',()=>{
-  const a=app();
-  assert.equal(a.run('HAZ.length===QUICK.length && QUICK.every(q=>q.steps.length===3 && q.sources.every(id=>SOURCES[id]?.url.startsWith("https://")))'),true);
+
+test('v1 data migrates: single expiry becomes a batch, old ticks ask for quantities', ()=>{
+  const a = app(JSON.stringify({done:{galon:true}, confirmed:{galon:'2 galon'}, exp:{galon:'2030-01-01'}}));
+  assert.equal(a.run('S.v'), 2);
+  assert.equal(a.run('S.batches.galon[0].e'), '2030-01-01');
+  assert.equal(a.run('"exp" in S || "confirmed" in S'), false);
+  assert.equal(a.run('stockState(findItem("galon"))'), 'review');
+});
+
+test('backup validation rejects foreign data and strips unknown fields', ()=>{
+  const a = app();
+  assert.throws(() => a.run('sanitizeData({hello:1})'), /tidak berisi data/);
+  assert.throws(() => a.run('sanitizeData([1,2])'), /bukan data/);
+  assert.throws(() => a.run('sanitizeData({fam:{dewasa:-1,anak:0,balita:0,lansia:0}})'), /tidak valid/);
+  const {data} = a.run('sanitizeData({fam:{dewasa:2,anak:1,balita:0,lansia:1}, members:[{nama:"Ani", evil:"x"}], have:{galon:3, nope:4}, days:9})');
+  assert.deepEqual(Object.keys(data.members[0]).sort(), ['butuh','goldar','hp','nama','obat','tugas']);
+  assert.equal(JSON.stringify(data.have), '{"galon":3}');   // vm objects live in another realm
+  assert.equal('days' in data, false);
+});
+
+test('QR share round-trip keeps plan and contacts only', async ()=>{
+  const a = app();
+  a.run('S.info.titik1 = "Lapangan desa"; S.members = [{nama:"Budi", hp:"0812"}]; S.have.galon = 5; S.region = "umum"');
+  const code = await a.run('encodeShare()');
+  assert.match(code, /^z[A-Za-z0-9_-]+$/);
+  const data = await a.run(`decodeShare(${JSON.stringify(code)})`);
+  assert.equal(data.info.titik1, 'Lapangan desa');
+  assert.equal(data.members[0].nama, 'Budi');
+  assert.equal(data.region, 'umum');
+  assert.equal('have' in data, false);
+});
+
+test('calendar export has one recurring event per check', ()=>{
+  const a = app();
+  const ics = a.run('buildIcs(new Date(2026, 9, 31))');
+  assert.equal((ics.match(/BEGIN:VEVENT/g) || []).length, a.run('CHECKS.length'));
+  assert.match(ics, /RRULE:FREQ=MONTHLY;INTERVAL=6/);
+  assert.match(ics, /DTSTART;VALUE=DATE:20261031/);
+  assert.ok(ics.includes('\r\n'));
+});
+
+test('region switch changes hazards and texts', ()=>{
+  const a = app();
+  assert.equal(a.run('hazList().some(h => h.k === "asap")'), false);
+  assert.equal(a.run('findItem("selimut").t').includes('Malang'), true);
+  a.run('S.region = "umum"; S.risk.gunung = true');
+  assert.equal(a.run('hazList().some(h => h.k === "asap")'), true);
+  assert.equal(a.run('hazList()[0].k'), 'erupsi');
+  assert.equal(a.run('findItem("selimut").t').includes('Malang'), false);
+});
+
+test('every hazard has three quick actions and https sources', ()=>{
+  const a = app();
+  assert.equal(a.run('HAZ.every(h => h.quick.length === 3 && h.src.every(id => SOURCES[id]?.url.startsWith("https://")))'), true);
+});
+
+test('progress never reaches 100% while something is short', ()=>{
+  const a = app();
+  a.run(`allItems().forEach(it => { if(it.exp) S.batches[it.id] = [{q:needOf(it), e:"${future(400)}"}]; else if(it.n) S.have[it.id] = needOf(it); else S.done[it.id] = true; });
+    PHASES.forEach(p => p.items.forEach(([id]) => S.done["plan-"+id] = true)); progress()`);
+  assert.equal(a.nodes.get('#pct').textContent, '100%');
+  a.run('S.batches.galon[0].e = "2000-01-01"; progress()');
+  assert.notEqual(a.nodes.get('#pct').textContent, '100%');
 });
