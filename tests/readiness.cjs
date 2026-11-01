@@ -343,6 +343,15 @@ test('community chat sanitizes messages and maps Firestore fields', ()=>{
   assert.equal(a.run('cleanCommunity({room:"CommunityRoomCode_12345", nick:"Warga", mid:"device_123456"}).room'), 'CommunityRoomCode_12345');
 });
 
+test('display themes expose four valid modes and survive backup validation', ()=>{
+  const a = app();
+  assert.equal(a.run('Object.keys(THEME_INFO).join()'), 'light,dark,night,battery');
+  assert.equal(a.run('S.theme'), 'light');
+  assert.equal(a.run('sanitizeData({theme:"night"}).data.theme'), 'night');
+  assert.equal(a.run('sanitizeData({theme:"battery"}).data.theme'), 'battery');
+  assert.equal(a.run('"theme" in sanitizeData({theme:"invalid"}).data'), false);
+});
+
 test('Firestore rules scope family and community chat to random codes', ()=>{
   const rules = fs.readFileSync(require('node:path').join(__dirname, '../firestore.rules'), 'utf8');
   assert.match(rules, /match \/fam\/\{gid\}\/chat\/\{messageId\}/);

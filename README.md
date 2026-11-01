@@ -22,7 +22,8 @@ Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 - **Chat keluarga online** memakai kode grup keluarga yang sama dengan lokasi live. Pesan maksimal 280 karakter dan hanya ditampilkan selama 48 jam.
 - **Ruang saling bantu warga** bersifat undangan untuk RT, desa, posko, atau komunitas. Tidak ada daftar ruang global. Pesan dapat ditandai sebagai Obrolan, Butuh bantuan, Bisa membantu, atau Info warga.
 - Kode acak ruang berfungsi sebagai kunci akses. UI memperingatkan pengguna agar tidak membagikan data sensitif, memverifikasi kabar melalui sumber resmi, dan memakai 112/119 untuk ancaman jiwa. Ini bukan sistem identitas atau moderasi penuh; untuk forum publik skala besar perlu Firebase Authentication, App Check, moderasi, pelaporan, dan admin tepercaya.
-- Aturan Firestore membatasi bentuk, panjang, kategori, dan masa berlaku pesan; pembaruan pesan ditolak dan penghapusan oleh klien hanya diizinkan setelah kedaluwarsa. Service worker v7.
+- Aturan Firestore membatasi bentuk, panjang, kategori, dan masa berlaku pesan; pembaruan pesan ditolak dan penghapusan oleh klien hanya diizinkan setelah kedaluwarsa.
+- Empat pilihan tampilan tersimpan per perangkat: **Light**, **Dark**, **Night** yang lebih redup, dan **Hemat baterai** dengan latar hitam OLED serta animasi/transisi dimatikan. Hemat baterai tidak mematikan internet atau pemantauan keselamatan; pengaturan itu tetap dikendalikan oleh Mode aplikasi. Service worker v8.
 
 ## Perubahan v1.6 (1 November 2026)
 

@@ -13,24 +13,37 @@
 <style>
 :root{
   --bg:#f7f5f2; --card:#ffffff; --ink:#1c1917; --muted:#6b645d; --line:#e7e2dc;
-  --accent:#c2410c; --accent-soft:#fff1e8; --ok:#15803d; --ok-soft:#e9f7ee;
+  --accent:#c2410c; --accent-ink:#fff; --accent-soft:#fff1e8; --ok:#15803d; --ok-soft:#e9f7ee;
   --warn:#b45309; --warn-soft:#fff6e0; --bad:#b91c1c; --bad-soft:#fdecec;
   --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#141210; --card:#1e1b18; --ink:#f3efe9; --muted:#a8a097; --line:#332e29;
-    --accent:#fb923c; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
+    --accent:#fb923c; --accent-ink:#1a1108; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
     --warn:#fbbf24; --warn-soft:#2a2210; --bad:#f87171; --bad-soft:#2c1515;
     --shadow:none;
   }
 }
 :root[data-theme="dark"]{
   --bg:#141210; --card:#1e1b18; --ink:#f3efe9; --muted:#a8a097; --line:#332e29;
-  --accent:#fb923c; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
+  --accent:#fb923c; --accent-ink:#1a1108; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
   --warn:#fbbf24; --warn-soft:#2a2210; --bad:#f87171; --bad-soft:#2c1515;
   --shadow:none;
 }
+:root[data-theme="night"]{
+  --bg:#07090c; --card:#10141a; --ink:#d8dee9; --muted:#8b95a5; --line:#252b34;
+  --accent:#f59e0b; --accent-ink:#171006; --accent-soft:#271b08; --ok:#6fcf8d; --ok-soft:#102419;
+  --warn:#f6c453; --warn-soft:#292109; --bad:#ff8585; --bad-soft:#2a1114;
+  --shadow:none;
+}
+:root[data-theme="battery"]{
+  --bg:#000; --card:#070707; --ink:#d4d4d4; --muted:#898989; --line:#222;
+  --accent:#ff9f43; --accent-ink:#160d05; --accent-soft:#241507; --ok:#66c985; --ok-soft:#0c2113;
+  --warn:#e7bc55; --warn-soft:#251e08; --bad:#f27d7d; --bad-soft:#270e0e;
+  --shadow:none;
+}
+:root[data-theme="battery"] *,:root[data-theme="battery"] *::before,:root[data-theme="battery"] *::after{animation:none!important;transition:none!important}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
@@ -40,7 +53,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
 .head{max-width:760px;margin:0 auto;padding:14px 16px 12px;display:flex;align-items:center;gap:8px}
 .head>div:nth-child(2){flex:1;min-width:0}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;flex:none}
 .head h1{font-size:18px;margin:0;line-height:1.2}
 .head small{color:var(--muted);font-size:12px}
 .net{display:block;font-size:11px;font-weight:600;color:var(--ok)}
@@ -78,7 +91,7 @@ h3{font-size:16px;margin:0}
 .step output{font-size:22px;font-weight:700;min-width:24px}
 .seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:12px}
 .seg button{flex:1;border:0;background:none;padding:8px 4px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:14px}
-.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
 .seg.top{margin:0 0 14px}
 .checks{display:grid;gap:8px;margin-top:8px}
 .checks label{display:flex;gap:10px;align-items:center;font-size:15px}
@@ -214,7 +227,7 @@ body.surv-open{overflow:hidden}
 .fam-row{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
 .subtabs{display:flex;gap:8px;margin:0 0 14px;overflow:auto;padding-bottom:2px}
 .subtabs .btn{white-space:nowrap;flex:1;text-align:center}
-.subtabs .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.subtabs .btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .community-grid{display:grid;gap:14px}
 .chat-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;background:var(--bg);border-radius:12px;padding:10px;margin:10px 0}
 .chat-empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
@@ -225,6 +238,10 @@ body.surv-open{overflow:hidden}
 .compose{display:grid;gap:8px}.compose textarea{width:100%;min-height:76px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;resize:vertical}
 .room-code{font:600 13px ui-monospace,Menlo,Consolas,monospace;word-break:break-all;background:var(--bg);border-radius:8px;padding:8px}
 .online-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:5px}.online-dot.off{background:var(--muted)}
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0 6px}
+.theme-grid button{min-width:0;padding:8px 4px;line-height:1.2}.theme-grid button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.theme-note{display:block;min-height:21px;color:var(--muted);font-size:13px}
+@media(max-width:460px){.theme-grid{grid-template-columns:repeat(2,1fr)}}
 .vid-g{margin:12px 0 6px}
 .vid{display:flex;gap:12px;align-items:center;padding:10px}
 .vid-box{width:120px;flex:none;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
@@ -290,7 +307,7 @@ body.surv-open{overflow:hidden}
 .readiness p{margin:8px 0}.readiness small{display:block;color:var(--muted)}
 .hazard-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .hazard-picker button{flex:1 1 95px;min-height:44px;padding:8px;font-size:14px}
-.hazard-picker [aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.hazard-picker [aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .hazard-picker .rel:after{content:" •";color:var(--bad)}
 .quick-steps{font-size:18px;font-weight:600}.quick-steps li{padding:8px 0}
 .hz summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
@@ -309,7 +326,7 @@ body.surv-open{overflow:hidden}
 .mem .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mem input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 9px;font-size:14px}
 .btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600}
-.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 .btn.del{color:var(--bad);font-size:13px;padding:5px 10px;justify-self:end}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
@@ -542,11 +559,20 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <div class="card" id="dataCard">
     <h3>Data &amp; cadangan</h3>
     <div id="dataStatus"></div>
+    <div class="noprint">
+      <h4 style="margin:12px 0 0">Tampilan layar</h4>
+      <div class="theme-grid" role="group" aria-label="Pilih tampilan layar">
+        <button class="btn" data-theme-mode="light">☀️ Light</button>
+        <button class="btn" data-theme-mode="dark">🌑 Dark</button>
+        <button class="btn" data-theme-mode="night">🌙 Night</button>
+        <button class="btn" data-theme-mode="battery">🔋 Hemat baterai</button>
+      </div>
+      <small class="theme-note" id="themeNote"></small>
+    </div>
     <div class="tools noprint">
       <button class="btn pri" id="installBtn" data-install hidden>📲 Pasang di HP</button>
       <button class="btn" id="exportBtn">Simpan cadangan (.json)</button>
       <label class="btn">Pulihkan cadangan<input type="file" id="importIn" accept=".json,application/json" hidden></label>
-      <button class="btn" id="themeBtn">Ganti tema</button>
       <button class="btn" id="resetBtn" style="color:var(--bad)">Hapus semua data</button>
     </div>
   </div>
@@ -624,7 +650,7 @@ const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,l
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
   have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null, custom:[],
   price:{}, calc:{}, geo:{}, routes:[], place:null, wx:null,
-  mode:'online', eqWatch:true, eqRadius:300, eqSeen:[], famGroup:'', live:{mid:'', name:'', on:false, status:''}, videos:[], quizBest:0,
+  mode:'online', theme:'light', eqWatch:true, eqRadius:300, eqSeen:[], famGroup:'', live:{mid:'', name:'', on:false, status:''}, videos:[], quizBest:0,
   view:'list', loc:'semua', sc:'semua', tab:'t-fam'};
 
 // v1 kept one expiry date per item and a "confirmed" snapshot; v2 tracks quantities and purchase batches.
@@ -1636,7 +1662,7 @@ const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 // Returns a clean copy with only known fields; throws when the input is clearly not app data.
 function sanitizeData(o){
   if(!isObj(o)) throw new Error('Isi file bukan data Siaga Keluarga.');
-  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom','geo','routes','price','calc','place','famGroup','videos','mode','eqWatch','eqRadius','quizBest'];
+  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom','geo','routes','price','calc','place','famGroup','videos','mode','theme','eqWatch','eqRadius','quizBest'];
   if(!known.some(k => k in o)) throw new Error('File tidak berisi data Siaga Keluarga.');
   const out = {}, warn = [];
   if('custom' in o){
@@ -1676,6 +1702,7 @@ function sanitizeData(o){
   if('famGroup' in o) out.famGroup = validGid(o.famGroup) ? o.famGroup : '';
   if(Array.isArray(o.videos)) out.videos = o.videos.filter(isObj).slice(0, 30).map(v => ({id:ytId(v.id), t:str(v.t, 100) || 'Video'})).filter(v => v.id);
   if(['online','offline'].includes(o.mode)) out.mode = o.mode;
+  if(['light','dark','night','battery'].includes(o.theme)) out.theme = o.theme;
   if(typeof o.eqWatch === 'boolean') out.eqWatch = o.eqWatch;
   if([100,300,500,1000].includes(o.eqRadius)) out.eqRadius = o.eqRadius;
   if(int(o.quizBest, 0, 100)) out.quizBest = o.quizBest;
@@ -2665,6 +2692,24 @@ function saveCustom(){
 
 function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); renderCommunity(); }
 
+const THEME_INFO = {
+  light:['Latar terang untuk penggunaan siang hari.','#c2410c'],
+  dark:['Latar gelap dengan kontras penuh.','#141210'],
+  night:['Warna lebih redup untuk penggunaan malam hari.','#07090c'],
+  battery:['Latar hitam OLED, tanpa animasi dan transisi. Internet tetap mengikuti Mode aplikasi.','#000000']
+};
+function renderThemeChooser(){
+  document.querySelectorAll('[data-theme-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeMode === S.theme));
+  const note = $('#themeNote'); if(note) note.textContent = THEME_INFO[S.theme]?.[0] || THEME_INFO.light[0];
+}
+function applyTheme(mode, persist = true){
+  S.theme = Object.hasOwn(THEME_INFO, mode) ? mode : 'light';
+  document.documentElement.dataset.theme = S.theme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_INFO[S.theme][1]);
+  renderThemeChooser();
+  if(persist) save();
+}
+
 function showTab(id){
   if(!document.getElementById(id)) id = 't-fam';
   S.tab = id; save();
@@ -2861,16 +2906,13 @@ document.addEventListener('click', e => {
   if(t.id === 'copyLink'){ return copyText(t.dataset.url).then(ok => toast(ok ? 'Tautan disalin.' : 'Tidak bisa menyalin otomatis.', !ok)); }
   if(t.id === 'addMem'){ S.members.push({}); save(); renderMembers(); return renderCard(); }
   if(t.dataset.del){ S.members.splice(+t.dataset.del, 1); save(); renderMembers(); return renderCard(); }
-  if(t.id === 'themeBtn'){
-    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
-    const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
-    S.theme = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = S.theme; return save(); }
+  const th = t.closest('[data-theme-mode]'); if(th) return applyTheme(th.dataset.themeMode);
   if(t.id === 'exportBtn'){
     S.lastBackup = ymd(new Date()); S.checks.backup = S.lastBackup; save();
     download(`siaga-keluarga-cadangan-${S.lastBackup}.json`, JSON.stringify(S, null, 2), 'application/json');
     renderPlan(); return; }
   if(t.id === 'resetBtn' && confirm('Hapus semua data: stok, tanggal, rencana, dan kontak?')){
-    S = clone(DEF); save(); renderAll(); renderHaz(); renderInfo(); return; }
+    S = clone(DEF); applyTheme(S.theme); renderAll(); renderHaz(); renderInfo(); return; }
 });
 document.addEventListener('keydown', e => {
   if((e.key === 'Enter' || e.key === ' ') && e.target.closest('#cats .cat-h')){ e.preventDefault(); e.target.click(); }
@@ -2906,7 +2948,7 @@ document.addEventListener('change', e => {
       if(!confirm(`Pulihkan cadangan?\n\nIsi: ${summarize(data)}.${warn.length ? `\nDiabaikan karena tidak valid: ${warn.join(', ')}.` : ''}\n\nData di HP ini akan diganti.${famImportNote(data)}`)) return;
       adoptFamGroup(data);
       const keep = {tab:S.tab, live:S.live, famGroup:S.famGroup, eqSeen:S.eqSeen};   // device-specific state survives a restore
-      S = migrate(Object.assign({}, data, keep, 'famGroup' in data ? {famGroup:data.famGroup} : {})); save(); renderAll(); renderHaz(); renderInfo(); renderFamily(); renderMode();
+      S = migrate(Object.assign({}, data, keep, 'famGroup' in data ? {famGroup:data.famGroup} : {})); applyTheme(S.theme); renderAll(); renderHaz(); renderInfo(); renderFamily(); renderMode();
       toast('Data dipulihkan.');
     }).catch(err => toast(err.message || 'File cadangan tidak valid.', true));
   }
@@ -2925,7 +2967,7 @@ document.addEventListener('input', e => {
 });
 
 // ---------- init ----------
-if(S.theme) document.documentElement.dataset.theme = S.theme;
+applyTheme(S.theme, false);
 // home-screen shortcuts open ?tab=…&act=…&view=…&survival=…
 let survivalParam = null;
 { const q = new URLSearchParams(location.search);
