@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#c2410c">
+<meta name="theme-color" content="#f1f4f1">
 <title>Siaga Keluarga</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
@@ -11,76 +11,119 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Siaga Keluarga">
 <style>
+/* Visual system: safety-sign colours (ISO 7010 meaning) — green = safe/ready/primary action,
+   red = emergency only, yellow = warning/shortage. Type: Atkinson Hyperlegible (bundled, OFL)
+   chosen for legibility for older eyes and readers under stress. */
+@font-face{font-family:"Atkinson Hyperlegible";src:url(fonts/atkinson-400.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible";src:url(fonts/atkinson-700.woff2) format("woff2");font-weight:600 800;font-display:swap}
 :root{
-  --bg:#f7f5f2; --card:#ffffff; --ink:#1c1917; --muted:#6b645d; --line:#e7e2dc;
-  --accent:#c2410c; --accent-ink:#fff; --accent-soft:#fff1e8; --ok:#15803d; --ok-soft:#e9f7ee;
-  --warn:#b45309; --warn-soft:#fff6e0; --bad:#b91c1c; --bad-soft:#fdecec;
-  --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
+  --bg:#f1f4f1; --card:#ffffff; --ink:#17201b; --muted:#56635c; --line:#d9e0db;
+  --accent:#16704a; --accent-ink:#fff; --accent-soft:#e2f1e8; --ok:#16704a; --ok-soft:#e2f1e8;
+  --warn:#8a5300; --warn-soft:#fff3cf; --sign:#f5b700; --bad:#b3261e; --bad-soft:#fbe8e6; --sos:#c41f17; --sos-deep:#8f1610;
+  --radius:12px; --shadow:none;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#141210; --card:#1e1b18; --ink:#f3efe9; --muted:#a8a097; --line:#332e29;
-    --accent:#fb923c; --accent-ink:#1a1108; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
-    --warn:#fbbf24; --warn-soft:#2a2210; --bad:#f87171; --bad-soft:#2c1515;
-    --shadow:none;
+    --bg:#0e1411; --card:#161e1a; --ink:#e8eee9; --muted:#9daaa2; --line:#29342e;
+    --accent:#4cc38a; --accent-ink:#04140b; --accent-soft:#12291d; --ok:#5bd093; --ok-soft:#12291d;
+    --warn:#f2c14e; --warn-soft:#2a230d; --sign:#e0a800; --bad:#ff8a80; --bad-soft:#2e1513; --sos:#b3221b; --sos-deep:#6e120d;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#141210; --card:#1e1b18; --ink:#f3efe9; --muted:#a8a097; --line:#332e29;
-  --accent:#fb923c; --accent-ink:#1a1108; --accent-soft:#2c1d12; --ok:#4ade80; --ok-soft:#14261a;
-  --warn:#fbbf24; --warn-soft:#2a2210; --bad:#f87171; --bad-soft:#2c1515;
-  --shadow:none;
+  --bg:#0e1411; --card:#161e1a; --ink:#e8eee9; --muted:#9daaa2; --line:#29342e;
+  --accent:#4cc38a; --accent-ink:#04140b; --accent-soft:#12291d; --ok:#5bd093; --ok-soft:#12291d;
+  --warn:#f2c14e; --warn-soft:#2a230d; --sign:#e0a800; --bad:#ff8a80; --bad-soft:#2e1513; --sos:#b3221b; --sos-deep:#6e120d;
 }
 :root[data-theme="night"]{
-  --bg:#07090c; --card:#10141a; --ink:#d8dee9; --muted:#8b95a5; --line:#252b34;
-  --accent:#f59e0b; --accent-ink:#171006; --accent-soft:#271b08; --ok:#6fcf8d; --ok-soft:#102419;
-  --warn:#f6c453; --warn-soft:#292109; --bad:#ff8585; --bad-soft:#2a1114;
-  --shadow:none;
+  --bg:#080b0a; --card:#101614; --ink:#cdd5d0; --muted:#86928b; --line:#212a25;
+  --accent:#e0a23c; --accent-ink:#170f03; --accent-soft:#261b08; --ok:#6fc690; --ok-soft:#10231a;
+  --warn:#f0c35a; --warn-soft:#282009; --sign:#c99400; --bad:#ff8585; --bad-soft:#2a1114; --sos:#8f1d18; --sos-deep:#4d0f0c;
 }
 :root[data-theme="battery"]{
-  --bg:#000; --card:#070707; --ink:#d4d4d4; --muted:#898989; --line:#222;
-  --accent:#ff9f43; --accent-ink:#160d05; --accent-soft:#241507; --ok:#66c985; --ok-soft:#0c2113;
-  --warn:#e7bc55; --warn-soft:#251e08; --bad:#f27d7d; --bad-soft:#270e0e;
-  --shadow:none;
+  --bg:#000; --card:#070707; --ink:#d4d4d4; --muted:#8c8c8c; --line:#222;
+  --accent:#5bc489; --accent-ink:#03130a; --accent-soft:#0b1f14; --ok:#66c985; --ok-soft:#0c2113;
+  --warn:#e7bc55; --warn-soft:#251e08; --sign:#b88f00; --bad:#f27d7d; --bad-soft:#270e0e; --sos:#7d1712; --sos-deep:#3d0b08;
 }
 :root[data-theme="battery"] *,:root[data-theme="battery"] *::before,:root[data-theme="battery"] *::after{animation:none!important;transition:none!important}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 button,input,select,textarea{font:inherit;color:inherit}
-.wrap{max-width:760px;margin:0 auto;padding:0 16px 110px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 120px}
 
 header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-.head{max-width:760px;margin:0 auto;padding:14px 16px 12px;display:flex;align-items:center;gap:8px}
+.head{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
 .head>div:nth-child(2){flex:1;min-width:0}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;flex:none}
-.head h1{font-size:18px;margin:0;line-height:1.2}
-.head small{color:var(--muted);font-size:12px}
-.net{display:block;font-size:11px;font-weight:600;color:var(--ok)}
+.logo{width:34px;height:34px;border-radius:8px;flex:none;display:block}
+.head h1{font-size:18px;margin:0;line-height:1.15;letter-spacing:-.01em}
+.head small{color:var(--muted);font-size:13px;display:block;line-height:1.3}
+.net{display:inline-flex!important;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--ok);border:1px solid var(--line);border-radius:99px;padding:3px 9px;background:var(--card);white-space:nowrap;cursor:pointer;flex:none}
+.net:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
 .net.off{color:var(--warn)}
-.ring{margin-left:auto;text-align:right;color:var(--muted);width:70px;flex:none;font-size:11px}
-.ring b{display:block;font-size:18px;color:var(--ink)}
-.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:4px}
-.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.net[hidden]{display:none!important}
 
 nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
-nav button{background:none;border:0;padding:10px 1px 9px;font-size:11px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button span{font-size:20px;line-height:1}
+nav button{background:none;border:0;padding:9px 1px 8px;font-size:12px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-height:58px}
+nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 nav button[aria-selected="true"]{color:var(--accent);font-weight:700}
+nav button[aria-selected="true"]:before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+nav button[data-t="t-act"]{color:var(--bad)}
+nav button[data-t="t-act"][aria-selected="true"]:before{background:var(--bad)}
 
-section{display:none;padding-top:18px}
+section{display:none;padding-top:20px}
 section.on{display:block}
-h2{font-size:22px;margin:4px 0 4px}
-h3{font-size:16px;margin:0}
-.lead{color:var(--muted);margin:0 0 16px}
-.muted{color:var(--muted);font-size:13px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+h2{font-size:26px;line-height:1.15;margin:0 0 6px;letter-spacing:-.015em}
+h2:focus{outline:none}
+h3{font-size:18px;line-height:1.25;margin:0}
+.lead{color:var(--muted);margin:0 0 16px;max-width:62ch}
+.muted{color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
 .card h3+.muted{margin:4px 0 10px}
-.note{background:var(--accent-soft);border-radius:var(--radius);padding:12px 14px;font-size:14px;margin-bottom:14px}
+.note{background:var(--accent-soft);border-radius:var(--radius);padding:12px 14px;font-size:15px;margin-bottom:12px}
 .note b{color:var(--accent)}
-.warnbox{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;margin:8px 0}
-.badbox{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;margin:8px 0}
+.warnbox{background:var(--warn-soft);color:var(--ink);border-left:4px solid var(--sign);border-radius:6px;padding:10px 12px;font-size:15px;margin:8px 0}
+.badbox{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:10px 12px;font-size:15px;font-weight:700;margin:8px 0}
+.group-h{font-size:15px;font-weight:700;color:var(--muted);margin:26px 0 8px;display:flex;align-items:center;gap:10px}
+.group-h:after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* Beranda: emergency sign (the one loud element) */
+.sos-sign{background:var(--sos);color:#fff;border-radius:14px;padding:6px;margin-bottom:14px}
+.sos-in{border:2px solid rgba(255,255,255,.85);border-radius:10px;padding:14px}
+.sos-sign h2{color:#fff;font-size:24px;margin:0 0 2px}
+.sos-sign p{margin:0 0 12px;color:#ffe3e0;font-size:15px}
+.sos-go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:var(--sos-deep);border:0;border-radius:10px;padding:14px;font-size:19px;font-weight:800;cursor:pointer;min-height:56px}
+.sos-go svg{width:26px;height:26px}
+.sos-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.sos-row>*{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--sos-deep);color:#fff;border:0;border-radius:10px;padding:10px 4px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;min-height:64px;justify-content:center;text-align:center;line-height:1.2}
+.sos-row svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Beranda: readiness status + next steps */
+.status{padding:0;overflow:hidden}
+.status-top{display:flex;gap:14px;align-items:center;padding:16px}
+.status-top .days{font-size:44px;font-weight:800;line-height:1;letter-spacing:-.03em;min-width:64px;text-align:center}
+.status-top .days small{display:block;font-size:13px;font-weight:700;letter-spacing:0;color:var(--muted);margin-top:4px}
+.status-top p{margin:0;font-size:15px}
+.status-top h3{margin-bottom:2px}
+.status{border-top:6px solid var(--bad)}
+.status.lvl-warn{border-top-color:var(--sign)}
+.status.lvl-ok{border-top-color:var(--ok)}
+.status.lvl-bad .days{color:var(--bad)}
+.status.lvl-ok .days{color:var(--ok)}
+.status .pbar{display:flex;align-items:center;gap:10px;padding:0 16px 14px;font-size:14px;color:var(--muted)}
+.status .pbar .bar{flex:1;margin:0}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.steps{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.steps li{display:grid;grid-template-columns:26px 1fr auto;gap:6px 12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+@media(max-width:420px){.steps li{grid-template-columns:26px 1fr}.steps li .btn{grid-column:2;justify-self:start}}
+.steps li:last-child{border-bottom:0}
+.steps .n{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:14px;font-weight:800;background:var(--accent-soft);color:var(--accent)}
+.steps .t{flex:1;min-width:0;font-size:15px}
+.steps .t{color:var(--muted);font-size:14px;line-height:1.35}
+.steps .t b{display:block;font-size:16px;color:var(--ink);margin-bottom:1px}
+.steps .btn{flex:none}
+.steps-h{font-size:14px;font-weight:700;color:var(--muted);padding:12px 16px 0}
 
 .fam{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media (min-width:560px){.fam{grid-template-columns:repeat(4,1fr)}}
@@ -89,9 +132,9 @@ h3{font-size:16px;margin:0}
 .step .ctl{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
 .step button,.stepper button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:18px;cursor:pointer;flex:none}
 .step output{font-size:22px;font-weight:700;min-width:24px}
-.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:12px}
-.seg button{flex:1;border:0;background:none;padding:8px 4px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:14px}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:3px;margin-top:12px}
+.seg button{flex:1;border:0;background:none;padding:8px 4px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:15px;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 0 0 1px var(--line),0 1px 2px rgba(0,0,0,.08)}
 .seg.top{margin:0 0 14px}
 .checks{display:grid;gap:8px;margin-top:8px}
 .checks label{display:flex;gap:10px;align-items:center;font-size:15px}
@@ -102,7 +145,7 @@ h3{font-size:16px;margin:0}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
 .stat{background:var(--bg);border-radius:12px;padding:10px 12px}
 .stat b{display:block;font-size:20px}
-.stat small{color:var(--muted);font-size:12px}
+.stat small{color:var(--muted);font-size:13px}
 
 .cat{margin-bottom:14px}
 .cat-h{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none}
@@ -135,7 +178,7 @@ h3{font-size:16px;margin:0}
 .batches{margin-top:8px;display:grid;gap:6px}
 .batch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .batch .x{border:0;background:none;color:var(--bad);font-size:18px;cursor:pointer;padding:0 6px}
-.btn.sm{font-size:13px;padding:5px 10px}
+.btn.sm{font-size:14px;padding:6px 11px;min-height:36px}
 .badge{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px}
 .badge.bad{color:var(--bad);background:var(--bad-soft)}
 .badge.warn{color:var(--warn);background:var(--warn-soft)}
@@ -149,7 +192,7 @@ h3{font-size:16px;margin:0}
 .meter-row span:last-child{text-align:right;font-weight:700}
 .meter{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
 .meter i{display:block;height:100%;border-radius:99px;background:var(--ok)}
-.meter i.warn{background:var(--warn)}.meter i.bad{background:var(--bad)}
+.meter i.warn{background:var(--sign)}.meter i.bad{background:var(--bad)}
 .mine{font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;margin-left:4px;color:var(--ok);background:var(--ok-soft)}
 .ctools{display:flex;gap:6px;margin-top:6px}
 .fa{padding:4px 16px;scroll-margin-top:96px}
@@ -172,10 +215,11 @@ h3{font-size:16px;margin:0}
 .geo-tools input,.wx-tools input{flex:1;min-width:150px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 8px;font-size:14px}
 .wx-days{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;font-size:13px}
 .wx-days div{background:var(--bg);border-radius:10px;padding:8px}
-.install-card{display:flex;gap:12px;align-items:flex-start;border-color:var(--accent);background:var(--accent-soft)}
-.install-card img{width:48px;height:48px;border-radius:12px;flex:none}
+.install-card{display:flex;gap:12px;align-items:flex-start;border-color:var(--accent)}
+.install-card img{width:44px;height:44px;border-radius:10px;flex:none}
 .install-card .txt{flex:1;min-width:0}
-.install-card ol{margin:8px 0 0;padding-left:20px;font-size:14px}
+.install-card ol{margin:8px 0 0;padding-left:20px;font-size:15px}
+.install-card details summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:15px;margin-top:6px}
 .install-card .tools{margin:10px 0 0}
 .lib-h{margin:18px 0 8px;font-size:17px;scroll-margin-top:96px}
 body.surv-open{overflow:hidden}
@@ -211,7 +255,7 @@ body.surv-open{overflow:hidden}
 .skill-vids{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.skill-vids small{flex-basis:100%}
 #sec-sinyal{scroll-margin-top:96px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
-.chips a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
+.chips a{font-size:14px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
 .eq-alert{background:var(--bad);color:#fff;padding:10px 16px;font-size:14px}
 .eq-alert.tsu{background:#7f1d1d;animation:pulse 1s ease-in-out 6}
 .eq-alert .eq-in{max-width:760px;margin:0 auto}
@@ -225,9 +269,9 @@ body.surv-open{overflow:hidden}
 .eq-set select,#vidUrl,#vidTitle{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 8px}
 .fam-list{margin:10px 0}
 .fam-row{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
-.subtabs{display:flex;gap:8px;margin:0 0 14px;overflow:auto;padding-bottom:2px}
-.subtabs .btn{white-space:nowrap;flex:1;text-align:center}
-.subtabs .btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.subtabs{display:flex;gap:4px;margin:4px 0 16px;overflow:auto;border-bottom:1px solid var(--line)}
+.subtabs .btn{white-space:nowrap;flex:1;text-align:center;background:none;border:0;border-radius:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 6px 9px;font-size:16px}
+.subtabs .btn.active{color:var(--ink);border-bottom-color:var(--accent)}
 .community-grid{display:grid;gap:14px}
 .chat-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;background:var(--bg);border-radius:12px;padding:10px;margin:10px 0}
 .chat-empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
@@ -242,7 +286,7 @@ body.surv-open{overflow:hidden}
 .room-code{font:600 13px ui-monospace,Menlo,Consolas,monospace;word-break:break-all;background:var(--bg);border-radius:8px;padding:8px}
 .online-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:5px}.online-dot.off{background:var(--muted)}
 .theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:10px 0 6px}
-.theme-grid button{min-width:0;padding:8px 4px;line-height:1.2}.theme-grid button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.theme-grid button{min-width:0;padding:8px 4px;line-height:1.2}.theme-grid button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .theme-note{display:block;min-height:21px;color:var(--muted);font-size:13px}
 @media(max-width:460px){.theme-grid{grid-template-columns:repeat(3,1fr)}}
 .vid-g{margin:12px 0 6px}
@@ -251,7 +295,7 @@ body.surv-open{overflow:hidden}
 .vid.playing{display:block}
 .vid.playing .vid-box{width:100%}
 .vid-box iframe{width:100%;height:100%;border:0;display:block}
-.vid-play{width:100%;height:100%;border:0;background:linear-gradient(135deg,#7f1d1d,#c2410c);color:#fff;font-size:28px;cursor:pointer}
+.vid-play{width:100%;height:100%;border:0;background:#1d2a23;color:#fff;font-size:28px;cursor:pointer}
 .vid-play[disabled]{background:#555;cursor:not-allowed;opacity:.6}
 .vid-meta{min-width:0}.vid-meta small{display:block;color:var(--muted);margin-top:2px}
 .vid.playing .vid-meta{margin-top:8px}
@@ -306,11 +350,11 @@ body.surv-open{overflow:hidden}
 .hz li{margin-bottom:6px}
 .hz .tag{font-size:12px;color:var(--muted);font-weight:400}
 .big{font-size:15px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-weight:600}
-.btn.quick-entry{display:block;width:100%;margin:0 0 16px;text-align:center;background:var(--bad);border-color:var(--bad);color:#fff}
+
 .readiness p{margin:8px 0}.readiness small{display:block;color:var(--muted)}
 .hazard-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.hazard-picker button{flex:1 1 95px;min-height:44px;padding:8px;font-size:14px}
-.hazard-picker [aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.hazard-picker button{flex:1 1 95px;min-height:48px;padding:8px;font-size:15px}
+.hazard-picker [aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .hazard-picker .rel:after{content:" •";color:var(--bad)}
 .quick-steps{font-size:18px;font-weight:600}.quick-steps li{padding:8px 0}
 .hz summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
@@ -319,7 +363,10 @@ body.surv-open{overflow:hidden}
 .nums{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media (min-width:560px){.nums{grid-template-columns:repeat(4,1fr)}}
 .num{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.num b{display:block;font-size:22px;color:var(--accent)}
+.num b{display:block;font-size:24px;color:var(--accent)}
+.num:first-child{grid-column:1/-1;background:var(--sos);border-color:var(--sos);color:#fff}
+.num:first-child b{color:#fff;font-size:30px}
+.num:last-child:nth-child(even){grid-column:1/-1}.num:first-child small{color:#ffe3e0}
 .num small{color:var(--muted);font-size:13px}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
@@ -328,7 +375,8 @@ body.surv-open{overflow:hidden}
 .mem{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;display:grid;gap:8px}
 .mem .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mem input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 9px;font-size:14px}
-.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:700;min-height:44px;line-height:1.25;font-size:15px}
+.btn:active{transform:translateY(1px)}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 .btn.del{color:var(--bad);font-size:13px;padding:5px 10px;justify-self:end}
@@ -338,7 +386,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 .src a{color:var(--accent)}
 .qr{margin:12px auto 0;width:max-content;max-width:100%;background:#fff;border-radius:12px;overflow:hidden}
 .qr canvas{display:block;image-rendering:pixelated}
-.toast{position:fixed;left:16px;right:16px;bottom:84px;z-index:9;max-width:520px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:9;max-width:520px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
 .toast.bad{background:var(--bad);color:#fff}
 
 /* emergency card (screen preview + print sheet) */
@@ -386,13 +434,12 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <body>
 <header>
   <div class="head">
-    <div class="logo" aria-hidden="true">S</div>
+    <img class="logo" src="icons/icon-192.png" alt="">
     <div>
       <h1>Siaga Keluarga</h1>
       <small id="subtitle">Panduan darurat</small>
-      <small id="net" class="net" hidden></small>
     </div>
-    <div class="ring"><b id="pct">0%</b>checklist selesai<div class="bar"><i id="pbar" style="width:0"></i></div></div>
+    <button id="net" class="net" hidden title="Atur mode online/offline"></button>
   </div>
   <div class="eq-alert" id="eqAlert" role="alert" hidden></div>
 </header>
@@ -401,18 +448,20 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 
 <!-- 1. KELUARGA -->
 <section id="t-fam" class="on">
-  <button class="btn quick-entry" data-survival="">🆘 Mode Darurat — panduan langkah demi langkah</button>
-  <div class="card install-card noprint" id="installCard" hidden></div>
-  <div class="card noprint" id="modeCard"></div>
-  <div class="card">
-    <h3>Wilayah panduan</h3>
-    <p class="muted">Pilih panduan khusus Malang Selatan atau panduan umum untuk seluruh Indonesia.</p>
-    <div class="seg top" id="regionCtl" role="group" aria-label="Wilayah panduan">
-      <button data-region="malang">Malang Selatan</button><button data-region="umum">Indonesia (umum)</button>
+  <div class="sos-sign noprint"><div class="sos-in">
+    <h2>Ada bencana sekarang?</h2>
+    <p>Panduan langkah demi langkah. Tetap jalan tanpa internet.</p>
+    <button class="sos-go" data-survival=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Buka Mode Darurat</button>
+    <div class="sos-row">
+      <a href="tel:112"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Telepon 112</a>
+      <button data-checkin="aman"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Saya aman</button>
+      <button data-signal="light"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg>Kedip SOS</button>
     </div>
-  </div>
+  </div></div>
+  <div class="card status" id="statusCard" aria-live="polite"></div>
+  <div class="card install-card noprint" id="installCard" hidden></div>
   <div class="card noprint" id="wxCard"></div>
-  <h2>Keluarga Anda</h2>
+  <h3 class="group-h" id="famHead">Keluarga Anda</h3>
   <p class="lead">Isi jumlah anggota keluarga. Semua jumlah stok dihitung otomatis.</p>
   <div class="card">
     <div class="fam" id="famCtl"></div>
@@ -427,16 +476,17 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div class="checks" id="specialCtl"></div>
   </div>
   <div class="note"><b>Mulai dari 3 hari</b> (standar BNPB / 72 jam), lalu naikkan bertahap ke 7 hari. Tidak perlu belanja sekaligus — mulai dari kebutuhan <b>utama</b> di daftar belanja.</div>
-  <div class="card" id="endurance" aria-live="polite"></div>
+  <h3 class="group-h">Rincian kesiapan</h3>
+  <div class="card" id="endurance"></div>
   <div class="card" id="hazReady"></div>
-  <div class="card readiness" id="readiness" aria-live="polite"></div>
+  <div class="card readiness" id="readiness"></div>
   <div class="card" id="soon"></div>
   <div class="card" id="regionInfo"></div>
 </section>
 
 <!-- 2. STOK -->
 <section id="t-list">
-  <h2>Stok</h2>
+  <h2>Persiapan</h2>
   <div class="subtabs noprint"><button class="btn active" data-go="t-list">Stok &amp; belanja</button><button class="btn" data-go="t-plan">Rencana berkala</button></div>
   <div class="seg top" id="viewCtl" role="group" aria-label="Tampilan stok">
     <button data-view="list">Checklist</button><button data-view="shop">Daftar belanja</button>
@@ -467,7 +517,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 
 <!-- 3. JAUH HARI -->
 <section id="t-plan">
-  <h2>Persiapan Jauh Hari</h2>
+  <h2>Persiapan</h2>
   <div class="subtabs noprint"><button class="btn" data-go="t-list">Stok &amp; belanja</button><button class="btn active" data-go="t-plan">Rencana berkala</button></div>
   <p class="lead">Stok saja tidak cukup. Menurut riset, <b>rencana keluarga</b> adalah faktor paling menentukan kesiapan rumah tangga. Kerjakan bertahap.</p>
   <div class="card">
@@ -482,7 +532,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 
 <!-- 4. SAAT BENCANA -->
 <section id="t-act" class="hz">
-  <h2>Saat Bencana</h2>
+  <h2>Darurat</h2>
   <div class="subtabs noprint"><button class="btn active" data-go="t-act">Tindakan &amp; P3K</button><button class="btn" data-go="t-lib">Pustaka darurat</button></div>
   <div class="seg top" id="actCtl" role="group" aria-label="Jenis panduan">
     <button data-act="bencana">Tindakan bencana</button><button data-act="p3k">Pertolongan pertama</button>
@@ -564,6 +614,15 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div class="tools"><button class="btn pri" id="makeQr">Buat QR code</button><button class="btn" id="copyLink" hidden>Salin tautan</button></div>
     <div id="qrBox"></div>
   </div>
+  <h3 class="group-h" id="settingsHead">Pengaturan</h3>
+  <div class="card noprint" id="modeCard"></div>
+  <div class="card">
+    <h3>Wilayah panduan</h3>
+    <p class="muted">Pilih panduan khusus Malang Selatan atau panduan umum untuk seluruh Indonesia.</p>
+    <div class="seg top" id="regionCtl" role="group" aria-label="Wilayah panduan">
+      <button data-region="malang">Malang Selatan</button><button data-region="umum">Indonesia (umum)</button>
+    </div>
+  </div>
   <div class="card" id="dataCard">
     <h3>Data &amp; cadangan</h3>
     <div id="dataStatus"></div>
@@ -593,7 +652,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 
 <!-- PUSTAKA (bagian kategori Darurat) -->
 <section id="t-lib" class="hz">
-  <h2>Pustaka Darurat</h2>
+  <h2>Darurat</h2>
   <div class="subtabs noprint"><button class="btn" data-go="t-act">Tindakan &amp; P3K</button><button class="btn active" data-go="t-lib">Pustaka darurat</button></div>
   <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, alat sinyal, video, dan aktivitas saat listrik padam.</p>
   <div class="chips noprint"><a href="#sec-sinyal">🆘 Sinyal</a><a href="#sec-hidup">🧭 Bertahan hidup</a><a href="#sec-radio">📻 Radio</a><a href="#sec-skill">🛠️ Keterampilan</a><a href="#sec-video">🎬 Video</a><a href="#sec-aktif">🎲 Aktivitas</a><a href="#sec-offline">📚 Offline</a></div>
@@ -643,11 +702,11 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <div class="toast" id="toast" role="status" hidden></div>
 
 <nav><div class="tabs" role="tablist">
-  <button role="tab" data-t="t-fam" aria-selected="true"><span>🏠</span>Beranda</button>
-  <button role="tab" data-t="t-list"><span>✅</span>Persiapan</button>
-  <button role="tab" data-t="t-act"><span>⚠️</span>Darurat</button>
-  <button role="tab" data-t="t-community"><span>🤝</span>Komunitas</button>
-  <button role="tab" data-t="t-info"><span>📋</span>Rencana</button>
+  <button role="tab" data-t="t-fam" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Beranda</button>
+  <button role="tab" data-t="t-list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="m3 6 1.5 1.5L7 5"/><path d="m3 12 1.5 1.5L7 11"/><path d="m3 18 1.5 1.5L7 17"/></svg>Persiapan</button>
+  <button role="tab" data-t="t-act"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Darurat</button>
+  <button role="tab" data-t="t-community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M18 14.5a5.5 5.5 0 0 1 3 5.5"/></svg>Komunitas</button>
+  <button role="tab" data-t="t-info"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6v3H9z"/><path d="M7 5H5v16h14V5h-2"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>Rencana</button>
 </div></nav>
 
 <script>
@@ -2050,13 +2109,37 @@ function progress(){
   const stock = count('ok'), plan = plans.filter(id => S.done[id]).length;
   const main = items.filter(it => (it.p||2) === 1), mainOk = main.filter(it => stockState(it, c) === 'ok').length;
   const p = Math.floor((stock + plan) / (items.length + plans.length) * 100);
-  $('#pct').textContent = p + '%';
-  $('#pbar').style.width = p + '%';
+  renderStatus(p, main.length - mainOk, count('expired'));
   $('#readiness').innerHTML = `<h3>Progres checklist</h3>
     <p><b>${mainOk}/${main.length}</b> kebutuhan utama cukup · <b>${stock}/${items.length}</b> semua barang · <b>${plan}/${plans.length}</b> persiapan selesai</p>
     <p>${count('short')} masih kurang · ${count('expired')} perlu diganti (kedaluwarsa) · ${count('review')} perlu diisi jumlahnya</p>
     <small>Persentase mencatat pekerjaan yang selesai, bukan jaminan aman. Barang dihitung cukup bila jumlah tersedia memenuhi kebutuhan dan tidak kedaluwarsa menurut tanggal yang diisi.</small>
     <div class="tools"><button class="btn sm" data-go-shop>Lihat daftar belanja</button></div>`;
+}
+
+// Beranda summary: how long the stock lasts, and the next three things worth doing.
+function nextSteps(e, mainShort, expired){
+  const out = [];
+  if(e.waterL === 0 && e.food === 0) out.push(['Catat stok yang sudah ada', 'Aplikasi menghitung yang masih kurang.', 'Isi stok', 'data-go="t-list"']);
+  if(expired) out.push([`Ganti ${expired} barang kedaluwarsa`, 'Barang lewat tanggal tidak dihitung cukup.', 'Lihat', 'data-go="t-list"']);
+  if(mainShort) out.push([`Lengkapi ${mainShort} kebutuhan utama`, 'Mulai dari air minum dan makanan.', 'Daftar belanja', 'data-go-shop']);
+  if(!S.info.titik1) out.push(['Tentukan titik kumpul keluarga', 'Tempat bertemu bila terpisah saat bencana.', 'Isi rencana', 'data-go="t-info"']);
+  if(!S.members.some(m => m.nama)) out.push(['Catat data anggota keluarga', 'Golongan darah, obat rutin, kebutuhan khusus.', 'Tambah', 'data-go="t-info"']);
+  if(!S.lastBackup) out.push(['Simpan cadangan data', 'Data hanya tersimpan di HP ini.', 'Simpan', 'data-go="t-info"']);
+  if(!out.length) out.push(['Kesiapan lengkap', 'Periksa ulang stok sesuai jadwal berkala.', 'Lihat jadwal', 'data-go="t-plan"']);
+  return out.slice(0, 3);
+}
+function renderStatus(p, mainShort, expired){
+  const e = endurance(), c = ctx(), target = S.days, empty = e.waterL === 0 && e.food === 0;
+  const lvl = e.total >= target ? 'ok' : e.total >= target/2 ? 'warn' : 'bad';
+  const title = empty ? 'Stok belum dicatat' : lvl === 'ok' ? `Siap untuk ${target} hari` : `Stok cukup ${fmtNum(e.total)} dari ${target} hari`;
+  const steps = nextSteps(e, mainShort, expired);
+  const el = $('#statusCard'); el.className = 'card status lvl-' + lvl;
+  el.innerHTML = `<div class="status-top"><div class="days">${empty ? '–' : fmtNum(e.total)}<small>hari</small></div>
+      <div><h3>${title}</h3><p class="muted">Air minum dan makanan untuk ${c.n} orang. Target ${target} hari.</p></div></div>
+    <div class="pbar"><span>Checklist</span><div class="bar"><i id="pbar" style="width:${p}%"></i></div><b id="pct">${p}%</b></div>
+    <div class="steps-h">Langkah berikutnya</div>
+    <ol class="steps">${steps.map(([t, sub, lbl, attr], i) => `<li><span class="n">${i+1}</span><span class="t"><b>${t}</b>${sub}</span><button class="btn sm" ${attr}>${lbl}</button></li>`).join('')}</ol>`;
 }
 
 function renderCalc(){
@@ -2726,10 +2809,10 @@ function saveCustom(){
 function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); renderCommunity(); }
 
 const THEME_INFO = {
-  auto:['Mengikuti pengaturan terang/gelap HP.','#c2410c'],
-  light:['Latar terang untuk penggunaan siang hari.','#c2410c'],
-  dark:['Latar gelap dengan kontras penuh.','#141210'],
-  night:['Warna lebih redup untuk penggunaan malam hari.','#07090c'],
+  auto:['Mengikuti pengaturan terang/gelap HP.','#f1f4f1'],
+  light:['Latar terang untuk penggunaan siang hari.','#f1f4f1'],
+  dark:['Latar gelap dengan kontras penuh.','#0e1411'],
+  night:['Warna lebih redup untuk penggunaan malam hari.','#080b0a'],
   battery:['Latar hitam OLED, tanpa animasi dan transisi. Internet tetap mengikuti Mode aplikasi.','#000000']
 };
 function renderThemeChooser(){
@@ -3048,11 +3131,13 @@ setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);
 let offlineReady = false, installEvt = null;
 function netStatus(){
   const el = $('#net');
-  if(!online()){ el.textContent = '📴 Mode offline — tanpa internet'; el.className = 'net off'; el.hidden = false; }
-  else if(!navigator.onLine){ el.textContent = '● Offline — semua fitur tetap jalan'; el.className = 'net off'; el.hidden = false; }
-  else if(offlineReady){ el.textContent = '✓ Siap dipakai tanpa internet'; el.className = 'net'; el.hidden = false; }
-  else el.hidden = true;
+  const [txt, title, off] = !online() ? ['Mode offline', 'Mode offline: aplikasi tidak memakai internet. Ketuk untuk mengubah.', true]
+    : !navigator.onLine ? ['Tanpa sinyal', 'Tidak ada internet. Semua panduan tetap jalan.', true]
+    : offlineReady ? ['Siap offline', 'Online, dan sudah tersimpan untuk dipakai tanpa internet.', false]
+    : ['Online', 'Online. Ketuk untuk mengatur mode.', false];
+  el.textContent = txt; el.title = title; el.setAttribute('aria-label', title); el.className = 'net' + (off ? ' off' : ''); el.hidden = false;
 }
+document.getElementById('net').addEventListener('click', () => { showTab('t-info'); document.getElementById('settingsHead').scrollIntoView({block:'start'}); });
 addEventListener('online', netStatus);
 addEventListener('offline', netStatus);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
@@ -3088,8 +3173,8 @@ function renderInstall(){
   const how = showHowTo || !installEvt;
   card.innerHTML = `<img src="icons/icon-192.png" alt="">
     <div class="txt"><h3>Pasang Siaga Keluarga di HP</h3>
-      <p class="muted" style="margin:4px 0 0">Buka langsung dari layar utama seperti aplikasi biasa, dan tetap bisa dipakai tanpa internet.</p>
-      ${how ? `<ol>${HOWTO[installPlatform()].map(s => `<li>${s}</li>`).join('')}</ol>` : ''}
+      <p class="muted" style="margin:4px 0 0">Buka dari layar utama seperti aplikasi biasa. Tetap jalan tanpa internet.</p>
+      ${how ? `<details${showHowTo ? ' open' : ''}><summary>Cara memasang</summary><ol>${HOWTO[installPlatform()].map(s => `<li>${s}</li>`).join('')}</ol></details>` : ''}
       <div class="tools">${installEvt ? '<button class="btn pri" data-install>📲 Pasang aplikasi</button>' : ''}<button class="btn" id="installLater">Nanti</button></div></div>`;
 }
 async function doInstall(){

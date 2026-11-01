@@ -118,10 +118,13 @@ test('every hazard has three quick actions and https sources', ()=>{
 test('progress never reaches 100% while something is short', ()=>{
   const a = app();
   a.run(`allItems().forEach(it => { if(it.exp) S.batches[it.id] = [{q:needOf(it), e:"${future(400)}"}]; else if(it.n) S.have[it.id] = needOf(it); else S.done[it.id] = true; });
-    PHASES.forEach(p => p.items.forEach(([id]) => S.done["plan-"+id] = true)); progress()`);
-  assert.equal(a.nodes.get('#pct').textContent, '100%');
+    PHASES.forEach(p => p.items.forEach(([id]) => S.done["plan-"+id] = true));
+    S.info.titik1 = "Lapangan desa"; S.members = [{nama:"Ibu"}]; S.lastBackup = "2026-11-01"; progress()`);
+  assert.match(a.nodes.get('#statusCard').innerHTML, /id="pct">100%</);
+  assert.match(a.nodes.get('#statusCard').innerHTML, /Kesiapan lengkap/);
   a.run('S.batches.galon[0].e = "2000-01-01"; progress()');
-  assert.notEqual(a.nodes.get('#pct').textContent, '100%');
+  assert.doesNotMatch(a.nodes.get('#statusCard').innerHTML, /id="pct">100%</);
+  assert.match(a.nodes.get('#statusCard').innerHTML, /Ganti 1 barang kedaluwarsa/);
 });
 
 test('endurance: water vs food, cooking needs stove and gas, expired stock ignored', ()=>{
