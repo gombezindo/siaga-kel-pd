@@ -11,6 +11,19 @@ node --test tests/readiness.cjs
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 
+## Perubahan v1.4 (1 November 2026)
+
+- **Tab baru 📚 Pustaka** (semua offline):
+  - **Alat sinyal darurat:** layar berkedip pola SOS (Morse, satuan 250 ms), bunyi SOS 2 kHz, atau keduanya; layar dijaga tetap menyala (Wake Lock bila didukung); ketuk layar atau Esc untuk berhenti.
+  - **Pesan darurat (SMS):** menyusun SMS siapa–di mana–kejadian–kondisi–kebutuhan–jam, dengan koordinat GPS (tanpa internet) dan tautan peta; nomor tujuan diambil dari "pusat kabar". Dikirim lewat aplikasi SMS HP.
+  - **Bertahan hidup (9 topik):** air minum aman, toilet & kebersihan darurat, makanan tanpa listrik, tempat berlindung, penerangan & api, arah tanpa internet, menenangkan diri & orang lain (P3K psikologis WHO), kembali ke rumah, di pengungsian.
+  - **Komunikasi & radio (6 topik):** HP saat jaringan padat (SMS), radio FM/RRI, **HT PMR 409 MHz tanpa ISR** (409,74375–409,99375 MHz, 20 kanal, maks. 500 mW, perangkat bersertifikat — Permenkominfo 2/2023, diubah Permen Komdigi 2/2025), ORARI & RAPI (wajib izin), cara bicara di radio, isyarat minta tolong.
+  - **Kode Morse** (teks → kode, kirim lewat kedip/bunyi) dan **alfabet fonetik**.
+  - **Ensiklopedia & peta offline:** panduan Kiwix (Wikipedia bahasa Indonesia, WikiMed, Wikivoyage), Organic Maps, PDF BNPB.
+  - **Pencarian** lintas Pustaka, P3K, dan Saat Bencana.
+- Kolom rencana baru **Radio** (kanal HT keluarga, frekuensi RRI/radio lokal) — ikut di kartu darurat dan QR.
+- Sengaja **tidak** dicantumkan: takaran tetes kaporit/pemutih (kadar produk berbeda-beda), daftar frekuensi ORARI/RAPI (wajib izin, berbeda per daerah), dan waktu SODIS (belum terverifikasi).
+
 ## Perubahan v1.3 (1 November 2026)
 
 - **Ketahanan logistik.** Kartu di tab Keluarga menghitung berapa hari stok yang sudah ada cukup: air minum (galon + botol + air buatan sendiri bersatuan liter), makan dimasak (beras dibatasi gas, perlu kompor), dan makanan siap makan. Ketahanan = minimum air vs makanan; ada petunjuk apa yang paling membatasi. Pembelian kedaluwarsa tidak dihitung.

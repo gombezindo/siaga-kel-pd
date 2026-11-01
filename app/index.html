@@ -51,8 +51,8 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
 .bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
 
 nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav .tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
-nav button{background:none;border:0;padding:10px 2px 9px;font-size:12px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav .tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav button{background:none;border:0;padding:10px 1px 9px;font-size:11px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:20px;line-height:1}
 nav button[aria-selected="true"]{color:var(--accent);font-weight:700}
 
@@ -139,7 +139,7 @@ h3{font-size:16px;margin:0}
 .meter i.warn{background:var(--warn)}.meter i.bad{background:var(--bad)}
 .mine{font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;margin-left:4px;color:var(--ok);background:var(--ok-soft)}
 .ctools{display:flex;gap:6px;margin-top:6px}
-.fa{padding:4px 16px}
+.fa{padding:4px 16px;scroll-margin-top:96px}
 .fa summary{cursor:pointer;font-weight:700;font-size:17px;min-height:48px;display:flex;gap:10px;align-items:center}
 .fa[open] summary{border-bottom:1px solid var(--line);margin-bottom:6px}
 .hz .fa-steps{font-size:16px;margin:8px 0;padding-left:22px}
@@ -164,6 +164,18 @@ h3{font-size:16px;margin:0}
 .install-card .txt{flex:1;min-width:0}
 .install-card ol{margin:8px 0 0;padding-left:20px;font-size:14px}
 .install-card .tools{margin:10px 0 0}
+.lib-h{margin:18px 0 8px;font-size:17px}
+.sig{position:fixed;inset:0;z-index:40;background:#000;display:flex;align-items:flex-end;justify-content:center;cursor:pointer}
+.sig.on{background:#fff}
+.sig-txt{margin-bottom:40px;padding:8px 14px;border-radius:10px;background:rgba(80,80,80,.85);color:#fff;font-size:15px}
+.sig-tools .btn{flex:1 1 140px}
+.phon{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;font-size:14px;margin-top:8px}
+.phon div{background:var(--bg);border-radius:8px;padding:6px 8px}
+.phon b{color:var(--accent);margin-right:4px}
+.morse-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;letter-spacing:.08em;word-break:break-word;background:var(--bg);border-radius:10px;padding:10px;margin:8px 0}
+.res{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;color:inherit}
+.res small{display:block;color:var(--muted)}
+.cform textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;min-height:96px}
 .linkrow{background:none;border:0;padding:4px 0;width:100%;text-align:left;cursor:pointer;color:inherit}
 .hz-ready{font-size:14px;background:var(--bg);border-radius:10px;padding:10px 12px;margin:4px 0 8px}
 .cform{display:grid;gap:10px}
@@ -430,9 +442,32 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <p>Jumlah kebutuhan adalah estimasi aplikasi, bukan standar yang seragam untuk setiap keluarga. Sesuaikan dengan kondisi anggota keluarga. Nomor darurat umum belum diuji sambung; cakupan layanan dapat berbeda antarwilayah.</p></div>
 </section>
 
+<!-- 6. PUSTAKA -->
+<section id="t-lib" class="hz">
+  <h2>Pustaka Darurat</h2>
+  <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, dan alat sinyal — semuanya bisa dipakai tanpa internet.</p>
+  <div class="card">
+    <h3>🆘 Alat sinyal darurat</h3>
+    <p class="muted">Kedip SOS membuat layar berkedip putih-hitam — naikkan kecerahan layar. Ketuk layar untuk berhenti.</p>
+    <div class="tools sig-tools"><button class="btn pri" data-signal="light">💡 Kedip SOS layar</button><button class="btn" data-signal="sound">🔊 Bunyi SOS</button><button class="btn" data-signal="both">Kedip + bunyi</button><button class="btn" id="openSms">✉️ Pesan darurat (SMS)</button></div>
+    <div id="smsBox"></div>
+  </div>
+  <div class="field noprint"><label for="libSearch">Cari panduan</label><input id="libSearch" type="search" placeholder="mis. air, radio, SOS, luka bakar, kaporit" autocomplete="off"></div>
+  <div id="libResults"></div>
+  <div id="libBody">
+    <h3 class="lib-h">🧭 Bertahan hidup</h3><div id="libSurvive"></div>
+    <h3 class="lib-h">📻 Komunikasi &amp; radio</h3><div id="libComms"></div>
+    <div class="card" id="morseCard"></div>
+    <div class="card" id="phonCard"></div>
+    <h3 class="lib-h">📚 Ensiklopedia &amp; peta offline</h3>
+    <p class="muted">Unduh selagi ada internet — setelah itu bisa dibaca tanpa sinyal.</p><div id="libOffline"></div>
+  </div>
+  <p class="src">Ringkasan disusun 1 November 2026 dari sumber yang dicantumkan di tiap topik. Tautan perlu internet; isi panduan tetap tersedia offline.</p>
+</section>
 </div>
 
 <div class="print-sheet" id="ecardPrint"></div>
+<div class="sig" id="sigOverlay" role="button" aria-label="Hentikan sinyal" hidden><div class="sig-txt" id="sigTxt">SOS · ketuk layar untuk berhenti</div></div>
 <div class="print-sheet" id="shopPrint"></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
@@ -442,6 +477,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <button role="tab" data-t="t-plan"><span>🗓️</span>Jauh Hari</button>
   <button role="tab" data-t="t-act"><span>⚠️</span>Saat Bencana</button>
   <button role="tab" data-t="t-info"><span>📋</span>Rencana</button>
+  <button role="tab" data-t="t-lib"><span>📚</span>Pustaka</button>
 </div></nav>
 
 <script>
@@ -804,6 +840,151 @@ const FIRSTAID = [
   call:'Segera ke fasilitas kesehatan bila: tidak bisa minum, muntah terus, tinja berdarah, sangat lemas atau mengantuk, kejang, bayi tidak mau menyusu, mata cekung, cubitan kulit perut kembali sangat lambat, tidak buang air kecil, demam tinggi, atau diare tidak membaik dalam 1–2 hari.'},
 ];
 
+// ---------- survival library & communication (offline) ----------
+const LIB = [
+ {k:'air', ic:'💧', t:'Air minum aman tanpa PDAM', src:['cdcboil'], steps:[
+  'Utamakan air kemasan atau air simpanan yang masih tersegel.',
+  'Air keruh: endapkan dulu, lalu saring dengan kain bersih berlapis sebelum dimasak.',
+  'Rebus sampai mendidih bergolak, biarkan mendidih 1 menit, lalu dinginkan dalam wadah bersih tertutup.',
+  'Tablet penjernih air: pakai sesuai petunjuk kemasan, termasuk lama menunggu sebelum diminum.',
+  'Merebus tidak menghilangkan bahan kimia (mis. air banjir tercampur BBM atau limbah) — untuk itu pakai air kemasan.'],
+  no:['Jangan menuang kaporit atau pemutih "kira-kira" ke air minum — pakai hanya bila kadar dan takarannya jelas dari petunjuk resmi. Bila ragu, rebus.']},
+ {k:'sanitasi', ic:'🚽', t:'Toilet & kebersihan darurat', src:['sphere'], steps:[
+  'Toilet darurat: ember bertutup dilapisi 2 kantong plastik; setiap selesai, taburi tanah kering, abu, atau serbuk gergaji.',
+  'Ikat kantong rapat dan kumpulkan di tempat tertutup, jauh dari sumber air dan dapur.',
+  'Bila menggali lubang kakus, buat minimal 30 meter dari sumur atau sumber air.',
+  'Cuci tangan pakai sabun setelah dari toilet dan sebelum makan atau menyiapkan makanan.',
+  'Bungkus sampah dapur dan tutup rapat agar tidak mengundang lalat dan tikus.'],
+  call:'Laporkan ke posko kesehatan bila banyak orang diare di pengungsian.'},
+ {k:'makanan', ic:'🍲', t:'Makanan aman tanpa listrik', src:['cdc'], steps:[
+  'Habiskan dulu isi kulkas (aman ±4 jam bila pintu tertutup), lalu freezer, baru stok kering.',
+  'Buang kaleng yang menggembung, bocor, atau berkarat parah, dan makanan yang terkena air banjir.',
+  'Masak di luar ruangan atau ruang berventilasi baik; jangan memakai arang atau briket di dalam rumah.',
+  'Ragu makanan masih aman? Buang — jangan dicicipi.']},
+ {k:'lindung', ic:'⛺', t:'Tempat berlindung, tetap kering & hangat', src:['bnpb'], steps:[
+  'Setelah gempa, jangan tidur di dalam bangunan yang retak parah; pilih area terbuka jauh dari tiang, pohon besar, tebing, dan sungai.',
+  'Buat atap darurat dari terpal yang dimiringkan agar air hujan mengalir; alasi tanah dengan terpal atau tikar.',
+  'Ganti pakaian basah secepatnya — tubuh yang lama basah bisa kedinginan berbahaya walau di daerah tropis, terutama anak dan lansia.',
+  'Saat panas terik: berteduh, minum cukup, dan perhatikan lansia dan anak.'],
+  call:'Ke posko atau telepon 119 bila ada yang menggigil hebat, bingung, atau sangat lemas.'},
+ {k:'cahaya', ic:'🕯️', t:'Penerangan & api yang aman', src:['cdc'], steps:[
+  'Utamakan senter atau lampu LED, dan simpan baterai cadangan.',
+  'Lilin: taruh di wadah tahan api, jauh dari gorden dan anak, jangan ditinggal tidur.',
+  'Genset, kompor arang, dan pemanas berbahan bakar hanya di luar ruangan — asapnya (CO) tidak berbau dan mematikan.',
+  'Setelah gempa: jangan menyalakan api atau saklar bila tercium bau gas; buka jendela dan keluar.']},
+ {k:'navigasi', ic:'🧭', t:'Menemukan arah tanpa internet', src:['organicmaps'], steps:[
+  'GPS di HP tetap bekerja tanpa internet — tetapi peta harus diunduh lebih dulu (Google Maps "Peta offline", atau Organic Maps).',
+  'Simpan koordinat titik kumpul di tab Rencana; koordinat itu bisa dibuka di aplikasi peta.',
+  'Cetak atau gambar peta sederhana ke titik kumpul dengan patokan (masjid, sekolah, jembatan).',
+  'Arah kasar: matahari terbit di timur dan terbenam di barat.',
+  'Ikuti rambu jalur evakuasi; hindari tepi sungai, lereng curam, dan jembatan rusak.']},
+ {k:'jiwa', ic:'🫂', t:'Menenangkan diri & orang lain', src:['whopfa'], steps:[
+  'LIHAT: pastikan aman, cari siapa yang paling butuh bantuan (luka, anak terpisah, lansia).',
+  'DENGAR: dekati dengan tenang, tanyakan kebutuhannya, dengarkan tanpa memaksa bercerita.',
+  'HUBUNGKAN: bantu kebutuhan dasar (air, makan, tempat), hubungkan dengan keluarga dan layanan bantuan.',
+  'Anak: tetap bersama orang tua, buat rutinitas sederhana, batasi tontonan berita atau video bencana.',
+  'Rawat diri sendiri: istirahat bergantian, makan dan minum, berbagi tugas.'],
+  no:['Jangan memaksa korban menceritakan kejadian, dan jangan memberi janji yang tidak pasti.'],
+  call:'Cari tenaga kesehatan bila ada yang bicara ingin menyakiti diri, sangat bingung, atau berhari-hari tidak mau makan dan minum.'},
+ {k:'rumah', ic:'🏚️', t:'Kembali ke rumah setelah bencana', src:['bnpb'], steps:[
+  'Masuk hanya setelah dinyatakan aman oleh petugas; periksa retakan besar, atap, dan tiang dari luar dulu.',
+  'Matikan listrik dari MCB sebelum masuk rumah yang terendam; jangan sentuh alat listrik yang basah.',
+  'Tercium bau gas? Jangan nyalakan api atau saklar; buka jendela, keluar, laporkan.',
+  'Pakai sepatu bot, sarung tangan, dan masker saat membersihkan lumpur atau puing.',
+  'Foto kerusakan untuk pendataan bantuan dan asuransi.']},
+ {k:'posko', ic:'🏕️', t:'Di pengungsian & mendapatkan bantuan', src:['bnpb'], steps:[
+  'Daftarkan semua anggota keluarga di posko, termasuk kebutuhan khusus (ibu hamil, bayi, lansia, disabilitas, obat rutin).',
+  'Tulis nama dan nomor HP orang tua di baju atau tas anak; tentukan titik temu bila terpisah.',
+  'Simpan dokumen dan uang di badan.',
+  'Ambil informasi hanya dari sumber resmi (BNPB, BPBD, BMKG, pemerintah daerah); jangan sebarkan kabar yang belum jelas.']},
+];
+const COMMS = [
+ {k:'hp', ic:'📱', t:'HP saat jaringan padat atau rusak', src:['readyplan'], steps:[
+  'Kirim SMS singkat daripada menelepon — SMS lebih mudah terkirim saat jaringan padat.',
+  'Semua anggota keluarga melapor ke satu "pusat kabar" di luar kota.',
+  'Hemat baterai: matikan data dan Bluetooth bila tidak perlu, redupkan layar. Tidak ada sinyal sama sekali? Mode pesawat, nyalakan sesekali untuk cek.',
+  'Pakai tombol "Pesan darurat (SMS)" di atas untuk menyusun SMS lengkap dengan koordinat GPS — GPS tetap jalan tanpa internet.']},
+ {k:'fm', ic:'📻', t:'Radio FM/AM untuk informasi resmi', src:['rri'], steps:[
+  'Siapkan radio baterai atau engkol — tetap bisa menerima siaran saat listrik dan internet mati.',
+  'Dengarkan RRI dan radio lokal: RRI menyiarkan informasi kebencanaan dan siaran darurat dari lokasi bencana.',
+  'Catat frekuensi RRI dan radio lokal daerah Anda di kolom "Radio" tab Rencana.']},
+ {k:'pmr', ic:'📡', t:'HT keluarga tanpa izin (PMR 409 MHz)', src:['permenpmr'], steps:[
+  'Indonesia membolehkan HT PMR di pita 409,74375–409,99375 MHz (20 kanal, daya maksimal 500 mW) dengan izin kelas — tanpa izin stasiun radio (ISR).',
+  'Syaratnya: HT bersertifikat Kominfo/Komdigi untuk PMR 409 MHz dan dipakai sesuai ketentuan. HT di frekuensi lain wajib izin.',
+  'Jangkauannya pendek dan mudah terhalang bangunan atau bukit — cocok antar-rumah atau ke titik kumpul, bukan jarak jauh.',
+  'Sepakati kanal utama, kanal cadangan, dan jadwal mendengar (mis. tiap jam tepat selama 5 menit) agar baterai awet. Catat di tab Rencana.'],
+  note:'Dasar: Permenkominfo 2/2023 tentang izin kelas, yang telah diubah dengan Permen Komdigi 2/2025 — cek teks resminya untuk ketentuan terbaru.'},
+ {k:'orari', ic:'🎙️', t:'Radio amatir (ORARI) & RAPI', src:['natuna'], steps:[
+  'ORARI (radio amatir) dan RAPI (radio antar penduduk) adalah organisasi resmi yang sering membantu jaringan komunikasi saat bencana, termasuk atas permintaan BNPB.',
+  'Memancar di frekuensi mereka wajib keanggotaan dan izin — jangan memancar tanpa izin.',
+  'Saat darurat, cari anggota ORARI/RAPI terdekat atau posko; mereka bisa meneruskan berita keluar wilayah.',
+  'Ingin lebih siap? Bergabung dan ikut latihan komunikasi darurat bersama organisasi lokal.']},
+ {k:'etika', ic:'🗣️', t:'Cara bicara di radio', steps:[
+  'Dengar dulu — jangan memotong percakapan orang lain.',
+  'Tekan tombol bicara (PTT), tunggu 1 detik, bicara singkat dan jelas, lalu lepas.',
+  'Sebut yang dipanggil lalu nama Anda: "Ayah, ini Budi, ganti."',
+  '"Ganti" = giliran Anda bicara · "Selesai" = percakapan berakhir · "Ulangi" = minta diulang.',
+  'Pesan darurat: ucapkan "DARURAT" tiga kali, lalu siapa, di mana, apa yang terjadi, dan apa yang dibutuhkan.',
+  'Eja nama dan alamat dengan alfabet fonetik di bawah.'],
+  note:'Praktik umum komunikasi radio; ikuti juga tata cara organisasi radio setempat.'},
+ {k:'isyarat', ic:'🆘', t:'Minta tolong tanpa alat komunikasi', src:['utahsignal','bnpb'], steps:[
+  'Peluit: 3 tiupan, jeda, ulangi — tanda minta tolong yang dikenal luas.',
+  'SOS: 3 pendek – 3 panjang – 3 pendek, dengan senter, layar HP, atau bunyi (tombol Kedip/Bunyi SOS di atas).',
+  'Tertimpa reruntuhan: tiup peluit atau ketuk pipa/dinding — berteriak menguras tenaga dan membuat menghirup debu.',
+  'Di tempat terbuka: kibarkan kain berwarna terang; tulis SOS besar (minimal 3 meter) di tanah atau atap.']},
+];
+const OFFLINE_RES = [
+ {t:'Kiwix — Wikipedia offline gratis', url:'https://kiwix.org/en/', d:'Aplikasi gratis (Android, iPhone, Windows, Linux) untuk membaca Wikipedia tanpa internet. Setelah dipasang, unduh paket "Wikipedia bahasa Indonesia" — pilih versi tanpa gambar (nopic/mini) agar lebih kecil.'},
+ {t:'Perpustakaan Kiwix', url:'https://library.kiwix.org/', d:'Paket offline lain: WikiMed (ensiklopedia kesehatan, bahasa Inggris), Wikivoyage, dan banyak lagi. Unduh lewat Wi-Fi dan simpan di kartu memori bila ruang HP terbatas.'},
+ {t:'Organic Maps — peta offline gratis', url:'https://organicmaps.app/', d:'Peta OpenStreetMap yang diunduh per provinsi dan dipakai bersama GPS tanpa internet.'},
+ {t:'BNPB — Buku Saku Tanggap Tangkas Tangguh (PDF)', url:'https://bnpb.go.id/storage/app/media/Buku%20BNPB/Buku%20Saku%20Bencana%20BNPB.pdf', d:'Unduh dan simpan PDF-nya di HP selagi ada internet.'},
+];
+const PHONETIC = 'Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Yankee Zulu'.split(' ');
+const MORSE = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',
+  0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.'};
+const morseWords = s => String(s).toUpperCase().split(/\s+/).map(w => [...w].map(ch => MORSE[ch]).filter(Boolean)).filter(w => w.length);
+const toMorse = s => morseWords(s).map(w => w.join(' ')).join(' / ');
+// [on, units]: dot 1, dash 3, gap inside a letter 1, between letters 3, between words 7
+function morseTimeline(s){
+  const out = [];
+  morseWords(s).forEach((letters, wi, words) => {
+    letters.forEach((code, li) => {
+      [...code].forEach((sym, si) => { out.push([true, sym === '.' ? 1 : 3]); if(si < code.length - 1) out.push([false, 1]); });
+      if(li < letters.length - 1) out.push([false, 3]);
+    });
+    if(wi < words.length - 1) out.push([false, 7]);
+  });
+  return out;
+}
+// short SMS: who, where (address + GPS), what, condition, needs, time
+function sosMessage(f, now = new Date()){
+  const parts = ['DARURAT.'];
+  if(f.who) parts.push(`Saya: ${f.who}.`);
+  const where = [f.where, f.geo ? `${f.geo.lat},${f.geo.lon}` : ''].filter(Boolean).join(' · ');
+  if(where) parts.push(`Lokasi: ${where}.`);
+  if(f.geo) parts.push(`Peta: maps.google.com/?q=${f.geo.lat},${f.geo.lon}`);
+  if(f.what) parts.push(`Kejadian: ${f.what}.`);
+  if(f.cond) parts.push(`Kondisi: ${f.cond}.`);
+  if(f.need) parts.push(`Butuh: ${f.need}.`);
+  parts.push(`Jam ${pad(now.getHours())}.${pad(now.getMinutes())}`);
+  return parts.join(' ');
+}
+const phoneIn = s => (/(\+?\d[\d\s.-]{7,}\d)/.exec(s || '') || [])[1]?.replace(/[\s.-]/g, '') || '';
+// plain-text search over every offline guide
+const fold = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function searchGuides(q){
+  const words = fold(q).split(/\s+/).filter(w => w.length > 1);
+  if(!words.length) return [];
+  const entries = [
+    ...LIB.map(x => ({type:'lib', k:x.k, ic:x.ic, t:x.t, where:'Bertahan hidup', text:[x.t, ...x.steps, ...(x.no||[]), x.call||''].join(' ')})),
+    ...COMMS.map(x => ({type:'lib', k:x.k, ic:x.ic, t:x.t, where:'Komunikasi & radio', text:[x.t, ...x.steps, x.note||''].join(' ')})),
+    ...FIRSTAID.map(x => ({type:'fa', k:x.k, ic:x.ic, t:x.t, where:'Pertolongan pertama', text:[x.t, ...x.steps, ...(x.no||[]), x.note||'', x.call||''].join(' ')})),
+    ...hazList().map(h => ({type:'haz', k:h.k, ic:h.ic, t:R(h.t), where:'Saat bencana', text:[R(h.t), h.lbl, ...h.quick, ...R(h.a), ...(h.after||[])].join(' ')})),
+  ];
+  return entries.map(e => ({e, score: words.reduce((s, w) => s + (fold(e.t).includes(w) ? 3 : fold(e.text).includes(w) ? 1 : -99), 0)}))
+    .filter(r => r.score > 0).sort((a, b) => b.score - a.score).map(r => r.e);
+}
+
 // location risk profile for the general region (user-reported, used to put relevant hazards first)
 const RISKS = [['pantai','Dekat pantai'],['gunung','Dekat gunung api'],['lereng','Di lereng / perbukitan'],['sungai','Dekat sungai / dataran rendah rawan banjir'],['asap','Wilayah rawan kabut asap karhutla']];
 
@@ -823,6 +1004,15 @@ const SOURCES = {
   kemkesdiare: {title:'Kemenkes — Diare pada anak', url:'https://keslan.kemkes.go.id/view_artikel/3028/diare-pada-anak', scope:'Oralit, zinc 10 hari, ASI, dan tanda bahaya.'},
   whodiare: {title:'WHO — Diarrhoeal disease', url:'https://www.who.int/news-room/fact-sheets/detail/diarrhoeal-disease', scope:'Oralit, zinc, dan pencegahan; berbahasa Inggris.'},
   whorabies: {title:'WHO — Rabies', url:'https://www.who.int/news-room/fact-sheets/detail/rabies', scope:'Pencucian luka gigitan dan vaksin pasca-gigitan; berbahasa Inggris.'},
+  cdcboil: {title:'CDC — Boil Water Advisory', url:'https://www.cdc.gov/natural-disasters/psa-toolkit/boil-water-advisory.html', scope:'Merebus air: mendidih bergolak 1 menit; berbahasa Inggris.'},
+  sphere: {title:'Sphere Handbook — standar minimum kemanusiaan', url:'https://spherestandards.org/handbook/', scope:'Air, sanitasi, dan kebersihan di pengungsian.'},
+  whopfa: {title:'WHO — Psychological First Aid: Guide for Field Workers', url:'https://www.who.int/publications/i/item/9789241548205', scope:'Prinsip Lihat, Dengar, Hubungkan.'},
+  organicmaps: {title:'Organic Maps — peta offline', url:'https://organicmaps.app/', scope:'Peta yang dapat diunduh dan dipakai dengan GPS tanpa internet.'},
+  readyplan: {title:'Ready.gov — Make a Plan', url:'https://www.ready.gov/plan', scope:'Rencana komunikasi keluarga dan pesan teks saat darurat; berbahasa Inggris.'},
+  rri: {title:'Jurnal — Jurnalisme bencana program Kentongan RRI', url:'https://jurnal.unissula.ac.id/index.php/makna/article/view/22694', scope:'Peran RRI dalam informasi kebencanaan.'},
+  permenpmr: {title:'Permenkominfo No. 2 Tahun 2023 — izin kelas frekuensi radio', url:'https://peraturan.go.id/id/permenkominfo-no-2-tahun-2023', scope:'PMR 409 MHz tanpa ISR; telah diubah Permen Komdigi 2/2025.'},
+  natuna: {title:'CNN Indonesia — BNPB minta jaringan RAPI/ORARI dimanfaatkan', url:'https://www.cnnindonesia.com/teknologi/20230309174741-213-923064/sinyal-di-wilayah-bencana-seperti-natuna-belum-pulih-apa-opsinya', scope:'Peran ORARI dan RAPI saat jaringan telekomunikasi lumpuh.'},
+  utahsignal: {title:'Be Ready Utah — Emergency Signaling', url:'https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/communication/signaling/', scope:'Peluit, SOS, cermin, dan isyarat darat-udara; berbahasa Inggris.'},
   bpbd: {title:'BPBD Kabupaten Malang', url:'https://bpbd.malangkab.go.id/', only:'malang', scope:'Informasi daerah; konfirmasikan jalur evakuasi dan titik aman dengan desa/BPBD.'},
 };
 
@@ -836,6 +1026,7 @@ const INFO = [
  ['bpbd',{malang:'Nomor BPBD Kab. Malang', umum:'Nomor BPBD kabupaten/kota'},'isi dari sumber resmi'],
  ['rt','Ketua RT / RW','nama & nomor'],
  ['pkm','Puskesmas / RS / bidan terdekat','nama & nomor'],
+ ['radio','Radio: kanal HT keluarga & frekuensi RRI/radio lokal','mis. HT PMR kanal 5 (cadangan 9), dengar tiap jam :00 · RRI …', true],
  ['catatan','Catatan lain','mis. siapa menjemput anak dari sekolah', true],
 ];
 const MEMBER_FIELDS = [['nama','Nama'],['hp','No. HP'],['goldar','Gol. darah'],['obat','Obat / alergi'],['butuh','Kebutuhan khusus'],['tugas','Tugas saat darurat']];
@@ -1165,6 +1356,7 @@ function cardHtml(){
     ${row('Alamat', i.alamat)}
     <div class="grid2">${row('Titik kumpul 1', i.titik1)}${row('Titik kumpul 2', i.titik2)}${row('Pusat kabar (luar kota)', i.luar)}${row(R({malang:'BPBD Kab. Malang', umum:'BPBD'}), i.bpbd)}${row('RT / RW', i.rt)}${row('Puskesmas / RS / bidan', i.pkm)}</div>
     ${i.jalur ? row('Jalur evakuasi', i.jalur) : ''}
+    ${i.radio ? row('Radio', i.radio) : ''}
     ${['titik1','titik2'].some(k => S.geo[k]) ? `<div><b>Koordinat titik kumpul:</b> ${['titik1','titik2'].map((k, n) => S.geo[k] ? `${n+1}: ${S.geo[k].lat}, ${S.geo[k].lon}` : '').filter(Boolean).join(' · ')}</div>` : ''}
     ${S.routes.some(r => r.nama || r.tujuan) ? `<h5>Rute evakuasi</h5><div>${S.routes.filter(r => r.nama || r.tujuan).map(r => `${esc(r.nama || 'Rute')} → ${esc(r.tujuan || '?')}${r.km ? ` (${fmtNum(r.km)} km)` : ''}${r.via ? `, lewat ${esc(r.via)}` : ''}`).join('<br>')}</div>` : ''}
     <h5>Nomor darurat</h5><div>${esc(nums)}</div>
@@ -1379,7 +1571,7 @@ function selectHazard(key){
 }
 // Expand details for a complete printed emergency guide, then restore the view.
 let printDetails = [];
-addEventListener('beforeprint', () => { printDetails = [...document.querySelectorAll('#hazards details, #p3kList details')].map(d=>[d,d.open]); printDetails.forEach(([d])=>d.open=true); });
+addEventListener('beforeprint', () => { printDetails = [...document.querySelectorAll('#hazards details, #p3kList details, #t-lib details')].map(d=>[d,d.open]); printDetails.forEach(([d])=>d.open=true); });
 addEventListener('afterprint', () => {
   printDetails.forEach(([d,open])=>d.open=open);
   document.body.classList.remove('print-only');
@@ -1522,6 +1714,102 @@ async function refreshWx(force){
   finally { wxBusy = false; renderWx(); }
 }
 
+// ---------- library tab ----------
+const topicHtml = (x, prefix) => `<details class="card fa" id="${prefix}-${x.k}">
+  <summary><span aria-hidden="true">${x.ic}</span> ${esc(x.t)}</summary>
+  <ol class="fa-steps">${x.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+  ${x.note ? `<p class="tip">${esc(x.note)}</p>` : ''}
+  ${x.no ? `<div class="badbox">${x.no.map(n => '✕ ' + esc(n)).join('<br>')}</div>` : ''}
+  ${x.call ? `<div class="warnbox">${esc(x.call)}</div>` : ''}
+  ${x.src?.length ? `<p class="src">Rujukan: ${sourceLinks(x.src)}</p>` : ''}</details>`;
+const prettyMorse = s => toMorse(s).replace(/\./g, '·').replace(/-/g, '–') || '—';
+let morseText = 'SOS';
+function renderLib(){
+  $('#libSurvive').innerHTML = LIB.map(x => topicHtml(x, 'lib')).join('');
+  $('#libComms').innerHTML = COMMS.map(x => topicHtml(x, 'lib')).join('');
+  $('#morseCard').innerHTML = `<h3>📶 Kode Morse</h3><p class="muted">Ketik pesan pendek, lalu kirim lewat kedipan layar atau bunyi. SOS = ··· ––– ···</p>
+    <input type="text" id="morseIn" maxlength="40" value="${esc(morseText)}" aria-label="Teks untuk kode Morse" style="width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px">
+    <div class="morse-out" id="morseOut">${esc(prettyMorse(morseText))}</div>
+    <div class="tools" style="margin:0"><button class="btn sm" data-signal="light" data-text="morse">💡 Kedip</button><button class="btn sm" data-signal="sound" data-text="morse">🔊 Bunyi</button></div>`;
+  $('#phonCard').innerHTML = `<h3>🔤 Alfabet fonetik</h3><p class="muted">Untuk mengeja nama dan alamat lewat radio atau telepon yang suaranya tidak jelas.</p>
+    <div class="phon">${PHONETIC.map(w => `<div><b>${w[0]}</b>${w}</div>`).join('')}</div>`;
+  $('#libOffline').innerHTML = OFFLINE_RES.map(r => `<div class="card"><h3><a href="${r.url}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">${esc(r.t)}</a></h3><p class="muted" style="margin:6px 0 0">${esc(r.d)}</p></div>`).join('');
+}
+function renderSearch(q){
+  const res = q.trim().length >= 2 ? searchGuides(q) : null;
+  $('#libBody').hidden = !!res;
+  $('#libResults').innerHTML = !res ? '' : res.length
+    ? res.slice(0, 20).map(e => `<button class="res" data-goto="${e.type}:${e.k}">${e.ic} <b>${esc(e.t)}</b><small>${e.where}</small></button>`).join('')
+    : '<p class="muted">Tidak ada panduan yang cocok. Coba kata lain.</p>';
+}
+function gotoGuide(type, k){
+  if(type === 'haz'){ S.actView = 'bencana'; save(); renderP3k(); showTab('t-act'); return selectHazard(k); }
+  if(type === 'fa'){ S.actView = 'p3k'; save(); renderP3k(); showTab('t-act'); }
+  else { $('#libSearch').value = ''; renderSearch(''); showTab('t-lib'); }
+  const d = document.getElementById((type === 'fa' ? 'fa-' : 'lib-') + k);
+  if(d){ d.open = true; setTimeout(() => d.scrollIntoView({block:'start'}), 50); }
+}
+
+// SOS by screen flash and/or tone, repeating until stopped; keeps the screen awake where supported
+let sig = null;
+function startSignal(mode, text = 'SOS'){
+  stopSignal();
+  const tl = morseTimeline(text);
+  if(!tl.length) return toast('Ketik huruf atau angka dulu.', true);
+  tl.push([false, 7]);
+  const unit = 250, light = mode !== 'sound', sound = mode !== 'light';
+  let ac = null, gain = null;
+  if(sound){
+    try { ac = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ac.createOscillator(); osc.type = 'square'; osc.frequency.value = 2000;
+      gain = ac.createGain(); gain.gain.value = 0; osc.connect(gain).connect(ac.destination); osc.start();
+    } catch { ac = null; gain = null; toast('Bunyi tidak didukung di perangkat ini.', true); }
+  }
+  const ov = $('#sigOverlay'); ov.hidden = false; ov.classList.remove('on');
+  $('#sigTxt').textContent = `${text.toUpperCase()} · ${[light && 'kedip', sound && 'bunyi'].filter(Boolean).join(' + ')} · ketuk layar untuk berhenti`;
+  let i = 0, timer = null, lock = null;
+  navigator.wakeLock?.request('screen').then(l => { lock = l; }).catch(() => {});
+  const step = () => {
+    const [on, u] = tl[i];
+    if(light) ov.classList.toggle('on', on);
+    if(gain) gain.gain.setValueAtTime(on ? 0.9 : 0, ac.currentTime);
+    i = (i + 1) % tl.length; timer = setTimeout(step, u * unit);
+  };
+  step();
+  sig = {stop(){ clearTimeout(timer); if(ac) ac.close(); ov.hidden = true; ov.classList.remove('on'); if(lock) lock.release().catch(() => {}); }};
+}
+function stopSignal(){ if(sig){ sig.stop(); sig = null; } }
+
+let smsOpen = false, smsGeo = null;
+function renderSms(){
+  const box = $('#smsBox');
+  if(!smsOpen){ box.innerHTML = ''; return; }
+  const who = S.members.find(m => m.nama)?.nama || '';
+  box.innerHTML = `<div class="cform" style="margin-top:12px">
+    <div class="row2"><div><label class="lbl" for="sm-who">Siapa</label><input type="text" id="sm-who" value="${esc(who ? `${who} (${ctx().n} orang)` : '')}" placeholder="nama, jumlah orang"></div>
+      <div><label class="lbl" for="sm-what">Kejadian</label><input type="text" id="sm-what" list="sm-what-list" placeholder="mis. banjir"><datalist id="sm-what-list">${HAZ.map(h => `<option value="${esc(h.lbl.toLowerCase())}">`).join('')}</datalist></div></div>
+    <div><label class="lbl" for="sm-where">Di mana</label><input type="text" id="sm-where" value="${esc(S.info.alamat || '')}" placeholder="alamat atau patokan"></div>
+    <div class="geo-tools" style="margin:0"><button class="btn sm" id="sm-gps">📍 Tambahkan lokasi GPS</button><span class="muted" id="sm-gpsinfo">${smsGeo ? `${smsGeo.lat}, ${smsGeo.lon}` : 'GPS bekerja tanpa internet'}</span></div>
+    <div class="row2"><div><label class="lbl" for="sm-cond">Kondisi</label><input type="text" id="sm-cond" placeholder="mis. 1 lansia luka kaki"></div>
+      <div><label class="lbl" for="sm-need">Butuh</label><input type="text" id="sm-need" placeholder="mis. evakuasi, air minum"></div></div>
+    <div><label class="lbl" for="sm-to">Kirim ke (nomor HP)</label><input type="tel" id="sm-to" value="${esc(phoneIn(S.info.luar))}" placeholder="nomor pusat kabar / keluarga"></div>
+    <div><label class="lbl" for="sm-text">Pesan <span class="muted" id="sm-count"></span></label><textarea id="sm-text" aria-label="Isi pesan darurat"></textarea></div>
+    <div class="tools" style="margin:0"><a class="btn pri" id="sm-send" href="#">✉️ Kirim SMS</a><button class="btn" id="sm-share">Bagikan…</button><button class="btn" id="sm-copy">Salin</button></div>
+    <p class="muted" style="margin:0">Dikirim lewat aplikasi SMS di HP — tidak perlu internet, cukup sinyal seluler. Mengubah kolom di atas akan menyusun ulang pesan.</p></div>`;
+  updateSms();
+}
+function updateSms(){
+  const v = id => ($('#' + id)?.value || '').trim();
+  const msg = sosMessage({who:v('sm-who'), where:v('sm-where'), geo:smsGeo, what:v('sm-what'), cond:v('sm-cond'), need:v('sm-need')});
+  $('#sm-text').value = msg;
+  updateSmsLink();
+}
+function updateSmsLink(){
+  const msg = $('#sm-text').value, to = $('#sm-to').value.replace(/[^\d+]/g, '');
+  $('#sm-count').textContent = `· ${msg.length} karakter${msg.length > 160 ? ' (lebih dari 1 SMS)' : ''}`;
+  $('#sm-send').href = `sms:${to}?&body=${encodeURIComponent(msg)}`;
+}
+
 const meterCls = (v, target) => v >= target ? '' : v >= target/2 ? 'warn' : 'bad';
 function renderEndurance(){
   const e = endurance(), c = ctx(), target = S.days;
@@ -1649,6 +1937,18 @@ document.addEventListener('click', e => {
   const go = t.closest('[data-go]'); if(go) return showTab(go.dataset.go);
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
+  const sg = t.closest('[data-signal]'); if(sg) return startSignal(sg.dataset.signal, sg.dataset.text === 'morse' ? morseText : 'SOS');
+  if(t.closest('#sigOverlay')) return stopSignal();
+  const gt = t.closest('[data-goto]'); if(gt){ const [type, k] = gt.dataset.goto.split(':'); return gotoGuide(type, k); }
+  if(t.id === 'openSms'){ smsOpen = !smsOpen; return renderSms(); }
+  if(t.id === 'sm-gps'){ t.disabled = true;
+    getPosition().then(p => { smsGeo = {lat:roundTo(p.lat, 5), lon:roundTo(p.lon, 5)}; $('#sm-gpsinfo').textContent = `${smsGeo.lat}, ${smsGeo.lon} (±${Math.round(p.acc)} m)`; updateSms(); })
+      .catch(err => toast(err.message, true)).finally(() => { t.disabled = false; });
+    return; }
+  if(t.id === 'sm-share'){ const text = $('#sm-text').value;
+    if(navigator.share) return navigator.share({text}).catch(() => {});
+    return copyText(text).then(ok => toast(ok ? 'Pesan disalin.' : 'Tidak bisa menyalin otomatis.', !ok)); }
+  if(t.id === 'sm-copy') return copyText($('#sm-text').value).then(ok => toast(ok ? 'Pesan disalin.' : 'Tidak bisa menyalin otomatis.', !ok));
   const act = t.closest('[data-act]'); if(act){ S.actView = act.dataset.act; save(); return renderP3k(); }
   const hl = t.closest('[data-hazlink]');
   if(hl){ S.actView = 'bencana'; save(); renderP3k(); showTab('t-act'); if(document.getElementById('hazard-' + hl.dataset.hazlink)) selectHazard(hl.dataset.hazlink); return; }
@@ -1727,6 +2027,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if((e.key === 'Enter' || e.key === ' ') && e.target.closest('#cats .cat-h')){ e.preventDefault(); e.target.click(); }
+  if(e.key === 'Escape') stopSignal();
   if(e.key === 'Enter' && e.target.id === 'wxCity'){ e.preventDefault(); $('#wxFind').click(); }
 });
 document.addEventListener('change', e => {
@@ -1757,6 +2058,10 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('input', e => {
   const t = e.target;
+  if(t.id === 'libSearch') renderSearch(t.value);
+  if(t.id === 'morseIn'){ morseText = t.value; $('#morseOut').textContent = prettyMorse(morseText); }
+  if(/^sm-(who|what|where|cond|need)$/.test(t.id)) updateSms();
+  if(t.id === 'sm-text' || t.id === 'sm-to') updateSmsLink();
   if(t.dataset.info){ S.info[t.dataset.info] = t.value; save(); renderCard(); if(/^titik/.test(t.dataset.info)) renderRoutes(); }
   if(t.dataset.r && t.dataset.rf !== 'km'){ S.routes[+t.dataset.r][t.dataset.rf] = t.value.slice(0, 200); save(); renderCard(); }
   if(t.dataset.m){ S.members[+t.dataset.m][t.dataset.f] = t.value; save(); renderCard(); }
@@ -1766,11 +2071,11 @@ document.addEventListener('input', e => {
 if(S.theme) document.documentElement.dataset.theme = S.theme;
 // home-screen shortcuts open ?tab=…&act=…&view=…
 { const q = new URLSearchParams(location.search);
-  if(['t-fam','t-list','t-plan','t-act','t-info'].includes(q.get('tab'))) S.tab = q.get('tab');
+  if(['t-fam','t-list','t-plan','t-act','t-info','t-lib'].includes(q.get('tab'))) S.tab = q.get('tab');
   if(['bencana','p3k'].includes(q.get('act'))) S.actView = q.get('act');
   if(['list','shop'].includes(q.get('view'))) S.view = q.get('view');
   if(q.toString()) history.replaceState(null, '', location.pathname + location.hash); }
-renderAll(); renderHaz(); renderInfo(); showTab(S.tab || 't-fam');
+renderAll(); renderHaz(); renderInfo(); renderLib(); showTab(S.tab || 't-fam');
 if(navigator.storage?.persist) navigator.storage.persist().catch(() => {});
 
 // QR import: the shared plan arrives as #import=<code>

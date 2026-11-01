@@ -131,3 +131,22 @@ Sumber tambahan:
 - [UNY — Materi P3K (PDF)](https://besmart.uny.ac.id/v2/pluginfile.php/1749871/mod_resource/content/6/MATERI%208.%20PERTOLONGAN%20PERTAMA%20PADA%20KECELAKAAN%20%28P3K%29.pdf)
 - [Alodokter — Cara membuat oralit](https://www.alodokter.com/ini-cara-membuat-oralit-untuk-diare-di-rumah)
 - [Alomedika — Apakah larutan gula garam masih digunakan?](https://alomedika.com/komunitas/topic/oralit-rumahan)
+
+## 13. Riset v1.4 — komunikasi, radio & bertahan hidup
+- **HT tanpa izin:** Permenkominfo 2/2023 (izin kelas; diubah Permen Komdigi 2/2025) memuat PMR 409,74375–409,99375 MHz, 500 mW ERP, 20 kanal — tanpa ISR, perangkat harus bersertifikat. Di luar itu, HT wajib izin (ISR, atau keanggotaan + izin ORARI/RAPI). Isi perubahan 2025 belum diperiksa — aplikasi meminta pengguna mengecek teks resmi.
+- **ORARI & RAPI:** BNPB meminta jaringan RAPI/ORARI dimanfaatkan saat telekomunikasi lumpuh (Natuna 2023); BMKG bekerja sama dengan RAPI untuk diseminasi peringatan. Daftar frekuensi darurat resmi tidak ditemukan.
+- **RRI:** program Kentongan (informasi kebencanaan) dan siaran darurat dari lokasi bencana; Radio Tanggap Merapi (BNPB–RRI).
+- **Air:** CDC — mendidih bergolak 1 menit (3 menit di atas 2.000 m); WHO membolehkan langsung diangkat setelah mendidih. Takaran pemutih bergantung kadar (EPA 8,25%: 2 tetes/L) → tidak dicantumkan. SODIS 6 jam tidak terverifikasi → tidak dicantumkan.
+- **Sanitasi:** kakus darurat minimal 30 m dari sumber air (Sphere).
+- **Isyarat:** 3 tiupan peluit dan SOS (3 pendek–3 panjang–3 pendek) dikenal luas; simbol darat-udara (X/V) tidak konsisten antarsumber → hanya "tulis SOS besar ≥3 m".
+- **P3K psikologis:** WHO 2011 — Lihat, Dengar, Hubungkan; bukan konseling.
+- **Ensiklopedia offline:** Kiwix (gratis, Android/iOS/desktop) + paket ZIM dari library.kiwix.org; Wikipedia tersedia varian mini/nopic/maxi. Ukuran paket bahasa Indonesia tidak terverifikasi → tidak dicantumkan.
+
+Sumber tambahan:
+- [Permenkominfo No. 2 Tahun 2023](https://peraturan.go.id/id/permenkominfo-no-2-tahun-2023) · [BPK — teks PDF](https://peraturan.bpk.go.id/Download/316746/2023permen2.pdf) · [Permen Komdigi 2/2025 (perubahan)](https://www.klaussa.com/peraturan/permen-no-2-tahun-2025-peraturan-menteri-komunikasi-dan-digital-nomor-2-tahun-2025-tentang-perubahan)
+- [CNN Indonesia — BNPB & jaringan RAPI/ORARI](https://www.cnnindonesia.com/teknologi/20230309174741-213-923064/sinyal-di-wilayah-bencana-seperti-natuna-belum-pulih-apa-opsinya) · [BMKG Sumbar — kerja sama RAPI](https://www.bmkg.go.id/berita/kegiatan/bmkg-sumbar-jalin-kerjasama-dengan-pengurus-daerah-radio-antar-pendduduk-indonesia-provinsi-sumbar)
+- [Jurnal — Program Kentongan RRI](https://jurnal.unissula.ac.id/index.php/makna/article/view/22694) · [Antara — Radio Tanggap Merapi](https://m.antaranews.com/amp/berita/233409/radio-tanggap-merapi-diresmikan)
+- [CDC — Boil Water Advisory](https://www.cdc.gov/natural-disasters/psa-toolkit/boil-water-advisory.html) · [Indiana/EPA — emergency disinfection](https://www.in.gov/localhealth/harrisoncounty/environmental-health/emergency-disinfection-of-drinking-water/)
+- [Sphere Handbook](https://spherestandards.org/handbook/) · [WHO — Psychological First Aid](https://www.who.int/publications/i/item/9789241548205)
+- [Be Ready Utah — Emergency Signaling](https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/communication/signaling/)
+- [Kiwix](https://kiwix.org/en/) · [Kiwix FAQ](https://www.kiwix.org/faq/) · [Kiwix Library](https://library.kiwix.org/) · [Organic Maps](https://organicmaps.app/)

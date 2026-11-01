@@ -248,3 +248,42 @@ test('routes, coordinates, prices and calculator settings survive backup validat
   assert.equal(shared.routes[0].tujuan, 'Bukit');
   assert.equal(shared.geo.titik1.lon, 112.6);
 });
+
+test('Morse: encoding and on/off timeline follow standard timing', ()=>{
+  const a = app();
+  assert.equal(a.run('toMorse("sos")'), '... --- ...');
+  assert.equal(a.run('toMorse("ok 1")'), '--- -.- / .----');
+  const tl = a.run('JSON.stringify(morseTimeline("SOS"))');
+  // S = 3 dots (1 on, 1 gap), letter gap 3, O = 3 dashes (3 on)
+  assert.ok(tl.startsWith('[[true,1],[false,1],[true,1],[false,1],[true,1],[false,3],[true,3]'));
+  assert.equal(a.run('morseTimeline("SOS").reduce((s, [, u]) => s + u, 0)'), 27);
+  assert.equal(a.run('morseTimeline("!!").length'), 0);
+});
+
+test('emergency SMS: who, where with GPS and map link, what, condition, needs, time', ()=>{
+  const a = app();
+  const msg = a.run('sosMessage({who:"Budi (4 orang)", where:"Jl. Raya 12", geo:{lat:-8.39012, lon:112.7123}, what:"banjir", cond:"1 lansia luka", need:"evakuasi"}, new Date(2026, 10, 1, 14, 5))');
+  assert.equal(msg, 'DARURAT. Saya: Budi (4 orang). Lokasi: Jl. Raya 12 · -8.39012,112.7123. Peta: maps.google.com/?q=-8.39012,112.7123 Kejadian: banjir. Kondisi: 1 lansia luka. Butuh: evakuasi. Jam 14.05');
+  assert.equal(a.run('sosMessage({}, new Date(2026, 0, 1, 9, 0))'), 'DARURAT. Jam 09.00');
+  assert.equal(a.run('phoneIn("Tante Rina (Surabaya) 0812-3456-7890")'), '081234567890');
+  assert.equal(a.run('phoneIn("+62 812 3456 7890 kantor")'), '+6281234567890');
+  assert.equal(a.run('phoneIn("belum ada")'), '');
+});
+
+test('library and radio guides have sources; PMR facts stated; offline search finds guides across tabs', ()=>{
+  const a = app();
+  assert.equal(a.run('[...LIB, ...COMMS].every(x => x.steps.length >= 3 && (x.src || []).every(id => SOURCES[id]?.url.startsWith("https://")))'), true);
+  assert.equal(a.run('[...LIB, ...COMMS].filter(x => !x.src).map(x => x.k).join()'), 'etika');   // only general radio etiquette is unsourced, and says so
+  const pmr = a.run('JSON.stringify(COMMS.find(x => x.k === "pmr"))');
+  assert.match(pmr, /409,74375–409,99375 MHz/);
+  assert.match(pmr, /500 mW/);
+  assert.match(pmr, /wajib izin/);
+  assert.doesNotMatch(a.run('JSON.stringify(LIB)'), /\d+\s*tetes/);   // no bleach drop dosing
+  const types = q => a.run(`searchGuides(${JSON.stringify(q)}).map(e => e.type + ":" + e.k).join()`);
+  assert.match(types('radio'), /lib:fm|lib:pmr/);
+  assert.match(types('luka bakar'), /^fa:bakar/);
+  assert.match(types('kaporit'), /lib:air/);
+  assert.match(types('tsunami'), /haz:tsunami/);
+  assert.equal(types('zzzz'), '');
+  assert.equal(a.run('PHONETIC.length'), 26);
+});
