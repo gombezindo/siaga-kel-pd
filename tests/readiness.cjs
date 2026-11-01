@@ -338,3 +338,17 @@ test('videos, workouts and quiz data are well-formed', ()=>{
   assert.equal(a.run('QUIZ.every(x => x.a.length === 4 && x.c >= 0 && x.c < 4 && x.e && new Set(x.a).size === 4)'), true);
   assert.equal(a.run('QUIZ.length'), 16);
 });
+
+test('imports never switch location groups silently while sharing', ()=>{
+  const a = app();
+  a.run('globalThis.fsReq = () => Promise.resolve(null); S.famGroup = "MyFamilyGroupCode_12345"; S.live = {mid:"dev1234567890", name:"Ayah", on:true, lastSent:"2026-11-01T07:00:00Z", status:""}');
+  assert.match(a.run('famImportNote({famGroup:"AttackerGroupCode_99999"})'), /DIMATIKAN/);
+  assert.equal(a.run('famImportNote({famGroup:"MyFamilyGroupCode_12345"})'), '');
+  a.run('globalThis.d1 = {famGroup:""}; adoptFamGroup(d1)');
+  assert.equal(a.run('"famGroup" in d1 || S.live.on !== true'), false);          // empty group: keep current group and sharing
+  a.run('adoptFamGroup({famGroup:"MyFamilyGroupCode_12345"})');
+  assert.equal(a.run('S.live.on'), true);                                        // same group: unchanged
+  a.run('adoptFamGroup({famGroup:"AttackerGroupCode_99999"})');
+  assert.equal(a.run('S.live.on'), false);                                       // different group: sharing switched off
+  assert.equal(a.run('S.live.lastSent'), null);
+});

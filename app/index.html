@@ -2098,6 +2098,18 @@ function renderFamily(){
       <small class="muted">Disimpan di Firebase (server Jakarta) hanya lokasi terakhir, tidak ada riwayat. Lokasi lebih dari 24 jam tidak ditampilkan; hapus kapan saja. Siapa pun yang tahu kode grup bisa melihat lokasi anggota — bagikan kode hanya ke keluarga.</small>`}`;
 }
 let myPosCache = null;
+// Imports (QR, backup) may carry a family group code. Never switch groups silently while this device shares
+// its location: a different group turns sharing off and removes this device's location from the old group.
+function famImportNote(data){
+  return data.famGroup && data.famGroup !== S.famGroup
+    ? '\n\nPERHATIAN: data ini berisi grup lokasi keluarga yang berbeda. Berbagi lokasi di HP ini akan DIMATIKAN; nyalakan lagi hanya bila Anda mempercayai grup tersebut.' : '';
+}
+function adoptFamGroup(data){
+  if(!data.famGroup){ delete data.famGroup; return; }   // a plan without a group keeps the current one
+  if(data.famGroup === S.famGroup) return;
+  if(S.live.lastSent && validGid(S.famGroup) && online()) fsReq('DELETE', `fam/${S.famGroup}/m/${S.live.mid}`).catch(() => {});
+  S.live.on = false; S.live.lastSent = null; famList = null;
+}
 function checkinHtml(){
   if(!checkin) return '';
   const msg = checkin.msg, to = phoneIn(S.info.luar);
@@ -2504,8 +2516,10 @@ document.addEventListener('change', e => {
     file.text().then(txt => {
       let parsed; try { parsed = JSON.parse(txt); } catch { throw new Error('File bukan JSON yang valid.'); }
       const {data, warn} = sanitizeData(parsed);
-      if(!confirm(`Pulihkan cadangan?\n\nIsi: ${summarize(data)}.${warn.length ? `\nDiabaikan karena tidak valid: ${warn.join(', ')}.` : ''}\n\nData di HP ini akan diganti.`)) return;
-      S = migrate(Object.assign({}, data, {tab:S.tab})); save(); renderAll(); renderHaz(); renderInfo();
+      if(!confirm(`Pulihkan cadangan?\n\nIsi: ${summarize(data)}.${warn.length ? `\nDiabaikan karena tidak valid: ${warn.join(', ')}.` : ''}\n\nData di HP ini akan diganti.${famImportNote(data)}`)) return;
+      adoptFamGroup(data);
+      const keep = {tab:S.tab, live:S.live, famGroup:S.famGroup, eqSeen:S.eqSeen};   // device-specific state survives a restore
+      S = migrate(Object.assign({}, data, keep, 'famGroup' in data ? {famGroup:data.famGroup} : {})); save(); renderAll(); renderHaz(); renderInfo(); renderFamily(); renderMode();
       toast('Data dipulihkan.');
     }).catch(err => toast(err.message || 'File cadangan tidak valid.', true));
   }
@@ -2542,8 +2556,9 @@ async function importFromHash(){
   history.replaceState(null, '', location.pathname + location.search);
   try {
     const data = await decodeShare(m[1]);
-    if(!confirm(`Impor rencana keluarga dari QR?\n\nIsi: ${summarize(data)}.\n\nRencana, kontak, dan data anggota di HP ini akan diganti. Stok tidak berubah.`)) return;
-    Object.assign(S, data); save(); renderAll(); renderHaz(); renderInfo(); showTab('t-info');
+    if(!confirm(`Impor rencana keluarga dari QR?\n\nIsi: ${summarize(data)}.\n\nRencana, kontak, dan data anggota di HP ini akan diganti. Stok tidak berubah.${famImportNote(data)}`)) return;
+    adoptFamGroup(data);
+    Object.assign(S, data); save(); renderAll(); renderHaz(); renderInfo(); renderFamily(); renderMode(); showTab('t-info');
     toast('Rencana keluarga berhasil diimpor.');
   } catch(err){ toast('QR tidak bisa dibaca: ' + (err.message || 'format salah'), true); }
 }
