@@ -159,6 +159,11 @@ h3{font-size:16px;margin:0}
 .geo-tools input,.wx-tools input{flex:1;min-width:150px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 8px;font-size:14px}
 .wx-days{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;font-size:13px}
 .wx-days div{background:var(--bg);border-radius:10px;padding:8px}
+.install-card{display:flex;gap:12px;align-items:flex-start;border-color:var(--accent);background:var(--accent-soft)}
+.install-card img{width:48px;height:48px;border-radius:12px;flex:none}
+.install-card .txt{flex:1;min-width:0}
+.install-card ol{margin:8px 0 0;padding-left:20px;font-size:14px}
+.install-card .tools{margin:10px 0 0}
 .linkrow{background:none;border:0;padding:4px 0;width:100%;text-align:left;cursor:pointer;color:inherit}
 .hz-ready{font-size:14px;background:var(--bg);border-radius:10px;padding:10px 12px;margin:4px 0 8px}
 .cform{display:grid;gap:10px}
@@ -284,6 +289,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 1. KELUARGA -->
 <section id="t-fam" class="on">
   <button class="btn quick-entry" data-go="t-act">Buka tindakan darurat</button>
+  <div class="card install-card noprint" id="installCard" hidden></div>
   <div class="card">
     <h3>Wilayah panduan</h3>
     <p class="muted">Pilih panduan khusus Malang Selatan atau panduan umum untuk seluruh Indonesia.</p>
@@ -411,7 +417,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <h3>Data &amp; cadangan</h3>
     <div id="dataStatus"></div>
     <div class="tools noprint">
-      <button class="btn pri" id="installBtn" hidden>Pasang di HP</button>
+      <button class="btn pri" id="installBtn" data-install hidden>📲 Pasang di HP</button>
       <button class="btn" id="exportBtn">Simpan cadangan (.json)</button>
       <label class="btn">Pulihkan cadangan<input type="file" id="importIn" accept=".json,application/json" hidden></label>
       <button class="btn" id="themeBtn">Ganti tema</button>
@@ -1758,6 +1764,12 @@ document.addEventListener('input', e => {
 
 // ---------- init ----------
 if(S.theme) document.documentElement.dataset.theme = S.theme;
+// home-screen shortcuts open ?tab=…&act=…&view=…
+{ const q = new URLSearchParams(location.search);
+  if(['t-fam','t-list','t-plan','t-act','t-info'].includes(q.get('tab'))) S.tab = q.get('tab');
+  if(['bencana','p3k'].includes(q.get('act'))) S.actView = q.get('act');
+  if(['list','shop'].includes(q.get('view'))) S.view = q.get('view');
+  if(q.toString()) history.replaceState(null, '', location.pathname + location.hash); }
 renderAll(); renderHaz(); renderInfo(); showTab(S.tab || 't-fam');
 if(navigator.storage?.persist) navigator.storage.persist().catch(() => {});
 
@@ -1799,12 +1811,51 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     .catch(() => {});
 }
 netStatus();
-addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('#installBtn').hidden = false; });
-addEventListener('appinstalled', () => { $('#installBtn').hidden = true; });
-$('#installBtn').addEventListener('click', () => {
-  if(!installEvt) return;
-  installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; $('#installBtn').hidden = true; });
+// ---------- install (Add to Home Screen) ----------
+// Chrome/Edge on Android & desktop fire beforeinstallprompt; iOS Safari and in-app browsers never do, so show manual steps.
+let showHowTo = false;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function installPlatform(){
+  const ua = navigator.userAgent;
+  if(/FBAN|FBAV|Instagram|Line\/|WhatsApp|; wv\)/i.test(ua)) return 'inapp';
+  if(/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if(/Android/i.test(ua)) return 'android';
+  return 'desktop';
+}
+const HOWTO = {
+  android:['Buka situs ini di <b>Chrome</b>.','Ketuk menu <b>⋮</b> di kanan atas.','Pilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>, lalu <b>Instal</b>.'],
+  ios:['Buka situs ini di <b>Safari</b>.','Ketuk tombol <b>Bagikan</b> (kotak dengan panah ke atas).','Pilih <b>Tambah ke Layar Utama</b>, lalu <b>Tambah</b>.'],
+  inapp:['Anda membuka dari dalam aplikasi lain (mis. WhatsApp) yang tidak bisa memasang aplikasi.','Ketuk menu <b>⋮</b> lalu <b>Buka di Chrome</b> (iPhone: <b>Buka di Safari</b>).','Setelah terbuka di browser, ketuk lagi tombol <b>Pasang aplikasi</b>.'],
+  desktop:['Buka di <b>Chrome</b> atau <b>Edge</b>.','Klik ikon pasang di ujung kanan kolom alamat, atau menu <b>⋮</b> → <b>Instal Siaga Keluarga</b>.'],
+};
+function renderInstall(){
+  const card = $('#installCard');
+  if(isStandalone() || S.installed){ card.hidden = true; $('#installBtn').hidden = true; return; }
+  $('#installBtn').hidden = false;
+  const later = S.installLater && daysUntil(S.installLater) > -14;   // "Nanti" hides the card for 14 days
+  card.hidden = later && !showHowTo;
+  const how = showHowTo || !installEvt;
+  card.innerHTML = `<img src="icons/icon-192.png" alt="">
+    <div class="txt"><h3>Pasang Siaga Keluarga di HP</h3>
+      <p class="muted" style="margin:4px 0 0">Buka langsung dari layar utama seperti aplikasi biasa, dan tetap bisa dipakai tanpa internet.</p>
+      ${how ? `<ol>${HOWTO[installPlatform()].map(s => `<li>${s}</li>`).join('')}</ol>` : ''}
+      <div class="tools">${installEvt ? '<button class="btn pri" data-install>📲 Pasang aplikasi</button>' : ''}<button class="btn" id="installLater">Nanti</button></div></div>`;
+}
+async function doInstall(){
+  if(!installEvt){ showHowTo = true; S.installLater = null; save(); renderInstall(); showTab('t-fam'); return; }
+  const evt = installEvt; installEvt = null;
+  evt.prompt();
+  const choice = await evt.userChoice.catch(() => null);
+  if(choice?.outcome === 'accepted') toast('Siaga Keluarga sedang dipasang. Buka dari layar utama HP.');
+  renderInstall();
+}
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderInstall(); });
+addEventListener('appinstalled', () => { S.installed = true; installEvt = null; save(); renderInstall(); toast('Aplikasi terpasang. Buka dari layar utama HP.'); });
+document.addEventListener('click', e => {
+  if(e.target.closest('[data-install]')) return doInstall();
+  if(e.target.id === 'installLater'){ S.installLater = ymd(new Date()); showHowTo = false; save(); renderInstall(); }
 });
+renderInstall();
 </script>
 </body>
 </html>
