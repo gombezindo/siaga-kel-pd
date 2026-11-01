@@ -1,7 +1,7 @@
 // Service worker: keeps the whole app available offline.
 // Page: network-first (gets updates when online, falls back to cache offline).
 // Other files: cache-first. Bump VERSION when adding/removing precached files.
-const VERSION = 'siaga-v5';
+const VERSION = 'siaga-v6';
 const FILES = ['./', './index.html', './manifest.webmanifest', './vendor/qrcode.js',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
 

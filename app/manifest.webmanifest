@@ -11,22 +11,109 @@
   "orientation": "any",
   "background_color": "#f7f5f2",
   "theme_color": "#c2410c",
-  "categories": ["health", "lifestyle", "utilities"],
+  "categories": [
+    "health",
+    "lifestyle",
+    "utilities"
+  ],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "screenshots": [
-    { "src": "screenshots/narrow-1.png", "sizes": "1080x2340", "type": "image/png", "form_factor": "narrow", "label": "Ketahanan logistik keluarga" },
-    { "src": "screenshots/narrow-2.png", "sizes": "1080x2340", "type": "image/png", "form_factor": "narrow", "label": "Tindakan saat bencana" },
-    { "src": "screenshots/narrow-3.png", "sizes": "1080x2340", "type": "image/png", "form_factor": "narrow", "label": "Daftar belanja kebutuhan darurat" },
-    { "src": "screenshots/wide-1.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide", "label": "Siaga Keluarga di komputer" }
+    {
+      "src": "screenshots/narrow-1.png",
+      "sizes": "1080x2340",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ketahanan logistik keluarga"
+    },
+    {
+      "src": "screenshots/narrow-2.png",
+      "sizes": "1080x2340",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tindakan saat bencana"
+    },
+    {
+      "src": "screenshots/narrow-3.png",
+      "sizes": "1080x2340",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Daftar belanja kebutuhan darurat"
+    },
+    {
+      "src": "screenshots/wide-1.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Siaga Keluarga di komputer"
+    }
   ],
   "shortcuts": [
-    { "name": "Tindakan darurat", "short_name": "Darurat", "url": "./?tab=t-act&act=bencana", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Pertolongan pertama (P3K)", "short_name": "P3K", "url": "./?tab=t-act&act=p3k", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Daftar belanja", "short_name": "Belanja", "url": "./?tab=t-list&view=shop", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Rencana & kartu darurat", "short_name": "Rencana", "url": "./?tab=t-info", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+    {
+      "name": "Mode darurat",
+      "short_name": "Darurat",
+      "url": "./?survival=",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pertolongan pertama (P3K)",
+      "short_name": "P3K",
+      "url": "./?tab=t-act&act=p3k",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Daftar belanja",
+      "short_name": "Belanja",
+      "url": "./?tab=t-list&view=shop",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Rencana & kartu darurat",
+      "short_name": "Rencana",
+      "url": "./?tab=t-info",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

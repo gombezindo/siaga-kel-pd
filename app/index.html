@@ -165,6 +165,37 @@ h3{font-size:16px;margin:0}
 .install-card ol{margin:8px 0 0;padding-left:20px;font-size:14px}
 .install-card .tools{margin:10px 0 0}
 .lib-h{margin:18px 0 8px;font-size:17px;scroll-margin-top:96px}
+body.surv-open{overflow:hidden}
+.surv{position:fixed;inset:0;z-index:35;background:#1a0f0d;color:#fff;display:flex;flex-direction:column}
+.surv-body{flex:1;overflow:auto;padding:16px 16px 24px;max-width:760px;width:100%;margin:0 auto}
+.surv h2{margin:4px 0 6px;font-size:26px}
+.sv-lead{color:#f3d9d0;margin:0 0 14px}
+.sv-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.sv-pick button{background:#3a1d17;border:2px solid #7f1d1d;color:#fff;border-radius:14px;padding:16px 8px;font-size:17px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sv-pick button span{font-size:34px}
+.sv-head{display:flex;align-items:center;gap:10px;font-size:20px;margin-bottom:10px}
+.sv-back{background:none;border:1px solid #7f6a64;color:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
+.sv-go{background:#14532d;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:15px}
+.sv-step{background:#b91c1c;border-radius:16px;padding:16px;margin-bottom:12px}
+.sv-step.done{background:#14532d}
+.sv-n{font-weight:700;font-size:14px;opacity:.9}
+.sv-bar{height:6px;background:rgba(255,255,255,.25);border-radius:99px;margin:6px 0 10px;overflow:hidden}.sv-bar i{display:block;height:100%;background:#fff}
+.sv-text{font-size:22px;font-weight:700;line-height:1.35;margin:6px 0 14px}
+.sv-nav{display:flex;gap:10px}
+.surv .btn{background:#fff;color:#111;border-color:#fff}
+.surv .btn[disabled]{opacity:.4}
+.sv-big{flex:1;font-size:18px;padding:14px}
+.sv-card{background:#2a1714;border-radius:12px;padding:12px;margin-bottom:10px;font-size:15px}
+.sv-card a{color:#fdba74}.sv-card .muted,.surv .muted{color:#d6c4bf}
+.sv-card ol{margin:8px 0 0;padding-left:20px}.sv-card li{margin-bottom:6px}
+.sv-chk{display:flex;gap:10px;align-items:center;padding:6px 0}
+.sv-chk input{width:22px;height:22px;accent-color:#16a34a}
+.sv-small{font-size:13px;color:#d6c4bf}
+.surv-bar{display:grid;grid-template-columns:repeat(6,1fr);background:#000;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.surv-bar button,.surv-bar a{background:none;border:0;color:#fff;font-size:22px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;text-decoration:none}
+.surv-bar span{font-size:11px}
+.skill-need{font-size:14px;background:var(--bg);border-radius:10px;padding:8px 10px;margin:8px 0}
+.skill-vids{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.skill-vids small{flex-basis:100%}
 #sec-sinyal{scroll-margin-top:96px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
 .chips a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
@@ -337,7 +368,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 
 <!-- 1. KELUARGA -->
 <section id="t-fam" class="on">
-  <button class="btn quick-entry" data-go="t-act">Buka tindakan darurat</button>
+  <button class="btn quick-entry" data-survival="">🆘 Mode Darurat — panduan langkah demi langkah</button>
   <div class="card install-card noprint" id="installCard" hidden></div>
   <div class="card noprint" id="modeCard"></div>
   <div class="card">
@@ -485,7 +516,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <section id="t-lib" class="hz">
   <h2>Pustaka Darurat</h2>
   <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, alat sinyal, video, dan aktivitas saat listrik padam.</p>
-  <div class="chips noprint"><a href="#sec-sinyal">🆘 Sinyal</a><a href="#sec-hidup">🧭 Bertahan hidup</a><a href="#sec-radio">📻 Radio</a><a href="#sec-video">🎬 Video</a><a href="#sec-aktif">🎲 Aktivitas</a><a href="#sec-offline">📚 Offline</a></div>
+  <div class="chips noprint"><a href="#sec-sinyal">🆘 Sinyal</a><a href="#sec-hidup">🧭 Bertahan hidup</a><a href="#sec-radio">📻 Radio</a><a href="#sec-skill">🛠️ Keterampilan</a><a href="#sec-video">🎬 Video</a><a href="#sec-aktif">🎲 Aktivitas</a><a href="#sec-offline">📚 Offline</a></div>
   <div class="card" id="sec-sinyal">
     <h3>🆘 Alat sinyal darurat</h3>
     <p class="muted">Kedip SOS membuat layar berkedip putih-hitam — naikkan kecerahan layar. Ketuk layar untuk berhenti.</p>
@@ -499,6 +530,9 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <h3 class="lib-h" id="sec-radio">📻 Komunikasi &amp; radio</h3><div id="libComms"></div>
     <div class="card" id="morseCard"></div>
     <div class="card" id="phonCard"></div>
+    <h3 class="lib-h" id="sec-skill">🛠️ Keterampilan bertahan hidup</h3>
+    <p class="muted">Praktikkan saat tenang bersama orang dewasa — jangan pertama kali saat bencana. Utamakan keselamatan: api hanya di luar ruangan dan selalu diawasi.</p>
+    <div id="skillList"></div>
     <h3 class="lib-h" id="sec-video">🎬 Video tutorial <span class="muted">· perlu internet</span></h3>
     <p class="muted">Video resmi dari kanal Info BMKG. Saat offline, daftar ini tetap jadi pengingat apa yang perlu ditonton.</p>
     <div id="vidList"></div>
@@ -520,6 +554,10 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 </div>
 
 <div class="print-sheet" id="ecardPrint"></div>
+<div class="surv" id="surv" role="dialog" aria-modal="true" aria-label="Mode darurat" hidden>
+  <div class="surv-body" id="survBody"></div>
+  <div class="surv-bar"><button data-signal="light">🔦<span>Kedip SOS</span></button><button data-signal="sound">🔊<span>Bunyi SOS</span></button><button data-checkin="aman">✅<span>Saya aman</span></button><button data-checkin="bantuan">🆘<span>Butuh bantuan</span></button><a href="tel:112">📞<span>112</span></a><button id="survClose">✕<span>Keluar</span></button></div>
+</div>
 <div class="sig" id="sigOverlay" role="button" aria-label="Hentikan sinyal" hidden><div class="sig-txt" id="sigTxt">SOS · ketuk layar untuk berhenti</div></div>
 <div class="print-sheet" id="shopPrint"></div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -1032,6 +1070,7 @@ function searchGuides(q){
   const entries = [
     ...LIB.map(x => ({type:'lib', k:x.k, ic:x.ic, t:x.t, where:'Bertahan hidup', text:[x.t, ...x.steps, ...(x.no||[]), x.call||''].join(' ')})),
     ...COMMS.map(x => ({type:'lib', k:x.k, ic:x.ic, t:x.t, where:'Komunikasi & radio', text:[x.t, ...x.steps, x.note||''].join(' ')})),
+    ...SKILLS.map(x => ({type:'lib', k:x.k, ic:x.ic, t:x.t, where:'Keterampilan bertahan hidup', text:[x.t, ...(x.need||[]), ...x.steps, ...(x.no||[]), x.call||''].join(' ')})),
     ...FIRSTAID.map(x => ({type:'fa', k:x.k, ic:x.ic, t:x.t, where:'Pertolongan pertama', text:[x.t, ...x.steps, ...(x.no||[]), x.note||'', x.call||''].join(' ')})),
     ...hazList().map(h => ({type:'haz', k:h.k, ic:h.ic, t:R(h.t), where:'Saat bencana', text:[R(h.t), h.lbl, ...h.quick, ...R(h.a), ...(h.after||[])].join(' ')})),
   ];
@@ -1140,6 +1179,143 @@ function checkinMessage(kind, who, geo, now = new Date()){
 const agoText = iso => { const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
   return !Number.isFinite(m) ? '—' : m < 1 ? 'baru saja' : m < 60 ? `${m} menit lalu` : m < 1440 ? `${Math.floor(m/60)} jam lalu` : `${Math.floor(m/1440)} hari lalu`; };
 
+// ---------- survival mode (full-screen, step by step, offline) ----------
+// steps follow the hazard guides above (BNPB/BMKG); `go` tells where to look for safety, `bring` adds hazard-specific items
+const SURVIVAL = [
+ {k:'gempa', ic:'🌏', lbl:'Gempa bumi', haz:'gempa', go:'Lapangan terbuka, jauh dari bangunan, tiang listrik, pohon, papan reklame, dan tebing.', steps:[
+  'Saat masih berguncang: MERUNDUK, lindungi kepala dan leher, berlindung di bawah meja kuat, berpegangan.',
+  'Jauhi kaca, lemari, dan benda yang bisa jatuh. Jangan memakai lift atau berlari di tangga saat masih berguncang.',
+  'Guncangan berhenti: pakai alas kaki, ambil tas evakuasi, keluar lewat jalur yang aman.',
+  'Matikan kompor, gas, dan listrik bila aman. Tercium bau gas? Jangan nyalakan api atau saklar.',
+  'Tuju lapangan terbuka atau titik kumpul — jauh dari bangunan, tiang listrik, pohon, papan reklame, dan tebing. Waspadai pecahan kaca dan genteng.',
+  'Di pesisir dan guncangan kuat atau lama? Jangan tunggu sirene — lanjutkan ke Mode Tsunami.',
+  'Kumpulkan dan hitung anggota keluarga. Kabari keluarga bahwa Anda aman.',
+  'Waspada gempa susulan. Jangan masuk bangunan yang retak sampai dinyatakan aman. Ambil info hanya dari BMKG/BPBD.'],
+  bring:['Sepatu atau sandal kuat','Senter','Peluit'], next:'tsunami'},
+ {k:'tsunami', ic:'🌊', lbl:'Tsunami', haz:'tsunami', go:'Bukit atau tempat tinggi sejauh mungkin dari pantai. Bila tak sempat: lantai atas bangunan beton yang kokoh.', steps:[
+  'Gempa kuat atau lama di pesisir, atau air laut surut tiba-tiba: LANGSUNG pergi. Jangan tunggu sirene, jangan kembali mengambil barang.',
+  'Lari ke bukit atau tempat tinggi, menjauh dari pantai dan sungai. Ikuti rambu jalur evakuasi.',
+  'Jalan kaki atau motor — mobil mudah terjebak macet. Hindari jembatan dan jalan di tepi sungai.',
+  'Tidak sempat ke tempat tinggi: naik ke lantai paling atas bangunan beton yang kokoh.',
+  'Bantu anak, lansia, dan penyandang disabilitas di sekitar Anda bila bisa tanpa membahayakan diri.',
+  'Tetap di tempat tinggi. Gelombang tsunami datang berkali-kali — turun hanya setelah BMKG/BPBD menyatakan aman.',
+  'Kabari keluarga dan pusat kabar di luar kota.'],
+  bring:['Air minum botol','Senter','Peluit']},
+ {k:'banjir', ic:'🌧️', lbl:'Banjir', haz:'banjir', go:'Tempat yang lebih tinggi: lantai atas, bukit, atau posko pengungsian — jauh dari sungai dan saluran air.', steps:[
+  'Pantau kabar desa/BPBD. Air mulai naik? Bersiap pergi lebih awal — jangan menunggu air tinggi.',
+  'Matikan listrik dari MCB dan tutup kran gas.',
+  'Naikkan dokumen dan barang berharga ke tempat tinggi; masukkan dokumen ke plastik kedap air.',
+  'Ambil tas evakuasi, obat, dan perlengkapan bayi/lansia.',
+  'Pergi ke tempat tinggi atau posko pengungsian lewat jalan yang tidak tergenang.',
+  'Jangan berjalan atau berkendara melewati arus — air setinggi lutut bisa menyeret orang dewasa, setinggi ban bisa menghanyutkan motor.',
+  'Jauhi sungai, selokan terbuka, gorong-gorong, dan kabel listrik yang jatuh.',
+  'Kabari keluarga. Jangan kembali ke rumah sampai air surut dan dinyatakan aman.'],
+  bring:['Jas hujan','Plastik kedap air untuk dokumen','Tali']},
+ {k:'longsor', ic:'⛰️', lbl:'Longsor', haz:'banjir', go:'Tanah datar dan stabil, jauh dari lereng, tebing, dan alur aliran tanah atau air.', steps:[
+  'Tanda bahaya: retakan baru di tanah atau dinding, pohon atau tiang miring, mata air tiba-tiba keruh atau hilang, suara gemuruh.',
+  'Segera menjauh dari lereng dan tebing, menuju tanah datar yang stabil. Jangan berhenti di jalur aliran tanah atau air.',
+  'Peringatkan tetangga di sekitar lereng.',
+  'Jangan kembali saat hujan deras masih turun — longsor susulan sering terjadi.',
+  'Laporkan ke desa/BPBD bila ada orang yang tertimbun; jangan menggali sendiri di lereng yang masih labil.',
+  'Kabari keluarga.'],
+  bring:['Senter','Jas hujan']},
+ {k:'erupsi', ic:'🌋', lbl:'Erupsi & abu', haz:'erupsi', go:'Di luar zona bahaya yang ditetapkan PVMBG/BPBD; bila hujan abu: di dalam ruangan tertutup.', steps:[
+  'Ikuti zona bahaya dan arahan evakuasi petugas. Jauhi lembah dan aliran sungai berhulu di gunung.',
+  'Hujan abu: masuk ke dalam rumah, tutup pintu, jendela, dan ventilasi.',
+  'Pakai masker N95 dan kacamata bila harus keluar. Lindungi bayi dan balita di dalam ruangan.',
+  'Tutup bak, sumur, tandon, dan wadah makanan.',
+  'Jangan kucek mata — bilas dengan air bersih mengalir.',
+  'Abu tebal di atap bisa membuatnya roboh — bersihkan dengan hati-hati bila aman.'],
+  bring:['Masker N95','Kacamata pelindung']},
+ {k:'cuaca', ic:'🌪️', lbl:'Angin kencang', haz:'cuaca', go:'Di dalam bangunan kokoh, jauh dari jendela kaca.', steps:[
+  'Awan gelap menjulang dan angin kencang: segera masuk ke bangunan kokoh.',
+  'Jauhi jendela kaca, pohon besar, baliho, tiang listrik, dan bangunan semi permanen.',
+  'Di jalan: menepi di tempat aman, jangan berteduh di bawah pohon atau baliho.',
+  'Setelah reda: waspadai kabel listrik putus dan pohon tumbang.'],
+  bring:['Senter']},
+ {k:'blackout', ic:'⚡', lbl:'Listrik padam', haz:'blackout', go:'Tetap di rumah bila aman; cari posko atau puskesmas ber-genset bila ada yang butuh alat medis listrik.', steps:[
+  'Kabari keluarga selagi sinyal masih ada; sepakati titik dan jam kumpul.',
+  'Isi ember dan bak dari tandon — pompa air listrik berhenti.',
+  'Cabut kulkas, TV, dan pompa dari stop kontak; sisakan 1 lampu sebagai tanda listrik kembali.',
+  'Hemat baterai HP dan powerbank; pakai senter, bukan lilin, bila bisa.',
+  'Genset dan kompor arang hanya di luar ruangan.',
+  'Pakai radio untuk kabar resmi.'],
+  bring:['Senter & baterai','Powerbank','Radio']},
+ {k:'terjebak', ic:'🧱', lbl:'Terjebak reruntuhan', haz:'gempa', go:'Tetap di tempat yang paling terlindung; bantu tim penyelamat menemukan Anda.', steps:[
+  'Jangan menyalakan api atau korek — bisa ada kebocoran gas.',
+  'Tutup mulut dan hidung dengan kain untuk menyaring debu.',
+  'Bergerak seminimal mungkin agar debu tidak naik dan reruntuhan tidak bergeser.',
+  'Tiup peluit atau ketuk pipa/dinding 3 kali berulang. Berteriak hanya sebagai pilihan terakhir — menguras tenaga dan menghirup debu.',
+  'Ada sinyal? Kirim SMS lokasi — SMS lebih mudah terkirim daripada telepon. Hemat baterai.',
+  'Tetap tenang dan bertahan; tim penyelamat mencari korban dengan mendengarkan suara.'],
+  bring:['Peluit','Kain penutup mulut']},
+];
+// what to grab: the evacuation bag plus family-specific needs plus the scenario's extras
+function survivalBring(sv, c = ctx()){
+  const out = ['Tas evakuasi (air, makanan, senter, P3K)','HP + powerbank','Dokumen & uang tunai'];
+  if(c.obat) out.push('Obat rutin + salinan resep');
+  if(c.bal) out.push('Susu, popok, dan perlengkapan bayi');
+  if(c.lan) out.push('Obat dan alat bantu lansia (kacamata, tongkat)');
+  if(c.hamil) out.push('Buku KIA & tas persalinan');
+  if(c.alat) out.push('Alat bantu & baterai cadangannya');
+  if(c.hewan) out.push('Hewan peliharaan, tali/kandang, dan pakan');
+  return [...out, ...sv.bring.filter(x => !out.some(o => o.toLowerCase().includes(x.toLowerCase())))];
+}
+
+// ---------- survival skills (Pustaka) ----------
+const ytSearch = q => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+const SKILLS = [
+ {k:'lampu', ic:'🪔', t:'Lampu darurat dari minyak goreng bekas', src:['utahcandle','oillamp'],
+  need:['Toples kaca/kaleng kecil yang stabil','Minyak goreng (bekas pun bisa, saring dulu)','Sumbu kapas: tali katun, kain katun digulung, atau sumbu kompor','Kawat untuk menjepit sumbu'],
+  steps:[
+  'Saring minyak bekas dengan kain agar sisa makanan tidak membuat banyak asap.',
+  'Tekuk kawat menjadi penjepit yang menggantung di bibir toples, dengan ujung sumbu mencuat ±0,5 cm di atasnya.',
+  'Tuang minyak sampai sedikit di bawah penjepit — jangan terlalu penuh, api bisa padam atau minyak meluap.',
+  'Rendam sumbu sampai basah oleh minyak, lalu nyalakan ujungnya. Atur panjang sumbu bila asap terlalu banyak.',
+  'Padamkan dengan menutup toples (mis. dengan tutup kaleng), bukan ditiup keras.'],
+  no:['Jangan menyiram api minyak dengan air — tutup rapat dengan tutup panci atau kain basah.','Jangan ditinggal tidur, jangan dekat gorden, kasur, atau jangkauan anak.'],
+  call:'Senter dan lampu LED tetap pilihan paling aman — lampu minyak hanya cadangan terakhir.',
+  vids:[{t:'Cari video lampu minyak goreng', url:ytSearch('cara membuat lampu darurat minyak goreng'), search:true}]},
+ {k:'filter', ic:'🪣', t:'Filter air berlapis (saringan pasir & arang)', src:['cawstbsf','cdcboil'],
+  need:['Ember atau botol besar berlubang kecil di dasar','Kerikil kecil dan pasir yang sudah dicuci bersih','Arang kayu ditumbuk (opsional)','Kain bersih','Wadah bersih bertutup untuk hasil saringan'],
+  steps:[
+  'Cuci kerikil dan pasir sampai air bilasan jernih.',
+  'Susun dari bawah: kain penutup lubang → kerikil → pasir kasar → arang (opsional) → pasir halus paling tebal → kain di atas sebagai penahan tuangan.',
+  'Endapkan dulu air keruh di ember lain beberapa jam, lalu tuang bagian atasnya pelan-pelan ke saringan.',
+  'Buang beberapa liter hasil saringan pertama sampai air keluar jernih.',
+  'Tampung di wadah bersih bertutup, lalu WAJIB direbus mendidih 1 menit (atau pakai tablet penjernih) sebelum diminum.'],
+  no:['Saringan darurat hanya menjernihkan — tidak membunuh kuman dan tidak menghilangkan bahan kimia.'],
+  call:'Filter biosand yang sesungguhnya (beton/plastik, desain CAWST) baru efektif menyaring kuman setelah lapisan biologisnya matang 2–4 minggu dengan pemakaian rutin. Tetap rebus bila ragu.',
+  vids:[{t:'CAWST — video pemakaian & perawatan biosand filter', url:'https://washresources.cawst.org/en/collections/dff54fff/biosand-filter-use-and-maintenance-videos'},
+        {t:'CAWST — cara kerja biosand filter', url:'https://washresources.cawst.org/en/resources/09f937d4/the-biosand-filter'}]},
+ {k:'kompor', ic:'🥫', t:'Kompor kaleng (hobo stove)', src:['scoutstove'],
+  need:['Kaleng besar bersih (kaleng susu/cat kosong), label dan sisa isinya dibuang','Pembuka kaleng, paku & palu, atau gunting seng','Sarung tangan kerja','Ranting kering kecil, serutan kayu, atau batok kelapa'],
+  steps:[
+  'Buang tutup atas kaleng. Pakai sarung tangan — tepi logam sangat tajam.',
+  'Buat "pintu" bahan bakar di sisi bawah: kira-kira 1/3 keliling kaleng, setinggi 1/4 kaleng.',
+  'Buat lubang udara melingkar di dekat dasar dan dekat bibir atas (sekitar 8–10 lubang per baris) agar api menyala baik dan panci tidak menutup aliran udara.',
+  'Letakkan kaleng tegak (bagian terbuka di atas) di tanah datar yang tidak mudah terbakar; panci nanti diletakkan di bibir atas kaleng.',
+  'Masukkan ranting kecil lewat pintu, nyalakan, lalu tambah bahan bakar sedikit-sedikit. Letakkan panci di atas.'],
+  no:['Hanya di luar ruangan: asap dan karbon monoksida (CO) mematikan di dalam tenda, rumah, atau mobil.','Jangan pakai kaleng bercat/berlapis plastik atau bekas bahan kimia. Kaleng sangat panas — jauhkan dari anak.'],
+  call:'Siapkan air atau pasir untuk memadamkan, dan padamkan sepenuhnya sebelum ditinggal.',
+  vids:[{t:'Cari video kompor kaleng (hobo stove)', url:ytSearch('cara membuat kompor kaleng hobo stove'), search:true}]},
+ {k:'hujan', ic:'🌧️', t:'Menampung air hujan', src:['cdcboil'],
+  need:['Ember atau drum bersih bertutup','Kain bersih untuk menyaring','Talang atau terpal yang dimiringkan'],
+  steps:[
+  'Biarkan air hujan 15–20 menit pertama terbuang — membawa debu, daun, dan kotoran dari atap.',
+  'Tampung lewat kain saring ke wadah bersih, lalu tutup rapat agar tidak jadi sarang nyamuk.',
+  'Untuk minum dan masak: rebus mendidih 1 menit dulu. Untuk mandi, cuci, dan WC bisa langsung.'],
+  no:['Jangan menampung air saat hujan abu vulkanik atau dari atap asbes/berkarat.']},
+ {k:'terpal', ic:'⛺', t:'Atap darurat dari terpal (bentuk A)', 
+  need:['Terpal','Tali ±10 m','Patok kayu atau batu pemberat'],
+  steps:[
+  'Pilih tanah yang sedikit lebih tinggi dan rata — bukan di bawah pohon rapuh, di kaki tebing, atau di alur air.',
+  'Bentangkan tali di antara dua pohon atau tiang setinggi dada, kencangkan.',
+  'Sampirkan terpal di atas tali sehingga membentuk huruf A; tarik kedua sisi miring ke tanah dan ikat ke patok atau beri batu pemberat.',
+  'Gali parit kecil di sekeliling agar air hujan tidak masuk; alasi lantai dengan terpal lain atau tikar.'],
+  note:'Praktik umum berkemah darurat; ikuti arahan posko pengungsian bila tersedia tenda resmi.'},
+];
+
 // location risk profile for the general region (user-reported, used to put relevant hazards first)
 const RISKS = [['pantai','Dekat pantai'],['gunung','Dekat gunung api'],['lereng','Di lereng / perbukitan'],['sungai','Dekat sungai / dataran rendah rawan banjir'],['asap','Wilayah rawan kabut asap karhutla']];
 
@@ -1168,6 +1344,10 @@ const SOURCES = {
   permenpmr: {title:'Permenkominfo No. 2 Tahun 2023 — izin kelas frekuensi radio', url:'https://peraturan.go.id/id/permenkominfo-no-2-tahun-2023', scope:'PMR 409 MHz tanpa ISR; telah diubah Permen Komdigi 2/2025.'},
   natuna: {title:'CNN Indonesia — BNPB minta jaringan RAPI/ORARI dimanfaatkan', url:'https://www.cnnindonesia.com/teknologi/20230309174741-213-923064/sinyal-di-wilayah-bencana-seperti-natuna-belum-pulih-apa-opsinya', scope:'Peran ORARI dan RAPI saat jaringan telekomunikasi lumpuh.'},
   utahsignal: {title:'Be Ready Utah — Emergency Signaling', url:'https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/communication/signaling/', scope:'Peluit, SOS, cermin, dan isyarat darat-udara; berbahasa Inggris.'},
+  utahcandle: {title:'Be Ready Utah — Candle & oil lamp safety', url:'https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/light-power/candle-safety/', scope:'Keamanan lilin dan lampu minyak; berbahasa Inggris.'},
+  oillamp: {title:'Mother Earth News — Make an olive oil lamp', url:'https://www.motherearthnews.com/diy/make-olive-oil-lamp/', scope:'Cara membuat lampu minyak nabati dengan sumbu; berbahasa Inggris.'},
+  cawstbsf: {title:'CAWST — Biosand Filter Manual (PDF)', url:'https://www3.ctahr.hawaii.edu/hawaiirain/Library/Guides&Manuals/CAWST%20files/Biosand%20Filter%20Manual_Version%2010_Sep%2009%5B1%5D.pdf', scope:'Cara kerja filter biosand dan waktu pematangan lapisan biologis.'},
+  scoutstove: {title:'Scouts South Africa — Conservation stoves', url:'https://scoutwiki.scouts.org.za/wiki/Conservation_stoves', scope:'Kompor kaleng hemat bahan bakar; berbahasa Inggris.'},
   bpbd: {title:'BPBD Kabupaten Malang', url:'https://bpbd.malangkab.go.id/', only:'malang', scope:'Informasi daerah; konfirmasikan jalur evakuasi dan titik aman dengan desa/BPBD.'},
 };
 
@@ -2036,7 +2216,7 @@ function showQuakeAlert(q, ref, test){
   el.className = 'eq-alert' + (ts ? ' tsu' : '');
   el.innerHTML = `<div class="eq-in"><b>${test ? '[UJI] ' : ''}${ts ? '🌊 BERPOTENSI TSUNAMI — segera jauhi pantai! ' : '⚠️ '}Gempa M${q.mag}${km !== null ? ` · ±${km} km dari ${esc(ref.name || 'lokasi Anda')}` : ''}</b>
     <div>${esc(q.tanggal)} ${esc(q.jam)} · ${esc(q.wilayah)}${q.depth ? ` · kedalaman ${esc(q.depth)}` : ''}${q.dirasakan ? ` · dirasakan: ${esc(q.dirasakan)}` : ''}${q.potensi ? ` · ${esc(q.potensi)}` : ''}</div>
-    <div class="tools"><button class="btn sm" data-hazlink="${ts ? 'tsunami' : 'gempa'}">Panduan ${ts ? 'tsunami' : 'gempa'}</button><button class="btn sm" data-checkin="aman">✅ Kabari keluarga: aman</button><button class="btn sm" id="eqClose">Tutup</button></div>
+    <div class="tools"><button class="btn sm" data-survival="${ts ? 'tsunami' : 'gempa'}">🆘 Mode darurat ${ts ? 'tsunami' : 'gempa'}</button><button class="btn sm" data-hazlink="${ts ? 'tsunami' : 'gempa'}">Panduan</button><button class="btn sm" data-checkin="aman">✅ Kabari keluarga: aman</button><button class="btn sm" id="eqClose">Tutup</button></div>
     <small>Sumber BMKG. Info muncul setelah gempa terjadi — bukan peringatan dini. Ikuti arahan BMKG/BPBD.</small></div>`;
   el.hidden = false;
   if(navigator.vibrate) navigator.vibrate([600, 200, 600, 200, 600]);
@@ -2231,6 +2411,57 @@ function renderActivities(){
   $('#ideaList').innerHTML = IDEAS.map(g => `<details class="card fa"><summary><span aria-hidden="true">${g.ic}</span> ${esc(g.t)}</summary><ul class="fa-steps">${g.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>`).join('');
 }
 
+// ---------- survival mode UI ----------
+let surv = null, survLock = null;   // {k, i, got:Set}
+function openSurvival(k){
+  surv = {k: SURVIVAL.some(s => s.k === k) ? k : null, i:0, got:new Set()};
+  $('#surv').hidden = false; document.body.classList.add('surv-open');
+  navigator.wakeLock?.request('screen').then(l => { survLock = l; }).catch(() => {});
+  renderSurvival();
+}
+function closeSurvival(){
+  surv = null; $('#surv').hidden = true; document.body.classList.remove('surv-open');
+  if(survLock){ survLock.release().catch(() => {}); survLock = null; }
+}
+function renderSurvival(){
+  const box = $('#survBody');
+  if(!surv.k){
+    box.innerHTML = `<h2>🆘 Mode Darurat</h2><p class="sv-lead">Apa yang sedang terjadi? Pilih untuk panduan langkah demi langkah — tetap jalan tanpa internet.</p>
+      <div class="sv-pick">${SURVIVAL.map(s => `<button data-surv="${s.k}"><span>${s.ic}</span>${esc(s.lbl)}</button>`).join('')}</div>`;
+    return;
+  }
+  const sv = SURVIVAL.find(s => s.k === surv.k), n = sv.steps.length, done = surv.i >= n;
+  const g = S.geo || {}, pts = ['titik1','titik2'].filter(k => S.info[k] || g[k]);
+  const bring = survivalBring(sv);
+  box.innerHTML = `<div class="sv-head"><button class="sv-back" data-surv="">◀ Ganti</button><b>${sv.ic} ${esc(sv.lbl)}</b></div>
+    <div class="sv-go"><b>Tujuan aman:</b> ${esc(sv.go)}</div>
+    ${done ? `<div class="sv-step done"><div class="sv-n">✓ Semua langkah selesai</div>
+        <p>Tetap di tempat aman, pantau info resmi BMKG/BPBD, dan kabari keluarga.</p>
+        ${sv.next ? `<button class="btn sv-big" data-surv="${sv.next}">Lanjut: Mode ${esc(SURVIVAL.find(s => s.k === sv.next).lbl)}</button>` : ''}</div>`
+      : `<div class="sv-step"><div class="sv-n">Langkah ${surv.i + 1} dari ${n}</div><div class="sv-bar"><i style="width:${surv.i / n * 100}%"></i></div>
+        <p class="sv-text">${esc(sv.steps[surv.i])}</p>
+        <div class="sv-nav"><button class="btn" id="svPrev"${surv.i ? '' : ' disabled'}>◀ Kembali</button><button class="btn sv-big" id="svNext">✓ Sudah, lanjut</button></div></div>`}
+    ${pts.length || S.routes.length ? `<div class="sv-card"><b>📍 Titik kumpul keluarga</b>${pts.map(k => `<div>${esc(S.info[k] || (k === 'titik1' ? 'Titik kumpul 1' : 'Titik kumpul 2'))}${g[k] ? ` · <a href="${mapUrl(g[k])}" target="_blank" rel="noopener noreferrer">buka peta</a>` : ''}</div>`).join('')}
+      ${S.routes.filter(r => r.nama || r.tujuan).map(r => `<div class="muted">Rute: ${esc(r.nama || '')} → ${esc(r.tujuan || '')}${r.km ? ` (${fmtNum(r.km)} km)` : ''}</div>`).join('')}</div>` : ''}
+    <div class="sv-card"><b>🎒 Bawa ini</b>${bring.map((x, i) => `<label class="sv-chk"><input type="checkbox" data-svgot="${i}"${surv.got.has(i) ? ' checked' : ''}> ${esc(x)}</label>`).join('')}</div>
+    <details class="sv-card"><summary><b>Semua langkah</b></summary><ol>${sv.steps.map((s, i) => `<li${i < surv.i ? ' class="muted"' : ''}>${esc(s)}</li>`).join('')}</ol></details>
+    <p class="sv-small">Ikuti arahan petugas BPBD/BMKG di lokasi. Panduan lengkap: tab Saat Bencana.</p>`;
+}
+
+// ---------- survival skills (Pustaka) ----------
+function renderSkills(){
+  $('#skillList').innerHTML = SKILLS.map(x => `<details class="card fa" id="lib-${x.k}">
+    <summary><span aria-hidden="true">${x.ic}</span> ${esc(x.t)}</summary>
+    ${x.need ? `<p class="skill-need"><b>Bahan:</b> ${x.need.map(esc).join(' · ')}</p>` : ''}
+    <ol class="fa-steps">${x.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+    ${x.note ? `<p class="tip">${esc(x.note)}</p>` : ''}
+    ${x.no ? `<div class="badbox">${x.no.map(n => '✕ ' + esc(n)).join('<br>')}</div>` : ''}
+    ${x.call ? `<div class="warnbox">${esc(x.call)}</div>` : ''}
+    ${x.vids ? `<div class="skill-vids">${x.vids.map(v => `<a class="btn sm" href="${v.url}" target="_blank" rel="noopener noreferrer">${v.search ? '🔎' : '🎬'} ${esc(v.t)}</a>`).join('')}
+      ${x.vids.some(v => v.search) ? '<small class="muted">Hasil pencarian YouTube bukan rekomendasi resmi — utamakan video yang menekankan keselamatan.</small>' : ''}</div>` : ''}
+    ${x.src?.length ? `<p class="src">Rujukan: ${sourceLinks(x.src)}</p>` : ''}</details>`).join('');
+}
+
 const meterCls = (v, target) => v >= target ? '' : v >= target/2 ? 'warn' : 'bad';
 function renderEndurance(){
   const e = endurance(), c = ctx(), target = S.days;
@@ -2359,6 +2590,11 @@ document.addEventListener('click', e => {
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
   const sg = t.closest('[data-signal]'); if(sg) return startSignal(sg.dataset.signal, sg.dataset.text === 'morse' ? morseText : sg.dataset.text === 'mg' ? mg.cur : 'SOS');
+  const sv = t.closest('[data-survival]'); if(sv){ $('#eqAlert').hidden = true; return openSurvival(sv.dataset.survival); }
+  const sp = t.closest('[data-surv]'); if(sp && surv){ surv = {k:sp.dataset.surv || null, i:0, got:new Set()}; $('#survBody').scrollTop = 0; return renderSurvival(); }
+  if(t.id === 'svNext'){ surv.i++; if(navigator.vibrate) navigator.vibrate(60); return renderSurvival(); }
+  if(t.id === 'svPrev'){ surv.i = Math.max(0, surv.i - 1); return renderSurvival(); }
+  if(t.id === 'survClose' || t.closest('#survClose')) return closeSurvival();
   const md = t.closest('[data-mode]');
   if(md){ S.mode = md.dataset.mode; save(); netStatus(); renderMode(); renderWx(); renderFamily(); renderVideos(); if(online()){ refreshWx(); onlineTick(); } return; }
   if(t.id === 'eqClose'){ $('#eqAlert').hidden = true; return; }
@@ -2366,7 +2602,7 @@ document.addEventListener('click', e => {
     return showQuakeAlert({dt:new Date().toISOString(), lat:ref.lat - 0.4, lon:ref.lon + 0.2, mag:5.4, depth:'10 km', wilayah:'Contoh: 50 km dari lokasi Anda', potensi:'Tidak berpotensi tsunami', dirasakan:'', jam:'', tanggal:'UJI'}, ref, true); }
   if(t.id === 'eqNow'){ return pollQuakes().then(() => toast('Data gempa BMKG diperbarui.')).catch(() => toast('Gagal mengambil data BMKG.', true)); }
   if(t.id === 'eqNotif'){ return Notification.requestPermission().then(() => renderMode()); }
-  const ci = t.closest('[data-checkin]'); if(ci){ $('#eqAlert').hidden = true; return doCheckin(ci.dataset.checkin); }
+  const ci = t.closest('[data-checkin]'); if(ci){ $('#eqAlert').hidden = true; if(surv) closeSurvival(); return doCheckin(ci.dataset.checkin); }
   if(t.id === 'ci-share'){ const text = $('#ci-text').value; if(navigator.share) return navigator.share({text}).catch(() => {}); return copyText(text).then(ok => toast(ok ? 'Pesan disalin.' : 'Tidak bisa menyalin otomatis.', !ok)); }
   if(t.id === 'famCreate'){ S.famGroup = randId(16); S.live.name = S.live.name || S.members.find(m => m.nama)?.nama || ''; save(); famList = []; renderFamily(); renderCard(); return toast('Grup dibuat. Bagikan kode atau QR ke keluarga.'); }
   if(t.id === 'famJoin'){ const code = ($('#famJoinCode').value || '').trim();
@@ -2488,7 +2724,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if((e.key === 'Enter' || e.key === ' ') && e.target.closest('#cats .cat-h')){ e.preventDefault(); e.target.click(); }
-  if(e.key === 'Escape') stopSignal();
+  if(e.key === 'Escape'){ if(sig) stopSignal(); else if(surv) closeSurvival(); }
   if(e.key === 'Enter' && e.target.id === 'wxCity'){ e.preventDefault(); $('#wxFind').click(); }
 });
 document.addEventListener('change', e => {
@@ -2498,6 +2734,7 @@ document.addEventListener('change', e => {
   if(t.dataset.bq){ const [id, i] = t.dataset.bq.split(':'); const v = parseFloat(t.value); S.batches[id][+i].q = Number.isFinite(v) && v > 0 ? round1(v) : 0; save(); renderAll(); }
   if(t.dataset.be){ const [id, i] = t.dataset.be.split(':'); S.batches[id][+i].e = t.value; save(); renderAll(); }
   if(t.dataset.special){ S.special[t.dataset.special] = t.checked; save(); renderAll(); }
+  if(t.dataset.svgot !== undefined && surv){ const i = +t.dataset.svgot; t.checked ? surv.got.add(i) : surv.got.delete(i); }
   if(t.id === 'scSel'){ S.sc = t.value; save(); renderList(); }
   if(t.id === 'eqWatch'){ S.eqWatch = t.checked; save(); renderMode(); if(S.eqWatch) pollQuakes(); }
   if(t.id === 'eqRadius'){ S.eqRadius = +t.value; save(); }
@@ -2539,14 +2776,17 @@ document.addEventListener('input', e => {
 
 // ---------- init ----------
 if(S.theme) document.documentElement.dataset.theme = S.theme;
-// home-screen shortcuts open ?tab=…&act=…&view=…
+// home-screen shortcuts open ?tab=…&act=…&view=…&survival=…
+let survivalParam = null;
 { const q = new URLSearchParams(location.search);
   if(['t-fam','t-list','t-plan','t-act','t-info','t-lib'].includes(q.get('tab'))) S.tab = q.get('tab');
   if(['bencana','p3k'].includes(q.get('act'))) S.actView = q.get('act');
   if(['list','shop'].includes(q.get('view'))) S.view = q.get('view');
+  if(q.has('survival')) survivalParam = q.get('survival');
   if(q.toString()) history.replaceState(null, '', location.pathname + location.hash); }
 if(!S.live.mid) S.live.mid = randId(12);
-renderAll(); renderHaz(); renderInfo(); renderLib(); renderMode(); renderFamily(); renderVideos(); renderActivities(); showTab(S.tab || 't-fam');
+renderAll(); renderHaz(); renderInfo(); renderLib(); renderSkills(); renderMode(); renderFamily(); renderVideos(); renderActivities(); showTab(S.tab || 't-fam');
+if(survivalParam !== null) openSurvival(survivalParam);
 if(navigator.storage?.persist) navigator.storage.persist().catch(() => {});
 
 // QR import: the shared plan arrives as #import=<code>

@@ -16,6 +16,12 @@ node --test tests/readiness.cjs
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 
+## Perubahan v1.6 (1 November 2026)
+
+- **🆘 Mode Darurat** (tombol merah di atas tab Keluarga, shortcut layar utama "Mode darurat", dan tombol di banner gempa): layar penuh kontras tinggi, layar dijaga menyala. Pilih situasi — gempa, tsunami, banjir, longsor, erupsi & abu, angin kencang, listrik padam, terjebak reruntuhan — lalu ikuti **langkah satu per satu** (✓ Sudah, lanjut). Setiap situasi menampilkan **tujuan aman** (mis. banjir → tempat tinggi/bukit/posko; gempa → lapangan terbuka jauh dari bangunan, tiang listrik, pohon, papan reklame), **titik kumpul & rute keluarga** dengan tautan peta, dan **daftar bawa** yang menyesuaikan keluarga (bayi, ibu hamil, obat rutin, alat bantu, hewan). Gempa di pesisir mengarah ke Mode Tsunami. Bar cepat: kedip/bunyi SOS, saya aman, butuh bantuan, telepon 112. Jalan tanpa internet.
+- **🛠️ Keterampilan bertahan hidup** (Pustaka): lampu darurat dari minyak goreng bekas, filter air berlapis (pasir & arang — hanya menjernihkan, wajib direbus; biosand asli butuh 2–4 minggu pematangan), kompor kaleng (hobo stove), menampung air hujan, atap terpal bentuk A. Tiap topik berisi bahan, langkah, larangan keselamatan, dan rujukan. Video: CAWST (resmi) untuk filter; untuk lampu & kompor hanya tautan pencarian YouTube berlabel "bukan rekomendasi resmi" (tidak ditemukan video dari sumber kredibel).
+- Service worker v6.
+
 ## Perubahan v1.5 (1 November 2026)
 
 - **Mode Online / Offline** (tab Keluarga). Offline: aplikasi tidak mengambil atau mengirim data apa pun ke internet; semua panduan tetap jalan. Online: cuaca, peringatan gempa, video, dan lokasi keluarga.

@@ -352,3 +352,30 @@ test('imports never switch location groups silently while sharing', ()=>{
   assert.equal(a.run('S.live.on'), false);                                       // different group: sharing switched off
   assert.equal(a.run('S.live.lastSent'), null);
 });
+
+test('survival mode: every scenario has a safe destination, steps, guide link; bring list follows the family', ()=>{
+  const a = app();
+  assert.equal(a.run('SURVIVAL.every(s => s.go && s.steps.length >= 4 && HAZ.some(h => h.k === s.haz) && (!s.next || SURVIVAL.some(x => x.k === s.next)))'), true);
+  assert.match(a.run('SURVIVAL.find(s => s.k === "banjir").go'), /tinggi/);
+  assert.match(a.run('SURVIVAL.find(s => s.k === "gempa").steps.join(" ")'), /lapangan terbuka.*tiang listrik/);
+  const base = a.run('survivalBring(SURVIVAL.find(s => s.k === "gempa"))');
+  assert.ok(base.includes('Tas evakuasi (air, makanan, senter, P3K)') && base.includes('Peluit'));
+  assert.ok(!base.some(x => /bayi|KIA/.test(x)));
+  a.run('S.fam.balita = 1; S.special.hamil = true; S.special.obat = true');
+  const fam = a.run('survivalBring(SURVIVAL.find(s => s.k === "banjir"))');
+  assert.ok(fam.some(x => /bayi/.test(x)) && fam.some(x => /KIA/.test(x)) && fam.some(x => /Obat rutin/.test(x)));
+  assert.equal(new Set(fam).size, fam.length);
+});
+
+test('survival skills: safety warnings, sourced, videos are https and search links labelled', ()=>{
+  const a = app();
+  assert.equal(a.run('SKILLS.every(x => x.steps.length >= 3 && x.need && (x.src || []).every(id => SOURCES[id]?.url.startsWith("https://")))'), true);
+  assert.equal(a.run('SKILLS.filter(x => !x.src).map(x => x.k).join()'), 'terpal');   // general camping practice, says so in its note
+  assert.match(a.run('JSON.stringify(SKILLS.find(x => x.k === "filter"))'), /WAJIB direbus/);
+  assert.match(a.run('JSON.stringify(SKILLS.find(x => x.k === "lampu").no)'), /Jangan menyiram api minyak dengan air/);
+  assert.match(a.run('JSON.stringify(SKILLS.find(x => x.k === "kompor").no)'), /Hanya di luar ruangan/);
+  assert.equal(a.run('SKILLS.flatMap(x => x.vids || []).every(v => v.url.startsWith("https://"))'), true);
+  assert.equal(a.run('SKILLS.find(x => x.k === "filter").vids.every(v => v.url.includes("cawst.org"))'), true);
+  assert.match(a.run('searchGuides("hobo stove").map(e => e.k).join()'), /kompor/);
+  assert.match(a.run('searchGuides("minyak goreng").map(e => e.k).join()'), /lampu/);
+});

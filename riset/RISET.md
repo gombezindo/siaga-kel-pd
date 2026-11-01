@@ -159,3 +159,17 @@ Sumber tambahan:
 Sumber tambahan:
 - [BMKG — Edukasi Gempa Bumi dan Tsunami](https://www.bmkg.go.id/gempabumi/mitigasi/edukasi-gempabumi-tsunami)
 - [BMKG Data Terbuka — TEWS](https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json)
+
+## 15. Riset v1.6 — mode darurat & keterampilan
+- **Setelah gempa:** BNPB/BPBD — keluar ke lapangan terbuka setelah guncangan berhenti; matikan kompor & listrik; jauhi tiang, pohon, sumber listrik, gedung yang mungkin roboh; waspadai pecahan kaca & genteng; info resmi dari BMKG/BPBD. Tsunami: evakuasi horizontal (jauhi pantai) atau vertikal (gedung tinggi).
+- **Biosand filter (CAWST):** lapisan biologis di atas pasir matang 2–4 minggu dengan pemakaian harian; air berdiri ±5 cm menjaga lapisan hidup. Saringan darurat pasir/arang tanpa pematangan hanya menjernihkan → wajib direbus.
+- **Lampu minyak nabati:** sumbu katun pada penjepit kawat, minyak di bawah penjepit; minyak goreng lebih berasap; senter lebih aman (Be Ready Utah). Jangan siram api minyak dengan air.
+- **Kompor kaleng:** pintu bahan bakar di bawah, lubang udara atas & bawah (±8–10 per baris lebih terkendali), tepi tajam, sangat panas; CO → hanya di luar ruangan (analogi peringatan kompor di tenda).
+- **Air hujan:** buang 15–20 menit pertama; rebus sebelum diminum.
+- Video YouTube kredibel untuk hobo stove & lampu minyak tidak ditemukan → hanya tautan pencarian berlabel.
+
+Sumber tambahan:
+- [CAWST — Biosand filter videos](https://washresources.cawst.org/en/collections/dff54fff/biosand-filter-use-and-maintenance-videos) · [CAWST — The Biosand Filter](https://washresources.cawst.org/en/resources/09f937d4/the-biosand-filter) · [CAWST Biosand Filter Manual (PDF)](https://www3.ctahr.hawaii.edu/hawaiirain/Library/Guides&Manuals/CAWST%20files/Biosand%20Filter%20Manual_Version%2010_Sep%2009%5B1%5D.pdf) · [SSWM — Biosand filter](https://sswm.info/humanitarian-crises/rural-settings/water-supply/water-purification/biosand-filter)
+- [Be Ready Utah — Candle & oil lamp safety](https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/light-power/candle-safety/) · [Mother Earth News — Olive oil lamp](https://www.motherearthnews.com/diy/make-olive-oil-lamp/)
+- [Scouts SA — Conservation stoves](https://scoutwiki.scouts.org.za/wiki/Conservation_stoves) · [Section Hiker — stove safety (CO)](https://sectionhiker.com/backpacking-stove-safety/)
+- [NU Online — prosedur penyelamatan saat gempa (LPBINU)](https://www.nu.or.id/nasional/lpbinu-bagikan-prosedur-penyelamatan-diri-saat-gempa-bumi-c3mGp) · [Kontan — panduan BMKG evakuasi tsunami](https://nasional.kontan.co.id/news/catat-panduan-bmkg-soal-evakuasi-darat-peringatan-dini-tsunami-di-tengah-pandemi?page=all)
