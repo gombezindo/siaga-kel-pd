@@ -345,8 +345,9 @@ test('community chat sanitizes messages and maps Firestore fields', ()=>{
 
 test('display themes expose four valid modes and survive backup validation', ()=>{
   const a = app();
-  assert.equal(a.run('Object.keys(THEME_INFO).join()'), 'light,dark,night,battery');
-  assert.equal(a.run('S.theme'), 'light');
+  assert.equal(a.run('Object.keys(THEME_INFO).join()'), 'auto,light,dark,night,battery');
+  assert.equal(a.run('S.theme'), 'auto');   // follows the phone's light/dark setting by default
+  assert.equal(a.run('sanitizeData({theme:"auto"}).data.theme'), 'auto');
   assert.equal(a.run('sanitizeData({theme:"night"}).data.theme'), 'night');
   assert.equal(a.run('sanitizeData({theme:"battery"}).data.theme'), 'battery');
   assert.equal(a.run('"theme" in sanitizeData({theme:"invalid"}).data'), false);
@@ -410,4 +411,24 @@ test('survival skills: safety warnings, sourced, videos are https and search lin
   assert.equal(a.run('SKILLS.find(x => x.k === "filter").vids.every(v => v.url.includes("cawst.org"))'), true);
   assert.match(a.run('searchGuides("hobo stove").map(e => e.k).join()'), /kompor/);
   assert.match(a.run('searchGuides("minyak goreng").map(e => e.k).join()'), /lampu/);
+});
+
+test('chat mute list is sanitized; offline messaging guidance is honest and sourced', ()=>{
+  const a = app();
+  assert.equal(JSON.stringify(a.run('cleanCommunity({muted:["dev_abc_123456", 5, "x".repeat(80)]}).muted')), '["dev_abc_123456"]');
+  assert.equal(JSON.stringify(a.run('cleanCommunity({}).muted')), '[]');
+  const mesh = a.run('JSON.stringify(COMMS.find(x => x.k === "mesh"))');
+  assert.match(mesh, /tidak bisa mengirim pesan langsung antar-HP/);
+  assert.match(mesh, /SEBELUM bencana/);
+  assert.equal(a.run('SOURCES.briar.url'), 'https://briarproject.org/manual/');
+  assert.match(a.run('searchGuides("bluetooth").map(e => e.k).join()'), /mesh/);
+});
+
+test('chat timestamps tolerate small phone clock differences', ()=>{
+  const html = fs.readFileSync(require('node:path').join(__dirname, '../app/index.html'), 'utf8');
+  const rules = fs.readFileSync(require('node:path').join(__dirname, '../firestore.rules'), 'utf8');
+  assert.match(html, /exp:new Date\(t\.getTime\(\)\+47\*3600e3\)/);   // below the 48 h rule cap
+  assert.match(rules, /d\.exp <= request\.time \+ duration\.value\(2, 'd'\)/);
+  const chatRule = rules.slice(rules.indexOf('function validChat'));
+  assert.match(chatRule, /d\.t > request\.time - duration\.value\(1, 'h'\)/);
 });

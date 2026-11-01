@@ -234,14 +234,17 @@ body.surv-open{overflow:hidden}
 .msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;overflow-wrap:anywhere}
 .msg.help{border-left:5px solid var(--bad)}.msg.offer{border-left:5px solid var(--ok)}.msg.info{border-left:5px solid var(--warn)}
 .msg-head{display:flex;gap:8px;justify-content:space-between;font-size:12px;color:var(--muted)}
-.msg p{margin:4px 0 0;white-space:pre-wrap}.msg .tag{font-weight:700;color:var(--ink)}
+.msg p{margin:4px 0 0;white-space:pre-wrap}.msg .mute{font-size:12px;margin-top:4px;color:var(--muted)}.msg .tag{font-weight:700;color:var(--ink)}
 .compose{display:grid;gap:8px}.compose textarea{width:100%;min-height:76px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;resize:vertical}
+.compose label{display:grid;gap:4px;font-size:13px;font-weight:600}
+.compose input,.compose select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;font-weight:400}
+.compose textarea{color:var(--ink);font-weight:400}
 .room-code{font:600 13px ui-monospace,Menlo,Consolas,monospace;word-break:break-all;background:var(--bg);border-radius:8px;padding:8px}
 .online-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:5px}.online-dot.off{background:var(--muted)}
-.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0 6px}
+.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:10px 0 6px}
 .theme-grid button{min-width:0;padding:8px 4px;line-height:1.2}.theme-grid button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .theme-note{display:block;min-height:21px;color:var(--muted);font-size:13px}
-@media(max-width:460px){.theme-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.theme-grid{grid-template-columns:repeat(3,1fr)}}
 .vid-g{margin:12px 0 6px}
 .vid{display:flex;gap:12px;align-items:center;padding:10px}
 .vid-box{width:120px;flex:none;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
@@ -515,6 +518,11 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
       <div id="communityRoom"></div>
     </div>
     <div class="card">
+      <h3>Tanpa internet?</h3>
+      <p class="muted">Chat ini butuh internet. Saat jaringan data mati: kirim <b>SMS</b> (tombol Saya aman / Pesan darurat), pakai <b>HT PMR 409 MHz</b>, atau aplikasi chat Bluetooth seperti <b>Briar</b> yang dipasang sebelum bencana.</p>
+      <button class="btn sm" data-goto="lib:mesh">Panduan chat tanpa internet</button>
+    </div>
+    <div class="card">
       <h3>Aturan ruang</h3>
       <ul>
         <li>Utamakan pesan singkat: kebutuhan, jumlah, area umum, dan waktu.</li>
@@ -562,6 +570,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div class="noprint">
       <h4 style="margin:12px 0 0">Tampilan layar</h4>
       <div class="theme-grid" role="group" aria-label="Pilih tampilan layar">
+        <button class="btn" data-theme-mode="auto">🔄 Otomatis</button>
         <button class="btn" data-theme-mode="light">☀️ Light</button>
         <button class="btn" data-theme-mode="dark">🌑 Dark</button>
         <button class="btn" data-theme-mode="night">🌙 Night</button>
@@ -650,7 +659,7 @@ const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,l
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
   have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null, custom:[],
   price:{}, calc:{}, geo:{}, routes:[], place:null, wx:null,
-  mode:'online', theme:'light', eqWatch:true, eqRadius:300, eqSeen:[], famGroup:'', live:{mid:'', name:'', on:false, status:''}, videos:[], quizBest:0,
+  mode:'online', theme:'auto', eqWatch:true, eqRadius:300, eqSeen:[], famGroup:'', live:{mid:'', name:'', on:false, status:''}, videos:[], quizBest:0,
   view:'list', loc:'semua', sc:'semua', tab:'t-fam'};
 
 // v1 kept one expiry date per item and a "confirmed" snapshot; v2 tracks quantities and purchase batches.
@@ -1081,6 +1090,12 @@ const COMMS = [
   'Memancar di frekuensi mereka wajib keanggotaan dan izin — jangan memancar tanpa izin.',
   'Saat darurat, cari anggota ORARI/RAPI terdekat atau posko; mereka bisa meneruskan berita keluar wilayah.',
   'Ingin lebih siap? Bergabung dan ikut latihan komunikasi darurat bersama organisasi lokal.']},
+ {k:'mesh', ic:'📶', t:'Chat antar-HP tanpa internet (Bluetooth/Wi-Fi)', src:['briar'], steps:[
+  'Chat di tab Komunitas butuh internet. Aplikasi web ini tidak bisa mengirim pesan langsung antar-HP lewat Bluetooth — itu keterbatasan browser.',
+  'Untuk chat tanpa internet, pasang aplikasi Briar (Android, gratis): saat internet mati, pesan disinkronkan lewat Bluetooth atau Wi-Fi ke HP yang berdekatan.',
+  'Siapkan SEBELUM bencana: pasang Briar di HP tiap anggota keluarga, lalu tambahkan kontak dengan bertemu langsung dan saling memindai QR.',
+  'Jangkauannya pendek (antar-HP yang berdekatan) — cocok di pengungsian atau satu lingkungan, bukan antar-kota.',
+  'Alternatif lain tanpa data internet: SMS (tombol Pesan darurat), HT PMR 409 MHz, dan isyarat SOS.']},
  {k:'etika', ic:'🗣️', t:'Cara bicara di radio', steps:[
   'Dengar dulu — jangan memotong percakapan orang lain.',
   'Tekan tombol bicara (PTT), tunggu 1 detik, bicara singkat dan jelas, lalu lepas.',
@@ -1414,6 +1429,7 @@ const SOURCES = {
   permenpmr: {title:'Permenkominfo No. 2 Tahun 2023 — izin kelas frekuensi radio', url:'https://peraturan.go.id/id/permenkominfo-no-2-tahun-2023', scope:'PMR 409 MHz tanpa ISR; telah diubah Permen Komdigi 2/2025.'},
   natuna: {title:'CNN Indonesia — BNPB minta jaringan RAPI/ORARI dimanfaatkan', url:'https://www.cnnindonesia.com/teknologi/20230309174741-213-923064/sinyal-di-wilayah-bencana-seperti-natuna-belum-pulih-apa-opsinya', scope:'Peran ORARI dan RAPI saat jaringan telekomunikasi lumpuh.'},
   utahsignal: {title:'Be Ready Utah — Emergency Signaling', url:'https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/communication/signaling/', scope:'Peluit, SOS, cermin, dan isyarat darat-udara; berbahasa Inggris.'},
+  briar: {title:'Briar — User Manual', url:'https://briarproject.org/manual/', scope:'Pesan lewat Bluetooth/Wi-Fi saat internet mati; Android; kontak ditambahkan dengan memindai QR.'},
   utahcandle: {title:'Be Ready Utah — Candle & oil lamp safety', url:'https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/light-power/candle-safety/', scope:'Keamanan lilin dan lampu minyak; berbahasa Inggris.'},
   oillamp: {title:'Mother Earth News — Make an olive oil lamp', url:'https://www.motherearthnews.com/diy/make-olive-oil-lamp/', scope:'Cara membuat lampu minyak nabati dengan sumbu; berbahasa Inggris.'},
   cawstbsf: {title:'CAWST — Biosand Filter Manual (PDF)', url:'https://www3.ctahr.hawaii.edu/hawaiirain/Library/Guides&Manuals/CAWST%20files/Biosand%20Filter%20Manual_Version%2010_Sep%2009%5B1%5D.pdf', scope:'Cara kerja filter biosand dan waktu pematangan lapisan biologis.'},
@@ -1702,7 +1718,7 @@ function sanitizeData(o){
   if('famGroup' in o) out.famGroup = validGid(o.famGroup) ? o.famGroup : '';
   if(Array.isArray(o.videos)) out.videos = o.videos.filter(isObj).slice(0, 30).map(v => ({id:ytId(v.id), t:str(v.t, 100) || 'Video'})).filter(v => v.id);
   if(['online','offline'].includes(o.mode)) out.mode = o.mode;
-  if(['light','dark','night','battery'].includes(o.theme)) out.theme = o.theme;
+  if(['auto','light','dark','night','battery'].includes(o.theme)) out.theme = o.theme;
   if(typeof o.eqWatch === 'boolean') out.eqWatch = o.eqWatch;
   if([100,300,500,1000].includes(o.eqRadius)) out.eqRadius = o.eqRadius;
   if(int(o.quizBest, 0, 100)) out.quizBest = o.quizBest;
@@ -2354,7 +2370,8 @@ let myPosCache = null;
 const COMM_KEY = 'siaga-community-v1';
 function cleanCommunity(v){
   const x = isObj(v) ? v : {};
-  return {room:validGid(x.room) ? x.room : '', nick:str(x.nick, 40), mid:/^[A-Za-z0-9_-]{12,40}$/.test(x.mid || '') ? x.mid : randId(12), lastFamily:+x.lastFamily || 0, lastRoom:+x.lastRoom || 0};
+  return {room:validGid(x.room) ? x.room : '', nick:str(x.nick, 40), mid:/^[A-Za-z0-9_-]{12,40}$/.test(x.mid || '') ? x.mid : randId(12), lastFamily:+x.lastFamily || 0, lastRoom:+x.lastRoom || 0,
+    muted:Array.isArray(x.muted) ? x.muted.filter(m => typeof m === 'string' && m.length <= 40).slice(-200) : []};
 }
 let COMM;
 try { COMM = cleanCommunity(JSON.parse(localStorage.getItem(COMM_KEY) || '{}')); } catch { COMM = cleanCommunity({}); }
@@ -2373,7 +2390,9 @@ const chatConfig = scope => scope === 'family'
   : {code:COMM.room, path:`community/${COMM.room}/posts`, list:roomMessages, title:'warga'};
 function messageHtml(m){
   const kind = CHAT_KINDS[m.kind] ? m.kind : 'chat';
-  return `<div class="msg ${kind}"><div class="msg-head"><span><span class="tag">${esc(CHAT_KINDS[kind])}</span> · ${esc(m.name)}</span><time>${esc(agoText(m.t))}</time></div><p>${esc(m.text)}</p></div>`;
+  const mine = m.mid === COMM.mid;
+  return `<div class="msg ${kind}"><div class="msg-head"><span><span class="tag">${esc(CHAT_KINDS[kind])}</span> · ${esc(m.name)}${mine ? ' (Anda)' : ''}</span><time>${esc(agoText(m.t))}</time></div><p>${esc(m.text)}</p>
+    ${mine || !m.mid ? '' : `<button class="linkbtn mute" data-mute="${esc(m.mid)}">Sembunyikan pengirim ini</button>`}</div>`;
 }
 function composeHtml(scope){
   const nick = scope === 'family' ? (S.live.name || COMM.nick) : COMM.nick;
@@ -2383,16 +2402,28 @@ function composeHtml(scope){
     <button class="btn pri" data-chat-send="${scope}">Kirim pesan</button></div>`;
 }
 function chatPanel(scope){
-  const c = chatConfig(scope), list = c.list || [], busy = chatBusy[scope], err = chatErr[scope];
+  const c = chatConfig(scope), all = c.list || [], busy = chatBusy[scope], err = chatErr[scope];
+  const list = all.filter(m => !COMM.muted.includes(m.mid)), hidden = all.length - list.length;
   return `<div class="tools" style="margin:4px 0"><button class="btn sm" data-chat-refresh="${scope}">Muat ulang</button></div>
     ${err ? `<div class="badbox">${esc(err)}</div>` : ''}
     <div class="chat-list" aria-live="polite">${busy && !c.list ? '<div class="chat-empty">Memuat…</div>' : list.length ? list.map(messageHtml).join('') : '<div class="chat-empty">Belum ada pesan dalam 48 jam terakhir.</div>'}</div>
+    ${hidden ? `<p class="muted" style="margin:0">${hidden} pesan dari pengirim yang Anda sembunyikan. <button class="linkbtn" data-unmute>Tampilkan semua lagi</button></p>` : ''}
     ${composeHtml(scope)}<small class="muted">Pesan hanya tampil 48 jam. Kode ruang adalah kunci masuk; tidak ada verifikasi identitas. Jangan gunakan sebagai sumber peringatan resmi.</small>`;
 }
+// Chat panels are re-rendered on every refresh (also every 60 s): keep what the user is typing and where the cursor is.
+const CHAT_INPUTS = ['familyChatName','familyChatText','roomChatName','roomChatText','roomChatKind','roomJoinCode'];
 function renderCommunity(){
   const can = online() && navigator.onLine;
   const dot = $('#communityDot'), mode = $('#communityMode');
   if(!dot || !mode) return;
+  const draft = {}; CHAT_INPUTS.forEach(id => { const el = document.getElementById(id); if(el) draft[id] = el.value; });
+  const act = document.activeElement, focusId = CHAT_INPUTS.includes(act?.id) ? act.id : null;
+  const caret = focusId && 'selectionStart' in act ? [act.selectionStart, act.selectionEnd] : null;
+  renderCommunityPanels(can, dot, mode);
+  Object.entries(draft).forEach(([id, v]) => { const el = document.getElementById(id); if(el) el.value = v; });
+  if(focusId){ const el = document.getElementById(focusId); if(el){ el.focus(); if(caret) try { el.setSelectionRange(caret[0], caret[1]); } catch {} } }
+}
+function renderCommunityPanels(can, dot, mode){
   dot.classList.toggle('off', !can); mode.textContent = can ? 'Terhubung.' : 'Chat perlu mode online dan koneksi internet.';
   $('#familyChat').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet. SMS dari Rencana tetap dapat dipakai saat jaringan data tidak tersedia.</p>'
     : !validGid(S.famGroup) ? '<p class="muted">Belum ada grup keluarga. Buat atau gabung grup dari Rencana; kode yang sama dipakai untuk lokasi live dan chat.</p><button class="btn" data-go="t-info">Buka Rencana</button>'
@@ -2426,8 +2457,10 @@ async function sendChat(scope){
   const kind = scope === 'room' && CHAT_KINDS[$('#roomChatKind')?.value] ? $('#roomChatKind').value : 'chat';
   if(name.length < 2) throw new Error('Isi nama minimal 2 karakter.');
   if(text.length < 2) throw new Error('Isi pesan minimal 2 karakter.');
-  const t = new Date(), msg = {name, text, kind, mid:COMM.mid, t:t.toISOString(), exp:new Date(t.getTime()+48*3600e3).toISOString()};
+  // exp stays 1 h under the rules' 48 h cap so phones whose clock runs a little fast are not rejected; messages still show for 48 h
+  const t = new Date(), msg = {name, text, kind, mid:COMM.mid, t:t.toISOString(), exp:new Date(t.getTime()+47*3600e3).toISOString()};
   await fsReq('POST', `${c.path}?documentId=${randId(12)}`, toChat(msg));
+  const box = $(`#${scope}ChatText`); if(box) box.value = '';   // sent: clear the draft before the refresh restores inputs
   COMM.nick = name; COMM[lastKey] = now; saveCommunity();
   if(scope === 'family' && !S.live.name){ S.live.name = name; save(); }
   await loadChat(scope);
@@ -2693,6 +2726,7 @@ function saveCustom(){
 function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); renderCommunity(); }
 
 const THEME_INFO = {
+  auto:['Mengikuti pengaturan terang/gelap HP.','#c2410c'],
   light:['Latar terang untuk penggunaan siang hari.','#c2410c'],
   dark:['Latar gelap dengan kontras penuh.','#141210'],
   night:['Warna lebih redup untuk penggunaan malam hari.','#07090c'],
@@ -2700,12 +2734,13 @@ const THEME_INFO = {
 };
 function renderThemeChooser(){
   document.querySelectorAll('[data-theme-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeMode === S.theme));
-  const note = $('#themeNote'); if(note) note.textContent = THEME_INFO[S.theme]?.[0] || THEME_INFO.light[0];
+  const note = $('#themeNote'); if(note) note.textContent = THEME_INFO[S.theme]?.[0] || THEME_INFO.auto[0];
 }
 function applyTheme(mode, persist = true){
-  S.theme = Object.hasOwn(THEME_INFO, mode) ? mode : 'light';
-  document.documentElement.dataset.theme = S.theme;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_INFO[S.theme][1]);
+  S.theme = Object.hasOwn(THEME_INFO, mode) ? mode : 'auto';
+  const sysDark = S.theme === 'auto' && window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+  if(S.theme === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = S.theme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', sysDark ? THEME_INFO.dark[1] : THEME_INFO[S.theme][1]);
   renderThemeChooser();
   if(persist) save();
 }
@@ -2790,6 +2825,9 @@ document.addEventListener('click', e => {
   const ci = t.closest('[data-checkin]'); if(ci){ $('#eqAlert').hidden = true; if(surv) closeSurvival(); return doCheckin(ci.dataset.checkin); }
   if(t.id === 'ci-share'){ const text = $('#ci-text').value; if(navigator.share) return navigator.share({text}).catch(() => {}); return copyText(text).then(ok => toast(ok ? 'Pesan disalin.' : 'Tidak bisa menyalin otomatis.', !ok)); }
   const cr = t.closest('[data-chat-refresh]'); if(cr) return loadChat(cr.dataset.chatRefresh);
+  const mu = t.closest('[data-mute]');
+  if(mu && confirm('Sembunyikan semua pesan dari pengirim ini di HP ini? Pesan di server tidak terhapus.')){ COMM.muted = [...new Set([...COMM.muted, mu.dataset.mute])].slice(-200); saveCommunity(); return renderCommunity(); }
+  if(t.closest('[data-unmute]')){ COMM.muted = []; saveCommunity(); return renderCommunity(); }
   const cs = t.closest('[data-chat-send]');
   if(cs){ cs.disabled = true; return sendChat(cs.dataset.chatSend).then(() => toast('Pesan terkirim.')).catch(err => toast(err.message, true)).finally(() => { cs.disabled = false; }); }
   if(t.id === 'roomCreate'){ COMM.room = randId(16); roomMessages = []; saveCommunity(); renderCommunity(); return toast('Ruang warga dibuat. Bagikan kodenya kepada warga yang dikenal.'); }

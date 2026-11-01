@@ -23,6 +23,10 @@ Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 - **Ruang saling bantu warga** bersifat undangan untuk RT, desa, posko, atau komunitas. Tidak ada daftar ruang global. Pesan dapat ditandai sebagai Obrolan, Butuh bantuan, Bisa membantu, atau Info warga.
 - Kode acak ruang berfungsi sebagai kunci akses. UI memperingatkan pengguna agar tidak membagikan data sensitif, memverifikasi kabar melalui sumber resmi, dan memakai 112/119 untuk ancaman jiwa. Ini bukan sistem identitas atau moderasi penuh; untuk forum publik skala besar perlu Firebase Authentication, App Check, moderasi, pelaporan, dan admin tepercaya.
 - Aturan Firestore membatasi bentuk, panjang, kategori, dan masa berlaku pesan; pembaruan pesan ditolak dan penghapusan oleh klien hanya diizinkan setelah kedaluwarsa.
+- **Perbaikan setelah review:** draf pesan tidak lagi hilang saat chat dimuat ulang (termasuk refresh otomatis 60 detik); pesan dari HP yang jamnya sedikit lebih cepat tidak lagi ditolak (kedaluwarsa dikirim 47 jam, toleransi jam ±1 jam seperti lokasi live); kolom formulir chat terbaca di tema gelap.
+- **Sembunyikan pengirim** (per perangkat) untuk menahan spam/penyalahgunaan di ruang tanpa akun; bisa ditampilkan lagi.
+- **Chat tanpa internet:** UI menjelaskan batasnya dengan jujur — aplikasi web tidak bisa membuat jaringan antar-HP via Bluetooth. Panduan baru di Pustaka (Komunikasi): pakai aplikasi mesh **Briar** (Android, Bluetooth/Wi-Fi, kontak ditambahkan dengan memindai QR saat bertemu) yang dipasang sebelum bencana, plus SMS, HT PMR, dan isyarat SOS.
+- Tema **Otomatis** (default) kembali mengikuti pengaturan terang/gelap HP seperti sebelum v1.7.
 - Empat pilihan tampilan tersimpan per perangkat: **Light**, **Dark**, **Night** yang lebih redup, dan **Hemat baterai** dengan latar hitam OLED serta animasi/transisi dimatikan. Hemat baterai tidak mematikan internet atau pemantauan keselamatan; pengaturan itu tetap dikendalikan oleh Mode aplikasi. Service worker v8.
 
 ## Perubahan v1.6 (1 November 2026)

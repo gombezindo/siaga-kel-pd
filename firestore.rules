@@ -30,8 +30,8 @@ service cloud.firestore {
         && d.kind in ['chat', 'help', 'offer', 'info']
         && d.mid is string && d.mid.size() >= 12 && d.mid.size() <= 40
         && d.t is timestamp
-        && d.t > request.time - duration.value(5, 'm')
-        && d.t < request.time + duration.value(5, 'm')
+        && d.t > request.time - duration.value(1, 'h')
+        && d.t < request.time + duration.value(1, 'h')
         && d.exp is timestamp
         && d.exp > request.time
         && d.exp <= request.time + duration.value(2, 'd');
