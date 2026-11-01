@@ -145,6 +145,20 @@ h3{font-size:16px;margin:0}
 .hz .fa-steps{font-size:16px;margin:8px 0;padding-left:22px}
 .hz .fa-steps li{margin-bottom:8px}
 .fa .tip{margin:0 0 8px}
+.price{font-size:13px;margin-top:4px;color:var(--muted)}
+.price input{width:96px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 6px;font-size:14px}
+.calc{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.calc h4{margin:0 0 8px;font-size:15px}
+.calc-in{display:grid;grid-template-columns:1fr 92px 64px;gap:8px;align-items:center;font-size:14px;margin-bottom:6px}
+.calc-in input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 6px;text-align:right}
+.calc-in small{color:var(--muted)}
+.calc-out{font-size:14px;background:var(--ok-soft);border-radius:10px;padding:8px 10px;margin-top:4px}
+.calc-out.warn{background:var(--warn-soft)}
+.geo-row{border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
+.geo-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.geo-tools input,.wx-tools input{flex:1;min-width:150px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 8px;font-size:14px}
+.wx-days{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;font-size:13px}
+.wx-days div{background:var(--bg);border-radius:10px;padding:8px}
 .linkrow{background:none;border:0;padding:4px 0;width:100%;text-align:left;cursor:pointer;color:inherit}
 .hz-ready{font-size:14px;background:var(--bg);border-radius:10px;padding:10px 12px;margin:4px 0 8px}
 .cform{display:grid;gap:10px}
@@ -199,6 +213,7 @@ h3{font-size:16px;margin:0}
 .mem input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 9px;font-size:14px}
 .btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 .btn.del{color:var(--bad);font-size:13px;padding:5px 10px;justify-self:end}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
 .card .tools{margin:12px 0 0}
@@ -276,6 +291,7 @@ h3{font-size:16px;margin:0}
       <button data-region="malang">Malang Selatan</button><button data-region="umum">Indonesia (umum)</button>
     </div>
   </div>
+  <div class="card noprint" id="wxCard"></div>
   <h2>Keluarga Anda</h2>
   <p class="lead">Isi jumlah anggota keluarga. Semua jumlah stok dihitung otomatis.</p>
   <div class="card">
@@ -338,6 +354,7 @@ h3{font-size:16px;margin:0}
     <div class="sched" id="sched"></div>
     <div class="tools"><button class="btn" id="icsBtn">Ekspor pengingat ke kalender (.ics)</button></div>
   </div>
+  <div class="card" id="calcCard"></div>
   <div id="phases"></div>
 </section>
 
@@ -370,6 +387,7 @@ h3{font-size:16px;margin:0}
     <h3 style="margin-bottom:12px">Rencana keluarga kami</h3>
     <div id="infoFields"></div>
   </div>
+  <div class="card" id="routeCard"></div>
   <div class="card">
     <h3>Anggota keluarga</h3>
     <p class="muted">Kebutuhan khusus dan tugas diisi sendiri, mis. "hamil 7 bulan", "kursi roda", "bawa tas siaga", "jemput adik".</p>
@@ -428,6 +446,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3,
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
   have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null, custom:[],
+  price:{}, calc:{}, geo:{}, routes:[], place:null, wx:null,
   view:'list', loc:'semua', sc:'semua', tab:'t-fam'};
 
 // v1 kept one expiry date per item and a "confirmed" snapshot; v2 tracks quantities and purchase batches.
@@ -712,62 +731,71 @@ const HAZ = [
 // ---------- first aid (lay rescuer) ----------
 // Steps follow AHA (CPR), ACS Stop the Bleed (bleeding) and Red Cross first-aid guides; see SOURCES.
 const FIRSTAID = [
- {k:'aman', ic:'🦺', t:'Langkah pertama di setiap kejadian', src:['ahacpr'], steps:[
+ {k:'aman', ic:'🦺', t:'Langkah pertama di setiap kejadian', src:['aha24'], steps:[
   'Pastikan tempat aman untuk Anda dan korban (listrik, api, reruntuhan, arus air).',
   'Cek respons: tepuk bahu dan panggil korban dengan suara keras.',
   'Telepon 119 atau 112 (atau minta orang lain menelepon) dan sebutkan lokasi dengan jelas.',
   'Tangani dulu yang mengancam nyawa: tidak bernapas, perdarahan hebat, tersedak.']},
- {k:'darah', ic:'🩸', t:'Perdarahan hebat', src:['stopbleed'], steps:[
+ {k:'darah', ic:'🩸', t:'Perdarahan hebat', src:['stopbleed','aha24','rctq'], steps:[
   'Tekan luka kuat-kuat dan terus-menerus dengan kain atau kasa bersih — pakai tangan bila tidak ada apa-apa.',
   'Bila darah merembes, tambah kain di atasnya. Jangan angkat kain pertama untuk mengintip.',
-  'Luka dalam (atau di leher, bahu, ketiak, selangkangan): sumbatkan kain rapat-rapat ke dalam luka sampai penuh, lalu tekan kuat dengan dua tangan.',
-  'Lengan/kaki yang terus berdarah walau ditekan: pasang torniket 5–7 cm di atas luka (bukan di sendi), kencangkan sampai darah berhenti, catat jamnya.'],
-  no:['Jangan melonggarkan atau melepas torniket — biarkan petugas medis yang melepas.'],
+  'Luka dalam (atau di leher, bahu, ketiak, selangkangan): sumbatkan kain rapat-rapat ke dalam luka sampai penuh, lalu tekan kuat dengan dua tangan tanpa dilepas sampai bantuan datang.',
+  'Lengan/kaki yang terus berdarah walau ditekan: pasang torniket 5–7 cm di atas luka, bukan di sendi (bila luka dekat sendi, pasang di atas sendi). Kencangkan sampai darah berhenti, catat jamnya.',
+  'Pakai torniket komersial bila ada. Bila tidak ada: kain lebar minimal 5 cm diikat, lalu diputar dengan tongkat. Torniket yang benar memang terasa sangat sakit.'],
+  no:['Jangan pakai tali, kabel, atau ikat pinggang tipis sebagai torniket.','Jangan melonggarkan atau melepas torniket — biarkan petugas medis yang melepas.'],
   call:'Selalu panggil 119/112 untuk perdarahan hebat, walau darah sudah berhenti.'},
- {k:'rjp', ic:'❤️', t:'Tidak sadar & tidak bernapas normal — RJP', src:['ahacpr'], steps:[
+ {k:'rjp', ic:'❤️', t:'Tidak sadar & tidak bernapas normal — RJP', src:['ahabls'], steps:[
   'Telepon 119/112 dan nyalakan pengeras suara HP. Minta orang lain mencari AED bila ada.',
   'Baringkan korban telentang di permukaan keras.',
   'Letakkan tumit telapak tangan di tengah dada (separuh bawah tulang dada), tangan lain di atasnya.',
   'Tekan dalam 5–6 cm dengan kecepatan 100–120 kali per menit; biarkan dada kembali naik penuh setiap tekanan.',
-  'Orang awam cukup menekan dada tanpa memberi napas. Jangan berhenti sampai korban bergerak, AED siap, atau petugas mengambil alih.'],
-  note:'Anak (1 tahun–remaja): tekan sekitar sepertiga tebal dada (±5 cm) dengan satu atau dua tangan. Bila terlatih, beri 2 napas setiap 30 tekanan.'},
- {k:'sedak', ic:'😮', t:'Tersedak (dewasa & anak di atas 1 tahun)', src:['redcross'], steps:[
+  'Orang dewasa: penolong awam cukup menekan dada tanpa memberi napas. Jangan berhenti sampai korban bergerak, AED siap, atau petugas mengambil alih.',
+  'Begitu AED datang: nyalakan, lalu ikuti perintah suaranya.'],
+  note:'Korban tenggelam dan anak: henti jantungnya karena kekurangan oksigen — bila Anda mampu, beri 2 napas buatan setiap 30 tekanan. Anak (1 tahun–remaja): tekan sekitar sepertiga tebal dada (±5 cm) dengan satu atau dua tangan. Bayi (di bawah 1 tahun): tekan dengan 2 jari di tengah dada tepat di bawah garis puting, sedalam ±4 cm.'},
+ {k:'sedak', ic:'😮', t:'Tersedak', src:['ahabls'], steps:[
   'Masih bisa batuk atau bicara: suruh terus batuk, jangan dipukul.',
-  'Tidak bisa bicara, batuk, atau bernapas: berdiri di belakangnya, condongkan badannya ke depan, beri 5 tepukan kuat di punggung di antara tulang belikat.',
-  'Lalu beri 5 hentakan perut: kepalan tangan di atas pusar, tarik kuat ke dalam dan ke atas.',
-  'Ulangi 5 tepukan dan 5 hentakan sampai benda keluar.',
-  'Bila korban jatuh tidak sadar: telepon 119/112 dan mulai RJP.'],
+  'Dewasa & anak di atas 1 tahun yang tidak bisa bicara, batuk, atau bernapas: berdiri di belakangnya, condongkan badannya ke depan, beri 5 tepukan kuat di punggung di antara tulang belikat.',
+  'Lalu beri 5 hentakan perut: kepalan tangan di atas pusar, tarik kuat ke dalam dan ke atas. Ulangi 5 tepukan dan 5 hentakan sampai benda keluar.',
+  'Bayi di bawah 1 tahun: telungkupkan di lengan Anda dengan kepala lebih rendah, beri 5 tepukan punggung, lalu balikkan dan beri 5 tekanan dada dengan 2 jari. Ulangi.',
+  'Bila korban jatuh tidak sadar: telepon 119/112 dan mulai RJP. Lihat ke dalam mulut; ambil benda hanya bila terlihat.'],
+  no:['Jangan lakukan hentakan perut pada bayi.'],
   note:'Ibu hamil atau orang bertubuh besar: hentakan dilakukan di dada, bukan di perut.'},
- {k:'bakar', ic:'🔥', t:'Luka bakar', src:['redcross'], steps:[
+ {k:'bakar', ic:'🔥', t:'Luka bakar', src:['redcross','aha24'], steps:[
   'Hentikan sumbernya: padamkan api, matikan listrik dari MCB sebelum menyentuh korban sengatan listrik.',
   'Aliri luka bakar dengan air mengalir yang sejuk (bukan es) minimal 20 menit.',
+  'Anak kecil: awasi tanda kedinginan/menggigil selama didinginkan; jaga bagian tubuh lain tetap hangat.',
   'Lepas cincin, jam, dan pakaian di sekitar luka — kecuali yang menempel di kulit.',
-  'Tutup longgar dengan plastik wrap bersih atau kain bersih yang tidak berbulu.'],
+  'Tutup longgar dengan kain bersih yang tidak berbulu atau plastik wrap bersih — jangan dibelit rapat, jangan di wajah.'],
   no:['Jangan oles pasta gigi, mentega, kecap, minyak, atau es.','Jangan pecahkan lepuhan.'],
-  call:'Ke fasilitas kesehatan bila luka lebih luas dari telapak tangan korban, di wajah/tangan/kaki/kelamin, akibat listrik atau bahan kimia, atau korbannya bayi/lansia.'},
- {k:'tulang', ic:'🦴', t:'Patah tulang & keseleo', src:['redcross'], steps:[
-  'Jangan meluruskan atau memijat bagian yang diduga patah.',
-  'Topang bagian yang cedera pada posisi yang ditemukan; buat bidai dari papan/kardus tebal yang melewati dua sendi di atas dan bawah cedera.',
-  'Kompres dingin yang dibungkus kain untuk bengkak, maksimal 20 menit sekali.',
+  call:'Telepon 119/112 bila ada tanda menghirup asap (sesak, suara serak, jelaga di hidung/mulut, bulu hidung terbakar) atau luka bakar di wajah. Ke fasilitas kesehatan bila luka lebih luas dari telapak tangan korban, luka tampak putih/coklat/kering dan tidak terasa sakit (luka dalam), di tangan/kaki/kelamin, akibat listrik atau bahan kimia, atau korbannya bayi/lansia.'},
+ {k:'tulang', ic:'🦴', t:'Patah tulang & keseleo', src:['aha24'], steps:[
+  'Jangan meluruskan atau memijat bagian yang diduga patah; topang pada posisi saat ditemukan.',
+  'Bila perlu dibidai: pakai papan/kardus tebal sepanjang satu sendi di atas dan satu sendi di bawah tulang yang patah.',
+  'Kompres dingin yang dibungkus kain untuk bengkak, maksimal 20 menit sekali — jangan langsung ke kulit.',
   'Tulang menembus kulit: tutup luka dengan kain bersih, jangan dimasukkan kembali.'],
-  no:['Curiga cedera leher/punggung (jatuh dari tinggi, tertimpa): jangan pindahkan korban kecuali ada bahaya langsung.']},
- {k:'syok', ic:'🥶', t:'Syok', src:['redcross'], steps:[
+  no:['Curiga cedera leher/punggung (jatuh dari tinggi, tertimpa): minta korban tetap diam, jangan pindahkan kecuali ada bahaya langsung, jangan pasang penyangga leher darurat.'],
+  call:'Segera telepon 119/112 bila ujung tangan/kaki di bawah cedera menjadi pucat, biru, atau dingin, atau ada cedera leher/punggung.'},
+ {k:'syok', ic:'🥶', t:'Syok', src:['aha24','redcross'], steps:[
   'Tanda: pucat, kulit dingin dan berkeringat, napas dan nadi cepat, lemas, gelisah atau bingung.',
   'Telepon 119/112. Hentikan perdarahan bila ada.',
-  'Baringkan korban, longgarkan pakaian, jaga tetap hangat dengan selimut.',
+  'Baringkan korban telentang, longgarkan pakaian, jaga tetap hangat dengan selimut.',
+  'Bila korban mengantuk, muntah, atau harus Anda tinggal: miringkan ke posisi pemulihan agar jalan napas terbuka.',
   'Temani dan tenangkan korban; pantau napasnya sampai bantuan datang.'],
   no:['Jangan beri makan atau minum.']},
- {k:'luka', ic:'🩹', t:'Luka biasa & luka setelah banjir', src:['redcross'], steps:[
+ {k:'luka', ic:'🩹', t:'Luka, luka setelah banjir & gigitan hewan', src:['aha24','whorabies'], steps:[
   'Cuci tangan, lalu bersihkan luka dengan air bersih mengalir.',
-  'Tekan dengan kasa sampai darah berhenti, lalu tutup dengan plester atau kasa.',
-  'Ganti penutup bila basah atau kotor.'],
-  call:'Ke fasilitas kesehatan bila luka dalam, terkena air banjir/lumpur, tertusuk benda berkarat, digigit hewan, atau muncul merah, bengkak, panas, bernanah, dan demam. Tanyakan juga suntikan tetanus.'},
- {k:'diare', ic:'💧', t:'Diare & dehidrasi', src:['oralit'], steps:[
-  'Beri oralit kemasan, dilarutkan sesuai petunjuk di bungkusnya dengan air matang.',
-  'Minum sedikit-sedikit tetapi sering; bila muntah, tunggu 10 menit lalu lanjutkan pelan-pelan.',
-  'Bayi tetap diberi ASI; anak dan dewasa tetap makan.',
+  'Tekan dengan kasa sampai darah berhenti, lalu tutup dengan plester atau kasa. Ganti penutup bila basah atau kotor.',
+  'Gigitan atau cakaran anjing, kucing, kera, atau kelelawar: segera cuci luka dengan sabun dan air mengalir selama 15 menit, lalu ke puskesmas/RS hari itu juga untuk vaksin anti-rabies.'],
+  no:['Jangan tunda vaksin rabies — rabies hampir selalu mematikan begitu gejalanya muncul.'],
+  call:'Ke fasilitas kesehatan bila luka dalam, terkena air banjir/lumpur, tertusuk benda berkarat, atau muncul merah, bengkak, panas, bernanah, dan demam. Tanyakan juga suntikan tetanus.'},
+ {k:'diare', ic:'💧', t:'Diare & dehidrasi', src:['kemkesdiare','whodiare'], steps:[
+  'Beri oralit kemasan, dilarutkan sesuai petunjuk di bungkusnya dengan air matang. Buang larutan setelah 24 jam.',
+  'Minum sedikit-sedikit tetapi sering; bila muntah, tunggu sebentar lalu lanjutkan pelan-pelan.',
+  'Bayi tetap diberi ASI, lebih sering dari biasanya; anak dan dewasa tetap makan.',
+  'Anak balita: beri tablet zinc 10 hari berturut-turut walau diare sudah berhenti, dengan dosis dari puskesmas/apotek.',
   'Jaga kebersihan: cuci tangan dengan sabun, minum hanya air matang atau air kemasan.'],
-  call:'Segera ke fasilitas kesehatan bila: tidak bisa minum, muntah terus, tinja berdarah, sangat lemas atau mengantuk, mata cekung, tidak buang air kecil, demam tinggi, atau diare tidak membaik dalam 1–2 hari. Bayi, lansia, dan ibu hamil lebih cepat memburuk.'},
+  no:['Jangan beri obat penghenti diare pada anak.'],
+  call:'Segera ke fasilitas kesehatan bila: tidak bisa minum, muntah terus, tinja berdarah, sangat lemas atau mengantuk, kejang, bayi tidak mau menyusu, mata cekung, cubitan kulit perut kembali sangat lambat, tidak buang air kecil, demam tinggi, atau diare tidak membaik dalam 1–2 hari.'},
 ];
 
 // location risk profile for the general region (user-reported, used to put relevant hazards first)
@@ -781,10 +809,14 @@ const SOURCES = {
   kemkesasap: {title:'Kemenkes — Pakai masker dan pantau kualitas udara saat asap karhutla', url:'https://kemkes.go.id/id/menkes-pakai-masker-dan-pantau-kualitas-udara-untuk-cegah-dampak-asap-karhutla', scope:'Masker, kualitas udara, dan kapan ke fasilitas kesehatan.'},
   cdc: {title:'CDC — Keselamatan saat listrik padam', url:'https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-during-a-power-outage.html', scope:'Keamanan pangan, genset, dan risiko karbon monoksida; panduan berbahasa Inggris.'},
   inarisk: {title:'InaRISK — Portal risiko bencana BNPB', url:'https://inarisk.bnpb.go.id/', scope:'Cek tingkat ancaman bencana di lokasi rumah.'},
-  ahacpr: {title:'American Heart Association — Pembaruan pedoman RJP', url:'https://news.heart.org/%ef%bb%bfnew-resuscitation-guidelines-update-cpr-chest-pushes/', scope:'Kecepatan dan kedalaman tekanan dada; RJP tekan dada saja untuk orang awam.'},
+  ahabls: {title:'American Heart Association — Pedoman Bantuan Hidup Dasar (BLS) 2025', url:'https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-basic-life-support', scope:'RJP, AED, dan tersedak; berbahasa Inggris.'},
+  aha24: {title:'AHA & American Red Cross — Pedoman Pertolongan Pertama 2024', url:'https://www.ahajournals.org/doi/10.1161/CIR.0000000000001281', scope:'Perdarahan, luka bakar, patah tulang, syok, dan luka; berbahasa Inggris.'},
   stopbleed: {title:'Stop the Bleed (ACS) — materi untuk masyarakat (PDF)', url:'https://stopthebleed.org/media/qk5jgpgs/lay-public-stop-the-bleed-presentation-pdf.pdf', scope:'Tekan langsung, sumbat luka, dan torniket.'},
-  redcross: {title:'Red Cross — Essential First Aid Guide (PDF)', url:'https://www.redcross.org.au/globalassets/cms/first-aid/first-aid-pdfs/first-aid-essentials/red-cross-essential-first-aid-guide-english.pdf', scope:'Luka bakar, tersedak, patah tulang, syok, dan luka; berbahasa Inggris.'},
-  oralit: {title:'Alodokter — Cara membuat dan memberikan oralit', url:'https://www.alodokter.com/ini-cara-membuat-oralit-untuk-diare-di-rumah', scope:'Pemberian oralit dan tanda perlu ke dokter. Utamakan oralit kemasan.'},
+  rctq: {title:'American Red Cross — Cara memasang torniket', url:'https://www.redcross.org/take-a-class/resources/articles/how-to-apply-a-tourniquet', scope:'Letak dan cara memasang torniket.'},
+  redcross: {title:'Red Cross Australia — Essential First Aid Guide (PDF)', url:'https://www.redcross.org.au/globalassets/cms/first-aid/first-aid-pdfs/first-aid-essentials/red-cross-essential-first-aid-guide-english.pdf', scope:'Pendinginan luka bakar 20 menit dan penanganan syok; berbahasa Inggris.'},
+  kemkesdiare: {title:'Kemenkes — Diare pada anak', url:'https://keslan.kemkes.go.id/view_artikel/3028/diare-pada-anak', scope:'Oralit, zinc 10 hari, ASI, dan tanda bahaya.'},
+  whodiare: {title:'WHO — Diarrhoeal disease', url:'https://www.who.int/news-room/fact-sheets/detail/diarrhoeal-disease', scope:'Oralit, zinc, dan pencegahan; berbahasa Inggris.'},
+  whorabies: {title:'WHO — Rabies', url:'https://www.who.int/news-room/fact-sheets/detail/rabies', scope:'Pencucian luka gigitan dan vaksin pasca-gigitan; berbahasa Inggris.'},
   bpbd: {title:'BPBD Kabupaten Malang', url:'https://bpbd.malangkab.go.id/', only:'malang', scope:'Informasi daerah; konfirmasikan jalur evakuasi dan titik aman dengan desa/BPBD.'},
 };
 
@@ -860,9 +892,13 @@ function shoppingList(c = ctx()){
     have: it.n ? haveOf(it) : null, need: it.n ? needOf(it, c) : null, q: it.q ? it.q(c) : '', expired: expiredQty(it)}));
 }
 function shoppingText(list){
-  const line = s => `- ${s.t}: ${s.buy !== null ? `beli ${fmtNum(s.buy)} ${s.u}` : `siapkan (${s.q})`}${s.loc === 'tas' ? ' [tas evakuasi]' : ''}`;
-  const part = (p, title) => { const l = list.filter(s => s.p === p); return l.length ? `${title}\n${l.map(line).join('\n')}` : ''; };
-  return [`Daftar belanja Siaga Keluarga (${S.days} hari, ${ctx().n} orang)`, part(1, 'UTAMA'), part(2, 'TAMBAHAN')].filter(Boolean).join('\n\n');
+  const line = s => { const c = costOf(s);
+    return `- ${s.t}: ${s.buy !== null ? `beli ${fmtNum(s.buy)} ${s.u}` : `siapkan (${s.q})`}${c !== null ? ` (± ${rupiah(c)})` : ''}${s.loc === 'tas' ? ' [tas evakuasi]' : ''}`; };
+  const sum = costSummary(list);
+  const part = (p, title) => { const l = list.filter(s => s.p === p); return l.length ? `${title}${sum[p].sum ? ` — ± ${rupiah(sum[p].sum)}` : ''}\n${l.map(line).join('\n')}` : ''; };
+  const total = sum[1].sum + sum[2].sum;
+  return [`Daftar belanja Siaga Keluarga (${S.days} hari, ${ctx().n} orang)`, part(1, 'UTAMA'), part(2, 'TAMBAHAN'),
+    total ? `Perkiraan total: ${rupiah(total)}${sum[1].missing + sum[2].missing ? ` (${sum[1].missing + sum[2].missing} barang belum ada harga)` : ''}` : ''].filter(Boolean).join('\n\n');
 }
 
 // ---------- how long current stock lasts ----------
@@ -888,6 +924,105 @@ function hazardReadiness(c = ctx()){
     const ok = rel.filter(it => stockState(it, c) === 'ok').length;
     return {h, ok, total:rel.length, pct: rel.length ? Math.floor(ok / rel.length * 100) : 0};
   });
+}
+
+// ---------- cost estimate (user-entered prices) ----------
+const rupiah = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+const isCash = s => s.u === 'ribu rupiah';
+function costOf(s){
+  if(isCash(s)) return s.buy * 1000;
+  const p = +S.price[s.id];
+  if(!(p > 0)) return null;
+  return s.buy !== null ? p * s.buy : p;
+}
+function costSummary(list){
+  const g = {1:{sum:0, missing:0}, 2:{sum:0, missing:0}};
+  list.forEach(s => { const c = costOf(s); if(c === null) g[s.p].missing++; else g[s.p].sum += c; });
+  return g;
+}
+
+// ---------- power & fuel calculators ----------
+// starting values are examples; reserve and loss may be set to 0
+const CALC_DEF = {gasHours:1.5, cookHours:1.5, pbMah:10000, phoneMah:4500, phones:0, tank:4, kmpl:40, reserve:20, wp:50, sunH:4, loss:25};
+const ZERO_OK = new Set(['reserve','loss']);
+function calcVal(k){
+  const v = S.calc[k];   // numbers only; anything else falls back to the example value
+  return typeof v === 'number' && Number.isFinite(v) && (v > 0 || (v === 0 && ZERO_OK.has(k))) ? v : CALC_DEF[k];
+}
+// assumptions: powerbank delivers 65% of rated mAh, phone battery 3.85 V, phone charging 80% efficient
+function calcPower(c = ctx()){
+  const have = id => { const it = findItem(id); return it && visible(it, c) ? haveOf(it) : 0; };
+  const cans = have('gas'), pbs = have('powerbank') + have('powerbanktas');
+  const phones = calcVal('phones') || Math.max(1, c.besar);
+  const charges = round1(pbs * calcVal('pbMah') * 0.65 / calcVal('phoneMah'));
+  const range = Math.round(calcVal('tank') * calcVal('kmpl'));
+  const solarWh = Math.round(calcVal('wp') * calcVal('sunH') * (1 - Math.min(90, calcVal('loss'))/100));
+  return {cans, pbs, phones, charges, range, solarWh,
+    gasDays: round1(cans * calcVal('gasHours') / calcVal('cookHours')),
+    pbDays: round1(charges / phones),
+    safeRange: Math.round(range * (1 - Math.min(90, calcVal('reserve'))/100)),
+    solarCharges: round1(solarWh / (calcVal('phoneMah') * 3.85 / 1000 / 0.8))};
+}
+const fuelFor = km => round1(km / calcVal('kmpl'));
+
+// ---------- coordinates ----------
+const validCoord = (lat, lon) => typeof lat === 'number' && typeof lon === 'number' && Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+const roundTo = (x, d) => Math.round(x * 10**d) / 10**d;
+function parseCoord(s){
+  const m = /(-?\d+(?:[.,]\d+)?)\s*[,;\s]\s*(-?\d+(?:[.,]\d+)?)/.exec((s || '').trim());
+  if(!m) return null;
+  const lat = +m[1].replace(',', '.'), lon = +m[2].replace(',', '.');
+  return validCoord(lat, lon) ? {lat:roundTo(lat, 5), lon:roundTo(lon, 5)} : null;
+}
+const mapUrl = g => `https://www.google.com/maps/search/?api=1&query=${g.lat},${g.lon}`;
+function distKm(a, b){
+  const r = x => x * Math.PI / 180, dLat = r(b.lat - a.lat), dLon = r(b.lon - a.lon);
+  const h = Math.sin(dLat/2)**2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLon/2)**2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+function getPosition(){
+  return new Promise((ok, fail) => {
+    if(!navigator.geolocation) return fail(new Error('HP ini tidak mendukung lokasi.'));
+    navigator.geolocation.getCurrentPosition(p => ok({lat:p.coords.latitude, lon:p.coords.longitude, acc:p.coords.accuracy}),
+      e => fail(new Error(e.code === 1 ? 'Izin lokasi ditolak. Aktifkan izin lokasi untuk situs ini.' : 'Lokasi tidak didapat. Coba di tempat terbuka.')),
+      {enableHighAccuracy:true, timeout:20000, maximumAge:60000});
+  });
+}
+
+// ---------- local conditions (online: Open-Meteo weather & air quality, BMKG latest earthquake) ----------
+const WMO = {0:'Cerah',1:'Cerah berawan',2:'Berawan',3:'Mendung',45:'Berkabut',48:'Berkabut',51:'Gerimis',53:'Gerimis',55:'Gerimis lebat',56:'Gerimis',57:'Gerimis',
+  61:'Hujan ringan',63:'Hujan sedang',65:'Hujan lebat',66:'Hujan',67:'Hujan lebat',80:'Hujan lokal',81:'Hujan deras lokal',82:'Hujan sangat deras',95:'Badai petir',96:'Badai petir',99:'Badai petir'};
+const wmoText = code => WMO[code] || 'Cuaca tidak diketahui';
+const aqiCat = v => v <= 50 ? ['ok','Baik'] : v <= 100 ? ['ok','Sedang'] : v <= 150 ? ['warn','Tidak sehat bagi kelompok sensitif'] : v <= 200 ? ['bad','Tidak sehat'] : v <= 300 ? ['bad','Sangat tidak sehat'] : ['bad','Berbahaya'];
+const wxPlace = () => S.place && validCoord(S.place.lat, S.place.lon) ? S.place : (S.region === 'malang' ? {name:'Malang Selatan', lat:-8.2, lon:112.6} : null);
+const samePlace = (a, b) => a && b && a.lat === b.lat && a.lon === b.lon;
+// warnings derived from the fetched data; thresholds: AQI > 100, rain ≥ 80% with ≥ 20 mm, M ≥ 5 within 300 km
+function wxAlerts(d){
+  const out = [];
+  const aqi = d.aq?.current?.us_aqi;
+  if(aqi > 100) out.push(['warn', 'Udara tidak sehat: kurangi aktivitas di luar dan pakai masker N95/KN95, terutama anak, lansia, ibu hamil.', S.region === 'umum' ? 'asap' : 'erupsi']);
+  const dd = d.wx?.daily;
+  if(dd && dd.time.some((_, i) => dd.precipitation_probability_max[i] >= 80 && dd.precipitation_sum[i] >= 20)) out.push(['warn', 'Potensi hujan lebat dalam 3 hari: siaga banjir dan longsor, siapkan tas evakuasi.', 'banjir']);
+  if(d.eq){ const [la, lo] = String(d.eq.Coordinates).split(',').map(Number);
+    if(+d.eq.Magnitude >= 5 && validCoord(la, lo) && distKm(d.place, {lat:la, lon:lo}) <= 300) out.push(['bad', 'Gempa kuat terjadi di dekat lokasi Anda: waspada gempa susulan, periksa retakan rumah.', 'gempa']); }
+  return out;
+}
+async function fetchConditions(place){
+  const lat = place.lat.toFixed(2), lon = place.lon.toFixed(2);
+  const get = url => fetch(url).then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  const [wx, aq, eq] = await Promise.allSettled([
+    get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&forecast_days=3&timezone=Asia%2FJakarta`),
+    get(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5`),
+    get('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json')]);
+  if([wx, aq, eq].every(r => r.status !== 'fulfilled')) throw new Error('Tidak bisa mengambil data. Periksa koneksi internet.');
+  return {at:new Date().toISOString(), place:{name:place.name, lat:place.lat, lon:place.lon},
+    wx: wx.value || null, aq: aq.value || null, eq: eq.value?.Infogempa?.gempa || null};
+}
+async function geocode(name){
+  const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=id&countryCode=ID`).then(r => r.json());
+  const g = res.results?.[0];
+  if(!g) throw new Error(`"${name}" tidak ditemukan. Coba nama kota atau kecamatan lain.`);
+  return {name:[g.name, g.admin2 || g.admin1].filter(Boolean).join(', '), lat:roundTo(g.latitude, 2), lon:roundTo(g.longitude, 2)};
 }
 
 // ---------- recurring checks ----------
@@ -925,7 +1060,7 @@ const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 // Returns a clean copy with only known fields; throws when the input is clearly not app data.
 function sanitizeData(o){
   if(!isObj(o)) throw new Error('Isi file bukan data Siaga Keluarga.');
-  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom'];
+  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom','geo','routes','price','calc','place'];
   if(!known.some(k => k in o)) throw new Error('File tidak berisi data Siaga Keluarga.');
   const out = {}, warn = [];
   if('custom' in o){
@@ -953,6 +1088,15 @@ function sanitizeData(o){
   if(isObj(o.done)) out.done = Object.fromEntries(Object.entries(o.done).filter(([, v]) => v === true));
   if(isObj(o.checks)) out.checks = Object.fromEntries(Object.entries(o.checks).filter(([k, v]) => CHECKS.some(c => c.id === k) && parseYmd(v)));
   if(isObj(o.exp)) out.exp = Object.fromEntries(Object.entries(o.exp).filter(([k, v]) => findItem(k) && parseYmd(v)));
+  const coord = v => isObj(v) && validCoord(v.lat, v.lon) ? {lat:v.lat, lon:v.lon} : null;
+  if(isObj(o.geo)) out.geo = Object.fromEntries(['titik1','titik2'].map(k => [k, coord(o.geo[k])]).filter(([, v]) => v));
+  if('routes' in o){
+    if(!Array.isArray(o.routes) || o.routes.length > 10) throw new Error('Data rute evakuasi tidak valid.');
+    out.routes = o.routes.filter(isObj).map(r => ({nama:str(r.nama, 80), tujuan:str(r.tujuan, 120), km: typeof r.km === 'number' && r.km > 0 && r.km < 1000 ? r.km : 0, via:str(r.via, 200)}));
+  }
+  if(isObj(o.price)) out.price = Object.fromEntries(Object.entries(o.price).filter(([k, v]) => findItem(k) && typeof v === 'number' && v > 0 && v < 1e9));
+  if(isObj(o.calc)) out.calc = Object.fromEntries(Object.entries(o.calc).filter(([k, v]) => k in CALC_DEF && typeof v === 'number' && v >= 0 && v < 1e7));
+  if(isObj(o.place) && validCoord(o.place.lat, o.place.lon)) out.place = {name:str(o.place.name, 80), lat:o.place.lat, lon:o.place.lon};
   if(typeof o.v === 'number') out.v = o.v;
   return {data:out, warn};
 }
@@ -977,7 +1121,7 @@ function summarize(d){
 }
 
 // ---------- share via QR (URL hash) ----------
-const SHARE_FIELDS = ['region','risk','fam','days','special','info','members'];
+const SHARE_FIELDS = ['region','risk','fam','days','special','info','members','geo','routes'];
 function b64url(bytes){ let s = ''; for(const b of bytes) s += String.fromCharCode(b); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 function unb64url(s){ const bin = atob(s.replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(bin, ch => ch.charCodeAt(0)); }
 async function pipeBytes(bytes, stream){ return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer()); }
@@ -1015,6 +1159,8 @@ function cardHtml(){
     ${row('Alamat', i.alamat)}
     <div class="grid2">${row('Titik kumpul 1', i.titik1)}${row('Titik kumpul 2', i.titik2)}${row('Pusat kabar (luar kota)', i.luar)}${row(R({malang:'BPBD Kab. Malang', umum:'BPBD'}), i.bpbd)}${row('RT / RW', i.rt)}${row('Puskesmas / RS / bidan', i.pkm)}</div>
     ${i.jalur ? row('Jalur evakuasi', i.jalur) : ''}
+    ${['titik1','titik2'].some(k => S.geo[k]) ? `<div><b>Koordinat titik kumpul:</b> ${['titik1','titik2'].map((k, n) => S.geo[k] ? `${n+1}: ${S.geo[k].lat}, ${S.geo[k].lon}` : '').filter(Boolean).join(' · ')}</div>` : ''}
+    ${S.routes.some(r => r.nama || r.tujuan) ? `<h5>Rute evakuasi</h5><div>${S.routes.filter(r => r.nama || r.tujuan).map(r => `${esc(r.nama || 'Rute')} → ${esc(r.tujuan || '?')}${r.km ? ` (${fmtNum(r.km)} km)` : ''}${r.via ? `, lewat ${esc(r.via)}` : ''}`).join('<br>')}</div>` : ''}
     <h5>Nomor darurat</h5><div>${esc(nums)}</div>
     <h5>Anggota keluarga</h5>
     ${members.length ? `<table><tr>${MEMBER_FIELDS.map(([, l]) => `<th>${l}</th>`).join('')}</tr>${members.map(m => `<tr>${MEMBER_FIELDS.map(([k]) => `<td>${esc(m[k])}</td>`).join('')}</tr>`).join('')}</table>` : '<div style="color:#888">Belum ada data anggota — isi di tab Rencana.</div>'}
@@ -1137,22 +1283,33 @@ function renderList(){
   renderShop();
 }
 
-function shopHtml(list){
+function shopHtml(list, print){
   if(!list.length) return '<div class="card"><h3>Semua kebutuhan terpenuhi 🎉</h3><p class="muted">Tetap cek tanggal kedaluwarsa dan jumlah fisik secara berkala.</p></div>';
+  const sum = costSummary(list);
+  const price = s => {
+    const cost = costOf(s), per = s.buy !== null ? esc(s.u) : 'paket';
+    if(isCash(s)) return `<div class="price">= <b>${rupiah(cost)}</b></div>`;
+    if(print) return cost !== null ? `<div class="price">± <b>${rupiah(cost)}</b></div>` : '';
+    return `<div class="price">Harga Rp <input type="number" min="0" step="500" inputmode="numeric" data-price="${s.id}" value="${S.price[s.id] || ''}" placeholder="0" aria-label="Harga per ${per} ${esc(s.t)}"> / ${per}${cost !== null ? ` = <b>${rupiah(cost)}</b>` : ''}</div>`;
+  };
   const line = s => `<li><span class="box" aria-hidden="true"></span><div><b>${esc(s.t)}</b><br>
     ${s.buy !== null ? `Beli <b>${fmtNum(s.buy)} ${esc(s.u)}</b> <span class="muted">(ada ${fmtNum(s.have)} dari ${fmtNum(s.need)}${s.expired ? `, ${fmtNum(s.expired)} kedaluwarsa` : ''})</span>` : `Siapkan: ${esc(s.q)}`}
-    <div class="loc">${s.loc === 'tas' ? '🎒 Tas evakuasi' : '🏠 Stok rumah'}</div></div></li>`;
-  return [[1,'Kebutuhan utama','Penuhi lebih dulu.'],[2,'Tambahan','Bila anggaran memungkinkan.']].map(([p, title, sub]) => {
+    ${price(s)}<div class="loc">${s.loc === 'tas' ? '🎒 Tas evakuasi' : '🏠 Stok rumah'}</div></div></li>`;
+  const money = g => `${rupiah(g.sum)}${g.missing ? ` + ${g.missing} barang tanpa harga` : ''}`;
+  const total = `<div class="card"><h3>Perkiraan biaya</h3>
+    <p style="margin:6px 0">Utama: <b>${money(sum[1])}</b><br>Tambahan: <b>${money(sum[2])}</b><br>Total: <b>${rupiah(sum[1].sum + sum[2].sum)}</b></p>
+    ${print ? '' : '<p class="muted" style="margin:0">Isi harga per satuan dari toko langganan Anda. Harga disimpan untuk belanja berikutnya; uang tunai dihitung otomatis.</p>'}</div>`;
+  return total + [[1,'Kebutuhan utama','Penuhi lebih dulu.'],[2,'Tambahan','Bila anggaran memungkinkan.']].map(([p, title, sub]) => {
     const l = list.filter(s => s.p === p);
     if(!l.length) return '';
-    return `<div class="card shop"><h3>${title} <span class="muted">· ${l.length} barang</span></h3><p class="muted" style="margin:0">${sub}</p>
+    return `<div class="card shop"><h3>${title} <span class="muted">· ${l.length} barang · ${money(sum[p])}</span></h3><p class="muted" style="margin:0">${sub}</p>
       ${['rumah','tas'].map(loc => { const g = l.filter(s => s.loc === loc); return g.length ? `<div class="shop-sub">${loc === 'tas' ? 'Tas evakuasi' : 'Stok rumah'}</div><ul>${g.map(line).join('')}</ul>` : ''; }).join('')}</div>`;
   }).join('');
 }
 function renderShop(){
   const list = shoppingList();
   $('#shopList').innerHTML = shopHtml(list);
-  $('#shopPrint').innerHTML = `<h2>Daftar belanja Siaga Keluarga</h2><p>${ctx().n} orang · ${S.days} hari · ${fmtDate(ymd(new Date()))}</p>` + shopHtml(list);
+  $('#shopPrint').innerHTML = `<h2>Daftar belanja Siaga Keluarga</h2><p>${ctx().n} orang · ${S.days} hari · ${fmtDate(ymd(new Date()))}</p>` + shopHtml(list, true);
 }
 
 function renderPlan(){
@@ -1204,7 +1361,7 @@ function renderP3k(){
     ${f.no ? `<div class="badbox">${f.no.map(x => '✕ ' + esc(x)).join('<br>')}</div>` : ''}
     ${f.call ? `<div class="warnbox">${esc(f.call)}</div>` : ''}
     <p class="src">Rujukan: ${sourceLinks(f.src)}</p></details>`).join('');
-  $('#p3kSrc').textContent = 'Disusun 1 November 2026 dari pedoman American Heart Association, Stop the Bleed (American College of Surgeons), dan Palang Merah. Tautan rujukan perlu internet; isi panduan tetap tersedia offline.';
+  $('#p3kSrc').textContent = 'Disusun 1 November 2026 dari pedoman AHA & American Red Cross (2024–2025), Stop the Bleed (ACS), Kemenkes, dan WHO; diperiksa ulang terhadap sumber tersebut. Tautan rujukan perlu internet; isi panduan tetap tersedia offline.';
 }
 function sourceLinks(ids){
   return ids.map(id => `<a href="${SOURCES[id].url}" target="_blank" rel="noopener noreferrer">${SOURCES[id].title}</a>`).join(' · ');
@@ -1228,6 +1385,7 @@ function renderInfo(){
   $('#infoFields').innerHTML = INFO.map(([k,l,ph,area]) => `<div class="field"><label for="i-${k}">${esc(R(l))}</label>
     ${area?`<textarea id="i-${k}" data-info="${k}" placeholder="${ph}">${esc(S.info[k])}</textarea>`
           :`<input id="i-${k}" data-info="${k}" placeholder="${ph}" value="${esc(S.info[k])}">`}</div>`).join('');
+  renderRoutes();
   renderMembers();
   renderCard();
 }
@@ -1273,6 +1431,89 @@ function progress(){
     <p>${count('short')} masih kurang · ${count('expired')} perlu diganti (kedaluwarsa) · ${count('review')} perlu diisi jumlahnya</p>
     <small>Persentase mencatat pekerjaan yang selesai, bukan jaminan aman. Barang dihitung cukup bila jumlah tersedia memenuhi kebutuhan dan tidak kedaluwarsa menurut tanggal yang diisi.</small>
     <div class="tools"><button class="btn sm" data-go-shop>Lihat daftar belanja</button></div>`;
+}
+
+function renderCalc(){
+  const r = calcPower();
+  const inp = (k, label, unit, step = 1, shown) => `<label class="calc-in"><span>${label}</span>
+    <input type="number" min="0" step="${step}" inputmode="decimal" data-calc="${k}" value="${shown ?? calcVal(k)}"><small>${unit}</small></label>`;
+  const far = Math.max(0, ...S.routes.map(x => +x.km || 0));
+  const out = (txt, cls = '') => `<div class="calc-out ${cls}">${txt}</div>`;
+  $('#calcCard').innerHTML = `<h3>Kalkulator daya &amp; BBM</h3>
+    <p class="muted">Angka awal hanyalah contoh — sesuaikan dengan alat Anda. Jumlah gas dan powerbank diambil dari tab Stok.</p>
+    <div class="calc"><h4>🔥 Gas kaleng · ${fmtNum(r.cans)} kaleng</h4>
+      ${inp('gasHours', 'Lama nyala per kaleng', 'jam', 0.5)}${inp('cookHours', 'Memasak per hari', 'jam', 0.5)}
+      ${out(`Cukup untuk ±<b>${fmtNum(r.gasDays)} hari</b> memasak.`, r.gasDays >= S.days ? '' : 'warn')}</div>
+    <div class="calc"><h4>🔋 Powerbank · ${fmtNum(r.pbs)} buah</h4>
+      ${inp('pbMah', 'Kapasitas per powerbank', 'mAh', 1000)}${inp('phoneMah', 'Baterai HP', 'mAh', 100)}${inp('phones', 'Jumlah HP', 'buah', 1, r.phones)}
+      ${out(`±<b>${fmtNum(r.charges)} kali</b> isi penuh HP → ±<b>${fmtNum(r.pbDays)} hari</b> bila tiap HP diisi sekali sehari.`, r.pbDays >= S.days ? '' : 'warn')}</div>
+    <div class="calc"><h4>🏍️ Kendaraan evakuasi</h4>
+      ${inp('tank', 'Isi tangki', 'liter', 0.5)}${inp('kmpl', 'Konsumsi', 'km/liter', 1)}${inp('reserve', 'Cadangan aman', '%', 5)}
+      ${out(`Jangkauan ±<b>${r.range} km</b>, aman ±<b>${r.safeRange} km</b>.` + (far ? ` Rute terjauh ${fmtNum(far)} km pulang-pergi ${fmtNum(far*2)} km: <b>${far*2 <= r.safeRange ? 'cukup' : 'tidak cukup — isi BBM atau cari rute lebih dekat'}</b>.` : ' Isi rute evakuasi di tab Rencana untuk membandingkan.'), far*2 > r.safeRange ? 'warn' : '')}</div>
+    <div class="calc"><h4>☀️ Panel surya</h4>
+      ${inp('wp', 'Daya panel', 'Wp', 10)}${inp('sunH', 'Matahari efektif', 'jam/hari', 0.5)}${inp('loss', 'Rugi sistem', '%', 5)}
+      ${out(`±<b>${fmtNum(r.solarWh)} Wh</b> per hari ≈ <b>${fmtNum(r.solarCharges)} kali</b> isi penuh HP.`)}</div>
+    <small class="muted">Asumsi: powerbank menyalurkan 65% kapasitas tertulis; baterai HP 3,85 V; pengisian HP 80% efisien.</small>`;
+}
+
+function renderRoutes(){
+  const g = S.geo || {};
+  const pt = (k, label) => { const v = g[k]; return `<div class="geo-row"><b>${label}</b>: ${esc(S.info[k]) || '<span class="muted">nama belum diisi</span>'}<br>
+    ${v ? `<span class="muted">${v.lat}, ${v.lon}</span> <a class="btn sm" href="${mapUrl(v)}" target="_blank" rel="noopener noreferrer">🗺️ Buka di peta</a>` : '<span class="muted">Koordinat belum disimpan.</span>'}
+    <div class="geo-tools"><button class="btn sm" data-geohere="${k}">📍 Simpan lokasi saya di sini</button>
+      <input type="text" data-geotext="${k}" placeholder="atau tempel koordinat: -8.2, 112.6" aria-label="Koordinat ${label}"></div></div>`; };
+  $('#routeCard').innerHTML = `<h3>Titik kumpul &amp; rute evakuasi</h3>
+    <p class="muted">Simpan koordinat saat berdiri di titik kumpul, atau tempel dari aplikasi peta. Koordinat ikut di kartu darurat dan QR.</p>
+    ${pt('titik1', 'Titik kumpul 1')}${pt('titik2', 'Titik kumpul 2')}
+    <h4 style="margin:14px 0 6px">Rute evakuasi</h4>
+    ${S.routes.map((x, i) => `<div class="mem">
+      <div class="row"><input data-r="${i}" data-rf="nama" placeholder="Nama rute (mis. Ke bukit)" aria-label="Nama rute ${i+1}" value="${esc(x.nama)}">
+        <input data-r="${i}" data-rf="tujuan" placeholder="Tujuan / tempat aman" aria-label="Tujuan rute ${i+1}" value="${esc(x.tujuan)}"></div>
+      <div class="row"><input data-r="${i}" data-rf="km" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Jarak (km)" aria-label="Jarak rute ${i+1}" value="${x.km || ''}">
+        <input data-r="${i}" data-rf="via" placeholder="Lewat jalan…" aria-label="Jalur rute ${i+1}" value="${esc(x.via)}"></div>
+      ${x.km ? `<div class="muted">Jalan kaki ±${Math.round(x.km / 4 * 60)} menit (4 km/jam; lebih lama untuk anak & lansia) · kendaraan butuh BBM ±${fmtNum(fuelFor(x.km))} L sekali jalan.</div>` : ''}
+      <button class="btn del" data-rdel="${i}">Hapus</button></div>`).join('') || '<p class="muted">Belum ada rute.</p>'}
+    <button class="btn" id="addRoute"${S.routes.length >= 10 ? ' disabled' : ''}>+ Tambah rute</button>`;
+}
+
+let wxBusy = false;
+const fmtTime = iso => new Date(iso).toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+const dayName = t => new Date(t + 'T00:00').toLocaleDateString('id-ID', {weekday:'short', day:'numeric'});
+function wxHtml(d){
+  const parts = [], cur = d.wx?.current, dd = d.wx?.daily;
+  if(cur) parts.push(`<div class="big-num" style="font-size:28px">${Math.round(cur.temperature_2m)}°C <small>${wmoText(cur.weather_code)} · angin ${Math.round(cur.wind_speed_10m)} km/jam</small></div>`);
+  if(dd) parts.push(`<div class="wx-days">${dd.time.map((t, i) => `<div><b>${dayName(t)}</b><br>${wmoText(dd.weather_code[i])}<br>${Math.round(dd.temperature_2m_min[i])}–${Math.round(dd.temperature_2m_max[i])}°C<br>hujan ${dd.precipitation_probability_max[i] ?? '–'}%</div>`).join('')}</div>`);
+  if(d.aq?.current){ const v = d.aq.current.us_aqi, cat = aqiCat(v); parts.push(`<p style="margin:8px 0">Kualitas udara: <span class="badge ${cat[0]}">${cat[1]}</span> AQI ${v} · PM2.5 ${fmtNum(d.aq.current.pm2_5)} µg/m³</p>`); }
+  if(d.eq){ const [la, lo] = String(d.eq.Coordinates).split(',').map(Number);
+    const km = validCoord(la, lo) ? ` · ±${Math.round(distKm(d.place, {lat:la, lon:lo}))} km dari lokasi` : '';
+    parts.push(`<p style="margin:8px 0">Gempa terbaru (BMKG): <b>M${esc(d.eq.Magnitude)}</b> · ${esc(d.eq.Tanggal)} ${esc(d.eq.Jam)}${km}<br><span class="muted">${esc(d.eq.Wilayah)}. ${esc(d.eq.Potensi)}</span></p>`); }
+  wxAlerts(d).forEach(([cls, txt, k]) => parts.push(`<div class="${cls === 'bad' ? 'badbox' : 'warnbox'}">${esc(txt)} <button class="btn sm" data-hazlink="${k}">Lihat panduan</button></div>`));
+  parts.push(`<p class="muted" style="margin:6px 0 0">Diperbarui ${fmtTime(d.at)}${navigator.onLine ? '' : ' · sedang offline, menampilkan data terakhir'}.</p>`);
+  return parts.join('');
+}
+function renderWx(){
+  const place = wxPlace(), d = S.wx;
+  let body;
+  if(!place) body = '<p class="muted">Pilih lokasi untuk melihat cuaca, kualitas udara, dan gempa terbaru.</p>';
+  else if(d && samePlace(d.place, place)) body = wxHtml(d);
+  else body = `<p class="muted">${wxBusy ? 'Memuat…' : navigator.onLine ? 'Ketuk "Perbarui" untuk memuat.' : 'Belum ada data. Hubungkan ke internet untuk memuat.'}</p>`;
+  $('#wxCard').innerHTML = `<h3>Kondisi sekitar <span class="muted">· perlu internet</span></h3>
+    <p class="muted" style="margin:4px 0 8px">Lokasi: <b>${esc(place?.name || 'belum dipilih')}</b>${wxBusy ? ' · memuat…' : ''}</p>
+    ${body}
+    <div class="tools wx-tools"><button class="btn sm" id="wxHere">📍 Pakai lokasi saya</button>
+      <input type="text" id="wxCity" placeholder="Cari kota / kecamatan" aria-label="Cari lokasi"><button class="btn sm" id="wxFind">Cari</button>
+      ${place ? '<button class="btn sm" id="wxRefresh">Perbarui</button>' : ''}</div>
+    <small class="muted">Lokasi dibulatkan (±1 km) lalu dikirim ke Open-Meteo untuk cuaca &amp; kualitas udara; data gempa dari BMKG. Ini bukan peringatan resmi — ikuti InfoBMKG dan BPBD.</small>`;
+}
+async function refreshWx(force){
+  const place = wxPlace();
+  if(!place || wxBusy || !navigator.onLine) return renderWx();
+  const fresh = S.wx && samePlace(S.wx.place, place) && Date.now() - new Date(S.wx.at) < 30*60e3;
+  if(fresh && !force) return renderWx();
+  wxBusy = true; renderWx();
+  try { S.wx = await fetchConditions(place); save(); }
+  catch(err){ toast(err.message || 'Gagal memuat kondisi sekitar.', true); }
+  finally { wxBusy = false; renderWx(); }
 }
 
 const meterCls = (v, target) => v >= target ? '' : v >= target/2 ? 'warn' : 'bad';
@@ -1345,7 +1586,7 @@ function saveCustom(){
   S.open[x.cat] = true; editing = null; save(); renderAll(); toast('Barang disimpan.');
 }
 
-function renderAll(){ renderRegion(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); progress(); renderSaveState(); }
+function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); }
 
 function showTab(id){
   S.tab = id; save();
@@ -1388,6 +1629,7 @@ async function makeQr(){
   $('#qrBox').innerHTML = `<div class="qr"></div>
     <p class="muted" style="text-align:center">Pindai dengan kamera HP anggota keluarga, lalu setujui impor.</p>`;
   $('#qrBox .qr').append(qrCanvas(qr, Math.min(324, $('#qrBox').clientWidth - 16 || 324)));
+  $('#toast').hidden = true;   // a toast over the code makes it unscannable
   $('#copyLink').hidden = false; $('#copyLink').dataset.url = url;
 }
 async function copyText(text){
@@ -1402,6 +1644,25 @@ document.addEventListener('click', e => {
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
   const act = t.closest('[data-act]'); if(act){ S.actView = act.dataset.act; save(); return renderP3k(); }
+  const hl = t.closest('[data-hazlink]');
+  if(hl){ S.actView = 'bencana'; save(); renderP3k(); showTab('t-act'); if(document.getElementById('hazard-' + hl.dataset.hazlink)) selectHazard(hl.dataset.hazlink); return; }
+  if(t.id === 'addRoute'){ S.routes.push({nama:'', tujuan:'', km:0, via:''}); save(); renderRoutes(); return renderCard(); }
+  const rd = t.closest('[data-rdel]'); if(rd){ S.routes.splice(+rd.dataset.rdel, 1); save(); renderRoutes(); renderCalc(); return renderCard(); }
+  const gh = t.closest('[data-geohere]');
+  if(gh){ const k = gh.dataset.geohere; gh.disabled = true; gh.textContent = 'Mencari lokasi…';
+    getPosition().then(p => { S.geo[k] = {lat:roundTo(p.lat, 5), lon:roundTo(p.lon, 5)}; save(); toast(`Koordinat disimpan (akurasi ±${Math.round(p.acc)} m).`); })
+      .catch(err => toast(err.message, true)).finally(() => { renderRoutes(); renderCard(); });
+    return; }
+  if(t.id === 'wxHere'){
+    getPosition().then(p => { S.place = {name:'Lokasi saya', lat:roundTo(p.lat, 2), lon:roundTo(p.lon, 2)}; save(); refreshWx(true); }).catch(err => toast(err.message, true));
+    return; }
+  if(t.id === 'wxFind'){
+    const q = $('#wxCity').value.trim();
+    if(!q) return toast('Ketik nama kota atau kecamatan.', true);
+    if(!navigator.onLine) return toast('Pencarian lokasi perlu internet.', true);
+    geocode(q).then(pl => { S.place = pl; save(); refreshWx(true); }).catch(err => toast(err.message || 'Pencarian gagal.', true));
+    return; }
+  if(t.id === 'wxRefresh') return refreshWx(true);
   const sc = t.closest('[data-sc]');
   if(sc){ S.sc = sc.dataset.sc; S.view = 'list'; S.loc = 'semua'; CATS.forEach(c => S.open[c.id] = true); save(); renderList(); return showTab('t-list'); }
   if(t.id === 'addCustom'){ editing = 'new'; return renderCustomForm(); }
@@ -1419,7 +1680,7 @@ document.addEventListener('click', e => {
   if(st){ S.fam[st.dataset.k] = Math.max(0, Math.min(20, S.fam[st.dataset.k] + +st.dataset.v));
     if(S.fam.dewasa + S.fam.lansia === 0) S.fam.dewasa = 1; save(); return renderAll(); }
   const d = t.closest('#daysCtl button'); if(d){ S.days = +d.dataset.d; save(); return renderAll(); }
-  const rg = t.closest('[data-region]'); if(rg){ S.region = rg.dataset.region; save(); renderAll(); renderHaz(); renderInfo(); return; }
+  const rg = t.closest('[data-region]'); if(rg){ S.region = rg.dataset.region; save(); renderAll(); renderHaz(); renderInfo(); return refreshWx(); }
   const v = t.closest('[data-view]'); if(v){ S.view = v.dataset.view; save(); return renderList(); }
   const lc = t.closest('[data-loc]'); if(lc){ S.loc = lc.dataset.loc; save(); return renderList(); }
   const pet = t.closest('[data-pet]'); if(pet){ S.special.hewan = Math.max(0, Math.min(20, (S.special.hewan||0) + +pet.dataset.pet)); save(); return renderAll(); }
@@ -1460,6 +1721,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if((e.key === 'Enter' || e.key === ' ') && e.target.closest('#cats .cat-h')){ e.preventDefault(); e.target.click(); }
+  if(e.key === 'Enter' && e.target.id === 'wxCity'){ e.preventDefault(); $('#wxFind').click(); }
 });
 document.addEventListener('change', e => {
   const t = e.target;
@@ -1469,6 +1731,12 @@ document.addEventListener('change', e => {
   if(t.dataset.be){ const [id, i] = t.dataset.be.split(':'); S.batches[id][+i].e = t.value; save(); renderAll(); }
   if(t.dataset.special){ S.special[t.dataset.special] = t.checked; save(); renderAll(); }
   if(t.id === 'scSel'){ S.sc = t.value; save(); renderList(); }
+  if(t.dataset.price){ const v = parseFloat(t.value); if(v > 0) S.price[t.dataset.price] = v; else delete S.price[t.dataset.price]; save(); renderShop(); }
+  if(t.dataset.calc){ const v = parseFloat(t.value); if(Number.isFinite(v) && v >= 0) S.calc[t.dataset.calc] = v; else delete S.calc[t.dataset.calc]; save(); renderCalc(); renderRoutes(); }
+  if(t.dataset.geotext){ const g = parseCoord(t.value);
+    if(!g) toast('Format koordinat: lintang, bujur — mis. -8.2, 112.6', true);
+    else { S.geo[t.dataset.geotext] = g; save(); renderRoutes(); renderCard(); } }
+  if(t.dataset.r && t.dataset.rf === 'km'){ const v = parseFloat(t.value); S.routes[+t.dataset.r].km = Number.isFinite(v) && v > 0 && v < 1000 ? round1(v) : 0; save(); renderRoutes(); renderCalc(); renderCard(); }
   if(t.dataset.risk){ S.risk[t.dataset.risk] = t.checked; save(); renderHaz(); renderCard(); }
   if(t.id === 'importIn' && t.files[0]){
     const file = t.files[0]; t.value = '';
@@ -1483,7 +1751,8 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('input', e => {
   const t = e.target;
-  if(t.dataset.info){ S.info[t.dataset.info] = t.value; save(); renderCard(); }
+  if(t.dataset.info){ S.info[t.dataset.info] = t.value; save(); renderCard(); if(/^titik/.test(t.dataset.info)) renderRoutes(); }
+  if(t.dataset.r && t.dataset.rf !== 'km'){ S.routes[+t.dataset.r][t.dataset.rf] = t.value.slice(0, 200); save(); renderCard(); }
   if(t.dataset.m){ S.members[+t.dataset.m][t.dataset.f] = t.value; save(); renderCard(); }
 });
 
@@ -1506,6 +1775,9 @@ async function importFromHash(){
 }
 importFromHash();
 addEventListener('hashchange', importFromHash);
+refreshWx();
+addEventListener('online', () => refreshWx());
+addEventListener('offline', renderWx);
 
 document.addEventListener('visibilitychange', () => { if(!document.hidden){ renderSoon(); renderList(); renderPlan(); progress(); } });
 setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);

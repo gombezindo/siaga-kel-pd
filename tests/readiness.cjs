@@ -184,3 +184,67 @@ test('first aid guide: every topic has steps and https sources; key numbers pres
   assert.match(a.run('JSON.stringify(FIRSTAID.find(f => f.k === "bakar"))'), /minimal 20 menit/);
   assert.doesNotMatch(a.run('JSON.stringify(FIRSTAID)'), /sendok/);   // no home-made ORS recipe
 });
+
+test('shopping cost: user prices, cash counted automatically, missing prices reported', ()=>{
+  const a = app();
+  a.run('S.price.galon = 20000; S.price.fotokopi = 15000');
+  const list = a.run('shoppingList()');
+  const cost = id => a.run(`costOf(shoppingList().find(s => s.id === "${id}"))`);
+  assert.equal(cost('galon'), 40000);        // 2 galon × 20.000
+  assert.equal(cost('fotokopi'), 15000);     // checkbox item: price per package
+  assert.equal(cost('tunai'), 600000);       // 600 ribu rupiah needed for 4 people
+  assert.equal(cost('roti'), null);
+  const sum = a.run('costSummary(shoppingList())');
+  assert.ok(sum[1].sum >= 655000 && sum[1].missing > 0);
+  assert.match(a.run('shoppingText(shoppingList())'), /Perkiraan total: Rp/);
+  assert.ok(list.length > 0);
+});
+
+test('power & fuel calculators use stock and editable assumptions', ()=>{
+  const a = app();
+  a.run('S.have.gas = 4; S.have.powerbank = 2; S.batches = {}');
+  let r = a.run('calcPower()');
+  assert.equal(r.gasDays, 4);                 // 4 cans × 1.5 h / 1.5 h per day
+  assert.equal(r.charges, 2.9);               // 2 × 10000 × 0.65 / 4500
+  assert.equal(r.phones, 2);                  // defaults to adults
+  assert.equal(r.range, 160);
+  assert.equal(r.safeRange, 128);
+  a.run('S.calc.reserve = 0; S.calc.kmpl = 10; S.calc.phones = "x"');
+  r = a.run('calcPower()');
+  assert.equal(r.safeRange, 40);              // zero reserve allowed
+  assert.equal(r.phones, 2);                  // invalid value falls back
+  assert.equal(a.run('fuelFor(25)'), 2.5);
+});
+
+test('coordinates, routes and conditions helpers', ()=>{
+  const a = app();
+  assert.equal(JSON.stringify(a.run('parseCoord("-8.123456, 112.6")')), '{"lat":-8.12346,"lon":112.6}');
+  assert.equal(JSON.stringify(a.run('parseCoord("-8,2; 112,6")')), '{"lat":-8.2,"lon":112.6}');
+  assert.equal(a.run('parseCoord("abc")'), null);
+  assert.equal(a.run('parseCoord("95, 10")'), null);
+  assert.equal(Math.round(a.run('distKm({lat:-8.2, lon:112.6}, {lat:-7.98, lon:112.63})')), 25);
+  assert.equal(a.run('aqiCat(160)[1]'), 'Tidak sehat');
+  assert.equal(a.run('wmoText(63)'), 'Hujan sedang');
+  const alerts = a.run(`wxAlerts({place:{lat:-8.2, lon:112.6}, aq:{current:{us_aqi:150}},
+    wx:{daily:{time:["2026-11-01"], precipitation_probability_max:[90], precipitation_sum:[35]}},
+    eq:{Coordinates:"-8.5,112.4", Magnitude:"5.6"}}).map(x => x[2]).join()`);
+  assert.equal(alerts, 'erupsi,banjir,gempa');
+  assert.equal(a.run('wxAlerts({place:{lat:-8.2, lon:112.6}, eq:{Coordinates:"4.79,96.20", Magnitude:"6.1"}}).length'), 0);   // far away
+});
+
+test('routes, coordinates, prices and calculator settings survive backup validation; QR carries routes', async ()=>{
+  const a = app();
+  const {data} = a.run(`sanitizeData({geo:{titik1:{lat:-8.2, lon:112.6}, titik2:{lat:"x", lon:1}, hack:{lat:1, lon:1}},
+    routes:[{nama:"Ke bukit", tujuan:"Bukit Kaliwaru", km:3.5, via:"jalan desa"}, {nama:"x", km:-4}],
+    price:{galon:20000, nope:5, beras:-1}, calc:{tank:5, bogus:1}, place:{name:"Rumah", lat:-8.2, lon:112.6}})`);
+  assert.equal(JSON.stringify(Object.keys(data.geo)), '["titik1"]');
+  assert.equal(data.routes.length, 2);
+  assert.equal(data.routes[1].km, 0);
+  assert.equal(JSON.stringify(data.price), '{"galon":20000}');
+  assert.equal(JSON.stringify(data.calc), '{"tank":5}');
+  assert.throws(() => a.run('sanitizeData({routes:new Array(11).fill({})})'), /rute/);
+  a.run('S.geo = {titik1:{lat:-8.2, lon:112.6}}; S.routes = [{nama:"Ke bukit", tujuan:"Bukit", km:3, via:""}]');
+  const shared = await a.run(`encodeShare().then(decodeShare)`);
+  assert.equal(shared.routes[0].tujuan, 'Bukit');
+  assert.equal(shared.geo.titik1.lon, 112.6);
+});
