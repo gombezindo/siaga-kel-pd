@@ -112,3 +112,22 @@ Dokumen penting dalam plastik kedap air, air & makanan tahan lama, obat-obatan &
 - [Black Ice — Data limits for QR barcodes](https://blackice.com/Help/Tools/Barcode%20OCX%20webhelp/WebHelp/Data_Limits_for_QR_Barcodes.htm)
 - [Keyence — What is a QR code?](https://www.keyence.com/ss/products/auto_id/barcode_lecture/basic_2d/qr/)
 - [Lake County Ohio — Stockpiling](https://www.lakecountyohio.gov/emergency-management-agency/preparedness/stockpiling/)
+
+## 12. Riset v1.3 — panduan P3K awam
+- **RJP (AHA):** tekan dada 100–120/menit, kedalaman dewasa ±5–6 cm (2–2,4 inci), tumit tangan di separuh bawah tulang dada, biarkan dada kembali penuh; penolong awam yang tidak terlatih cukup RJP tekan dada saja. Anak: ±1/3 tebal dada (±5 cm), 30:2 bila terlatih; jeda < 10 detik.
+- **Perdarahan (Stop the Bleed, ACS):** tekan langsung kuat; luka dalam/area sambungan (leher, bahu, ketiak, selangkangan) → sumbat kain sampai penuh lalu tekan; torniket hanya lengan/kaki, 2–3 inci di atas luka, bukan di sendi, kencangkan sampai berhenti, catat jam, jangan dilepas.
+- **Luka bakar (Palang Merah Australia):** aliri air sejuk mengalir minimal 20 menit; jangan es. Sumber lain menyebut 10–15 menit — dipakai angka Palang Merah.
+- **Tersedak:** tepukan punggung + hentakan perut (dipakai luas); panduan Palang Merah Australia memakai hentakan dada — perbedaan antarlembaga dicatat; aplikasi memakai 5 tepukan + 5 hentakan perut, hentakan dada untuk ibu hamil/obesitas.
+- **Patah tulang, syok:** sumber sekunder Indonesia (modul P3K UNY, artikel kesehatan) dan Palang Merah: jangan luruskan, bidai melewati dua sendi, jangan pindahkan bila curiga cedera tulang belakang; syok → baringkan, hangatkan, tanpa makan/minum, panggil bantuan.
+- **Diare:** takaran larutan gula-garam berbeda antarsumber (6 sdt gula + ½ sdt garam/L vs 1 sdt gula + ¼ sdt garam), dan dokter menilai larutan buatan kurang terukur → aplikasi hanya menganjurkan **oralit kemasan**.
+- **Celah:** pedoman resmi PMI/Kemenkes berbahasa Indonesia tidak ditemukan dalam bentuk daring yang bisa dirujuk langsung. Konten perlu ditinjau tenaga kesehatan.
+
+Sumber tambahan:
+- [AHA — New resuscitation guidelines update CPR chest pushes](https://news.heart.org/%ef%bb%bfnew-resuscitation-guidelines-update-cpr-chest-pushes/)
+- [VUMC — Heartsaver CPR AED summary 2025 (PDF)](https://www.vumc.org/resuscitation-program/sites/default/files/public_files/BLS/Heartsaver/Heartsaver-CPR-AED-Summary-High-Quality-CPR%20Components-2025-Guidelines.pdf)
+- [Stop the Bleed — lay public presentation (PDF)](https://stopthebleed.org/media/qk5jgpgs/lay-public-stop-the-bleed-presentation-pdf.pdf)
+- [Red Cross Australia — Essential First Aid Guide (PDF)](https://www.redcross.org.au/globalassets/cms/first-aid/first-aid-pdfs/first-aid-essentials/red-cross-essential-first-aid-guide-english.pdf)
+- [Red Cross Canada — Comprehensive Guide for First Aid & CPR (PDF)](https://cdn.redcross.ca/prodmedia/crc/documents/Comprehensive_Guide_for_FirstAidCPR_en.pdf)
+- [UNY — Materi P3K (PDF)](https://besmart.uny.ac.id/v2/pluginfile.php/1749871/mod_resource/content/6/MATERI%208.%20PERTOLONGAN%20PERTAMA%20PADA%20KECELAKAAN%20%28P3K%29.pdf)
+- [Alodokter — Cara membuat oralit](https://www.alodokter.com/ini-cara-membuat-oralit-untuk-diare-di-rumah)
+- [Alomedika — Apakah larutan gula garam masih digunakan?](https://alomedika.com/komunitas/topic/oralit-rumahan)

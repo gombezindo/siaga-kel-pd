@@ -174,3 +174,13 @@ test('custom items join stock, shopping list, scenarios, and survive backup vali
   assert.equal(bad[0].cat, 'alat');
   assert.equal(JSON.stringify(bad[0].sc), '["banjir"]');
 });
+
+test('first aid guide: every topic has steps and https sources; key numbers present', ()=>{
+  const a = app();
+  assert.equal(a.run('FIRSTAID.every(f => f.steps.length >= 3 && f.src.length && f.src.every(id => SOURCES[id]?.url.startsWith("https://")))'), true);
+  const rjp = a.run('JSON.stringify(FIRSTAID.find(f => f.k === "rjp"))');
+  assert.match(rjp, /100–120/);
+  assert.match(rjp, /5–6 cm/);
+  assert.match(a.run('JSON.stringify(FIRSTAID.find(f => f.k === "bakar"))'), /minimal 20 menit/);
+  assert.doesNotMatch(a.run('JSON.stringify(FIRSTAID)'), /sendok/);   // no home-made ORS recipe
+});

@@ -139,6 +139,12 @@ h3{font-size:16px;margin:0}
 .meter i.warn{background:var(--warn)}.meter i.bad{background:var(--bad)}
 .mine{font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;margin-left:4px;color:var(--ok);background:var(--ok-soft)}
 .ctools{display:flex;gap:6px;margin-top:6px}
+.fa{padding:4px 16px}
+.fa summary{cursor:pointer;font-weight:700;font-size:17px;min-height:48px;display:flex;gap:10px;align-items:center}
+.fa[open] summary{border-bottom:1px solid var(--line);margin-bottom:6px}
+.hz .fa-steps{font-size:16px;margin:8px 0;padding-left:22px}
+.hz .fa-steps li{margin-bottom:8px}
+.fa .tip{margin:0 0 8px}
 .linkrow{background:none;border:0;padding:4px 0;width:100%;text-align:left;cursor:pointer;color:inherit}
 .hz-ready{font-size:14px;background:var(--bg);border-radius:10px;padding:10px 12px;margin:4px 0 8px}
 .cform{display:grid;gap:10px}
@@ -229,7 +235,8 @@ h3{font-size:16px;margin:0}
   .card{box-shadow:none;break-inside:avoid}
   .wrap{padding-bottom:0}
   .hazard-picker,.quick-entry{display:none!important}
-  .hazard-panel[hidden]{display:block!important}
+  .hazard-panel[hidden],#hazView[hidden],#p3kView[hidden]{display:block!important}
+  #actCtl{display:none!important}
   body.print-only .wrap{display:none!important}
   body.print-only .print-sheet.print-target{display:block!important}
   .ecard{border:0;padding:0}
@@ -337,10 +344,21 @@ h3{font-size:16px;margin:0}
 <!-- 4. SAAT BENCANA -->
 <section id="t-act" class="hz">
   <h2>Saat Bencana</h2>
-  <p class="lead">Pilih bencana untuk melihat tiga tindakan utama. Ikuti arahan petugas setempat.</p>
-  <div id="hazardPicker" class="hazard-picker" role="group" aria-label="Pilih jenis bencana"></div>
-  <div id="hazards"></div>
-  <button class="btn" data-go="t-info">Buka rencana &amp; titik kumpul</button>
+  <div class="seg top" id="actCtl" role="group" aria-label="Jenis panduan">
+    <button data-act="bencana">Tindakan bencana</button><button data-act="p3k">Pertolongan pertama</button>
+  </div>
+  <div id="hazView">
+    <p class="lead">Pilih bencana untuk melihat tiga tindakan utama. Ikuti arahan petugas setempat.</p>
+    <div id="hazardPicker" class="hazard-picker" role="group" aria-label="Pilih jenis bencana"></div>
+    <div id="hazards"></div>
+    <button class="btn" data-go="t-info">Buka rencana &amp; titik kumpul</button>
+  </div>
+  <div id="p3kView" hidden>
+    <div class="big">Darurat medis? Telepon <a href="tel:119" style="color:inherit">119</a> (ambulans) atau <a href="tel:112" style="color:inherit">112</a> lebih dulu, lalu lakukan pertolongan sambil menunggu.</div>
+    <p class="lead">Panduan pertolongan pertama untuk orang awam — tetap bisa dibuka tanpa internet. Bukan pengganti tenaga kesehatan atau pelatihan resmi; ikuti pelatihan P3K/RJP dari PMI bila bisa.</p>
+    <div id="p3kList"></div>
+    <p class="src" id="p3kSrc"></p>
+  </div>
 </section>
 
 <!-- 5. RENCANA -->
@@ -691,6 +709,67 @@ const HAZ = [
   'Isi daya HP dari kendaraan hanya di area terbuka, bukan garasi tertutup, atau gunakan panel surya. Pakai radio untuk kabar resmi.',
   'Kunci rumah, ronda bersama tetangga, cek tetangga lansia.']},
 ];
+// ---------- first aid (lay rescuer) ----------
+// Steps follow AHA (CPR), ACS Stop the Bleed (bleeding) and Red Cross first-aid guides; see SOURCES.
+const FIRSTAID = [
+ {k:'aman', ic:'🦺', t:'Langkah pertama di setiap kejadian', src:['ahacpr'], steps:[
+  'Pastikan tempat aman untuk Anda dan korban (listrik, api, reruntuhan, arus air).',
+  'Cek respons: tepuk bahu dan panggil korban dengan suara keras.',
+  'Telepon 119 atau 112 (atau minta orang lain menelepon) dan sebutkan lokasi dengan jelas.',
+  'Tangani dulu yang mengancam nyawa: tidak bernapas, perdarahan hebat, tersedak.']},
+ {k:'darah', ic:'🩸', t:'Perdarahan hebat', src:['stopbleed'], steps:[
+  'Tekan luka kuat-kuat dan terus-menerus dengan kain atau kasa bersih — pakai tangan bila tidak ada apa-apa.',
+  'Bila darah merembes, tambah kain di atasnya. Jangan angkat kain pertama untuk mengintip.',
+  'Luka dalam (atau di leher, bahu, ketiak, selangkangan): sumbatkan kain rapat-rapat ke dalam luka sampai penuh, lalu tekan kuat dengan dua tangan.',
+  'Lengan/kaki yang terus berdarah walau ditekan: pasang torniket 5–7 cm di atas luka (bukan di sendi), kencangkan sampai darah berhenti, catat jamnya.'],
+  no:['Jangan melonggarkan atau melepas torniket — biarkan petugas medis yang melepas.'],
+  call:'Selalu panggil 119/112 untuk perdarahan hebat, walau darah sudah berhenti.'},
+ {k:'rjp', ic:'❤️', t:'Tidak sadar & tidak bernapas normal — RJP', src:['ahacpr'], steps:[
+  'Telepon 119/112 dan nyalakan pengeras suara HP. Minta orang lain mencari AED bila ada.',
+  'Baringkan korban telentang di permukaan keras.',
+  'Letakkan tumit telapak tangan di tengah dada (separuh bawah tulang dada), tangan lain di atasnya.',
+  'Tekan dalam 5–6 cm dengan kecepatan 100–120 kali per menit; biarkan dada kembali naik penuh setiap tekanan.',
+  'Orang awam cukup menekan dada tanpa memberi napas. Jangan berhenti sampai korban bergerak, AED siap, atau petugas mengambil alih.'],
+  note:'Anak (1 tahun–remaja): tekan sekitar sepertiga tebal dada (±5 cm) dengan satu atau dua tangan. Bila terlatih, beri 2 napas setiap 30 tekanan.'},
+ {k:'sedak', ic:'😮', t:'Tersedak (dewasa & anak di atas 1 tahun)', src:['redcross'], steps:[
+  'Masih bisa batuk atau bicara: suruh terus batuk, jangan dipukul.',
+  'Tidak bisa bicara, batuk, atau bernapas: berdiri di belakangnya, condongkan badannya ke depan, beri 5 tepukan kuat di punggung di antara tulang belikat.',
+  'Lalu beri 5 hentakan perut: kepalan tangan di atas pusar, tarik kuat ke dalam dan ke atas.',
+  'Ulangi 5 tepukan dan 5 hentakan sampai benda keluar.',
+  'Bila korban jatuh tidak sadar: telepon 119/112 dan mulai RJP.'],
+  note:'Ibu hamil atau orang bertubuh besar: hentakan dilakukan di dada, bukan di perut.'},
+ {k:'bakar', ic:'🔥', t:'Luka bakar', src:['redcross'], steps:[
+  'Hentikan sumbernya: padamkan api, matikan listrik dari MCB sebelum menyentuh korban sengatan listrik.',
+  'Aliri luka bakar dengan air mengalir yang sejuk (bukan es) minimal 20 menit.',
+  'Lepas cincin, jam, dan pakaian di sekitar luka — kecuali yang menempel di kulit.',
+  'Tutup longgar dengan plastik wrap bersih atau kain bersih yang tidak berbulu.'],
+  no:['Jangan oles pasta gigi, mentega, kecap, minyak, atau es.','Jangan pecahkan lepuhan.'],
+  call:'Ke fasilitas kesehatan bila luka lebih luas dari telapak tangan korban, di wajah/tangan/kaki/kelamin, akibat listrik atau bahan kimia, atau korbannya bayi/lansia.'},
+ {k:'tulang', ic:'🦴', t:'Patah tulang & keseleo', src:['redcross'], steps:[
+  'Jangan meluruskan atau memijat bagian yang diduga patah.',
+  'Topang bagian yang cedera pada posisi yang ditemukan; buat bidai dari papan/kardus tebal yang melewati dua sendi di atas dan bawah cedera.',
+  'Kompres dingin yang dibungkus kain untuk bengkak, maksimal 20 menit sekali.',
+  'Tulang menembus kulit: tutup luka dengan kain bersih, jangan dimasukkan kembali.'],
+  no:['Curiga cedera leher/punggung (jatuh dari tinggi, tertimpa): jangan pindahkan korban kecuali ada bahaya langsung.']},
+ {k:'syok', ic:'🥶', t:'Syok', src:['redcross'], steps:[
+  'Tanda: pucat, kulit dingin dan berkeringat, napas dan nadi cepat, lemas, gelisah atau bingung.',
+  'Telepon 119/112. Hentikan perdarahan bila ada.',
+  'Baringkan korban, longgarkan pakaian, jaga tetap hangat dengan selimut.',
+  'Temani dan tenangkan korban; pantau napasnya sampai bantuan datang.'],
+  no:['Jangan beri makan atau minum.']},
+ {k:'luka', ic:'🩹', t:'Luka biasa & luka setelah banjir', src:['redcross'], steps:[
+  'Cuci tangan, lalu bersihkan luka dengan air bersih mengalir.',
+  'Tekan dengan kasa sampai darah berhenti, lalu tutup dengan plester atau kasa.',
+  'Ganti penutup bila basah atau kotor.'],
+  call:'Ke fasilitas kesehatan bila luka dalam, terkena air banjir/lumpur, tertusuk benda berkarat, digigit hewan, atau muncul merah, bengkak, panas, bernanah, dan demam. Tanyakan juga suntikan tetanus.'},
+ {k:'diare', ic:'💧', t:'Diare & dehidrasi', src:['oralit'], steps:[
+  'Beri oralit kemasan, dilarutkan sesuai petunjuk di bungkusnya dengan air matang.',
+  'Minum sedikit-sedikit tetapi sering; bila muntah, tunggu 10 menit lalu lanjutkan pelan-pelan.',
+  'Bayi tetap diberi ASI; anak dan dewasa tetap makan.',
+  'Jaga kebersihan: cuci tangan dengan sabun, minum hanya air matang atau air kemasan.'],
+  call:'Segera ke fasilitas kesehatan bila: tidak bisa minum, muntah terus, tinja berdarah, sangat lemas atau mengantuk, mata cekung, tidak buang air kecil, demam tinggi, atau diare tidak membaik dalam 1–2 hari. Bayi, lansia, dan ibu hamil lebih cepat memburuk.'},
+];
+
 // location risk profile for the general region (user-reported, used to put relevant hazards first)
 const RISKS = [['pantai','Dekat pantai'],['gunung','Dekat gunung api'],['lereng','Di lereng / perbukitan'],['sungai','Dekat sungai / dataran rendah rawan banjir'],['asap','Wilayah rawan kabut asap karhutla']];
 
@@ -702,6 +781,10 @@ const SOURCES = {
   kemkesasap: {title:'Kemenkes — Pakai masker dan pantau kualitas udara saat asap karhutla', url:'https://kemkes.go.id/id/menkes-pakai-masker-dan-pantau-kualitas-udara-untuk-cegah-dampak-asap-karhutla', scope:'Masker, kualitas udara, dan kapan ke fasilitas kesehatan.'},
   cdc: {title:'CDC — Keselamatan saat listrik padam', url:'https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-during-a-power-outage.html', scope:'Keamanan pangan, genset, dan risiko karbon monoksida; panduan berbahasa Inggris.'},
   inarisk: {title:'InaRISK — Portal risiko bencana BNPB', url:'https://inarisk.bnpb.go.id/', scope:'Cek tingkat ancaman bencana di lokasi rumah.'},
+  ahacpr: {title:'American Heart Association — Pembaruan pedoman RJP', url:'https://news.heart.org/%ef%bb%bfnew-resuscitation-guidelines-update-cpr-chest-pushes/', scope:'Kecepatan dan kedalaman tekanan dada; RJP tekan dada saja untuk orang awam.'},
+  stopbleed: {title:'Stop the Bleed (ACS) — materi untuk masyarakat (PDF)', url:'https://stopthebleed.org/media/qk5jgpgs/lay-public-stop-the-bleed-presentation-pdf.pdf', scope:'Tekan langsung, sumbat luka, dan torniket.'},
+  redcross: {title:'Red Cross — Essential First Aid Guide (PDF)', url:'https://www.redcross.org.au/globalassets/cms/first-aid/first-aid-pdfs/first-aid-essentials/red-cross-essential-first-aid-guide-english.pdf', scope:'Luka bakar, tersedak, patah tulang, syok, dan luka; berbahasa Inggris.'},
+  oralit: {title:'Alodokter — Cara membuat dan memberikan oralit', url:'https://www.alodokter.com/ini-cara-membuat-oralit-untuk-diare-di-rumah', scope:'Pemberian oralit dan tanda perlu ke dokter. Utamakan oralit kemasan.'},
   bpbd: {title:'BPBD Kabupaten Malang', url:'https://bpbd.malangkab.go.id/', only:'malang', scope:'Informasi daerah; konfirmasikan jalur evakuasi dan titik aman dengan desa/BPBD.'},
 };
 
@@ -1107,6 +1190,21 @@ function renderHaz(){
   $('#sourceList').innerHTML = Object.values(SOURCES).filter(s => !s.only || s.only === S.region)
     .map(source=>`<li><a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a><br>${source.scope}</li>`).join('');
   renderHazReady();
+  renderP3k();
+}
+function renderP3k(){
+  const v = S.actView || 'bencana';
+  document.querySelectorAll('#actCtl button').forEach(b => b.setAttribute('aria-pressed', b.dataset.act === v));
+  $('#hazView').hidden = v !== 'bencana';
+  $('#p3kView').hidden = v !== 'p3k';
+  $('#p3kList').innerHTML = FIRSTAID.map((f, i) => `<details class="card fa" id="fa-${f.k}"${i < 2 ? ' open' : ''}>
+    <summary><span aria-hidden="true">${f.ic}</span> ${esc(f.t)}</summary>
+    <ol class="fa-steps">${f.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+    ${f.note ? `<p class="tip">${esc(f.note)}</p>` : ''}
+    ${f.no ? `<div class="badbox">${f.no.map(x => '✕ ' + esc(x)).join('<br>')}</div>` : ''}
+    ${f.call ? `<div class="warnbox">${esc(f.call)}</div>` : ''}
+    <p class="src">Rujukan: ${sourceLinks(f.src)}</p></details>`).join('');
+  $('#p3kSrc').textContent = 'Disusun 1 November 2026 dari pedoman American Heart Association, Stop the Bleed (American College of Surgeons), dan Palang Merah. Tautan rujukan perlu internet; isi panduan tetap tersedia offline.';
 }
 function sourceLinks(ids){
   return ids.map(id => `<a href="${SOURCES[id].url}" target="_blank" rel="noopener noreferrer">${SOURCES[id].title}</a>`).join(' · ');
@@ -1118,7 +1216,7 @@ function selectHazard(key){
 }
 // Expand details for a complete printed emergency guide, then restore the view.
 let printDetails = [];
-addEventListener('beforeprint', () => { printDetails = [...document.querySelectorAll('#hazards details')].map(d=>[d,d.open]); printDetails.forEach(([d])=>d.open=true); });
+addEventListener('beforeprint', () => { printDetails = [...document.querySelectorAll('#hazards details, #p3kList details')].map(d=>[d,d.open]); printDetails.forEach(([d])=>d.open=true); });
 addEventListener('afterprint', () => {
   printDetails.forEach(([d,open])=>d.open=open);
   document.body.classList.remove('print-only');
@@ -1303,6 +1401,7 @@ document.addEventListener('click', e => {
   const go = t.closest('[data-go]'); if(go) return showTab(go.dataset.go);
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
+  const act = t.closest('[data-act]'); if(act){ S.actView = act.dataset.act; save(); return renderP3k(); }
   const sc = t.closest('[data-sc]');
   if(sc){ S.sc = sc.dataset.sc; S.view = 'list'; S.loc = 'semua'; CATS.forEach(c => S.open[c.id] = true); save(); renderList(); return showTab('t-list'); }
   if(t.id === 'addCustom'){ editing = 'new'; return renderCustomForm(); }
