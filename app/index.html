@@ -51,7 +51,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
 .bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
 
 nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav .tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav .tabs{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
 nav button{background:none;border:0;padding:10px 1px 9px;font-size:11px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:20px;line-height:1}
 nav button[aria-selected="true"]{color:var(--accent);font-weight:700}
@@ -212,6 +212,19 @@ body.surv-open{overflow:hidden}
 .eq-set select,#vidUrl,#vidTitle{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 8px}
 .fam-list{margin:10px 0}
 .fam-row{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
+.subtabs{display:flex;gap:8px;margin:0 0 14px;overflow:auto;padding-bottom:2px}
+.subtabs .btn{white-space:nowrap;flex:1;text-align:center}
+.subtabs .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.community-grid{display:grid;gap:14px}
+.chat-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;background:var(--bg);border-radius:12px;padding:10px;margin:10px 0}
+.chat-empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
+.msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;overflow-wrap:anywhere}
+.msg.help{border-left:5px solid var(--bad)}.msg.offer{border-left:5px solid var(--ok)}.msg.info{border-left:5px solid var(--warn)}
+.msg-head{display:flex;gap:8px;justify-content:space-between;font-size:12px;color:var(--muted)}
+.msg p{margin:4px 0 0;white-space:pre-wrap}.msg .tag{font-weight:700;color:var(--ink)}
+.compose{display:grid;gap:8px}.compose textarea{width:100%;min-height:76px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;resize:vertical}
+.room-code{font:600 13px ui-monospace,Menlo,Consolas,monospace;word-break:break-all;background:var(--bg);border-radius:8px;padding:8px}
+.online-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:5px}.online-dot.off{background:var(--muted)}
 .vid-g{margin:12px 0 6px}
 .vid{display:flex;gap:12px;align-items:center;padding:10px}
 .vid-box{width:120px;flex:none;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
@@ -404,6 +417,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 2. STOK -->
 <section id="t-list">
   <h2>Stok</h2>
+  <div class="subtabs noprint"><button class="btn active" data-go="t-list">Stok &amp; belanja</button><button class="btn" data-go="t-plan">Rencana berkala</button></div>
   <div class="seg top" id="viewCtl" role="group" aria-label="Tampilan stok">
     <button data-view="list">Checklist</button><button data-view="shop">Daftar belanja</button>
   </div>
@@ -434,6 +448,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 3. JAUH HARI -->
 <section id="t-plan">
   <h2>Persiapan Jauh Hari</h2>
+  <div class="subtabs noprint"><button class="btn" data-go="t-list">Stok &amp; belanja</button><button class="btn active" data-go="t-plan">Rencana berkala</button></div>
   <p class="lead">Stok saja tidak cukup. Menurut riset, <b>rencana keluarga</b> adalah faktor paling menentukan kesiapan rumah tangga. Kerjakan bertahap.</p>
   <div class="card">
     <h3>Jadwal pemeriksaan berkala</h3>
@@ -448,6 +463,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 4. SAAT BENCANA -->
 <section id="t-act" class="hz">
   <h2>Saat Bencana</h2>
+  <div class="subtabs noprint"><button class="btn active" data-go="t-act">Tindakan &amp; P3K</button><button class="btn" data-go="t-lib">Pustaka darurat</button></div>
   <div class="seg top" id="actCtl" role="group" aria-label="Jenis panduan">
     <button data-act="bencana">Tindakan bencana</button><button data-act="p3k">Pertolongan pertama</button>
   </div>
@@ -465,7 +481,35 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   </div>
 </section>
 
-<!-- 5. RENCANA -->
+<!-- 5. KOMUNITAS -->
+<section id="t-community">
+  <h2>Komunitas</h2>
+  <p class="lead"><span class="online-dot" id="communityDot"></span><span id="communityMode">Perlu mode online.</span> Pesan dipakai untuk koordinasi keluarga dan warga.</p>
+  <div class="warnbox"><b>Jangan bagikan</b> NIK, foto dokumen, nomor rekening, kata sandi, atau lokasi rumah yang terlalu rinci. Informasi keselamatan tetap harus dikonfirmasi ke BMKG, BPBD, atau petugas.</div>
+  <div class="community-grid">
+    <div class="card">
+      <h3>Chat keluarga</h3>
+      <p class="muted">Memakai kode grup lokasi keluarga yang sama. Siapa pun yang mengetahui kode dapat membaca dan menulis. Pesan tampil selama 48 jam.</p>
+      <div id="familyChat"></div>
+    </div>
+    <div class="card">
+      <h3>Ruang saling bantu warga</h3>
+      <p class="muted">Ruang undangan untuk RT, desa, posko, atau komunitas. Tidak ada daftar ruang publik; bagikan kode hanya kepada warga yang dikenal. Gunakan kategori agar kebutuhan mudah dipilah.</p>
+      <div id="communityRoom"></div>
+    </div>
+    <div class="card">
+      <h3>Aturan ruang</h3>
+      <ul>
+        <li>Utamakan pesan singkat: kebutuhan, jumlah, area umum, dan waktu.</li>
+        <li>Jangan menjanjikan bantuan yang belum pasti atau meneruskan kabar yang belum terverifikasi.</li>
+        <li>Untuk ancaman jiwa, gunakan 112/119 dan petugas setempat; forum bukan layanan darurat.</li>
+        <li>Jika ruang disalahgunakan, hentikan pemakaian dan buat kode ruang baru.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6. RENCANA -->
 <section id="t-info">
   <h2>Rencana Keluarga</h2>
   <p class="lead">Ketuk nomor untuk menelepon. Cetak kartu darurat — HP bisa mati.</p>
@@ -512,9 +556,10 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <p>Jumlah kebutuhan adalah estimasi aplikasi, bukan standar yang seragam untuk setiap keluarga. Sesuaikan dengan kondisi anggota keluarga. Nomor darurat umum belum diuji sambung; cakupan layanan dapat berbeda antarwilayah.</p></div>
 </section>
 
-<!-- 6. PUSTAKA -->
+<!-- PUSTAKA (bagian kategori Darurat) -->
 <section id="t-lib" class="hz">
   <h2>Pustaka Darurat</h2>
+  <div class="subtabs noprint"><button class="btn" data-go="t-act">Tindakan &amp; P3K</button><button class="btn active" data-go="t-lib">Pustaka darurat</button></div>
   <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, alat sinyal, video, dan aktivitas saat listrik padam.</p>
   <div class="chips noprint"><a href="#sec-sinyal">🆘 Sinyal</a><a href="#sec-hidup">🧭 Bertahan hidup</a><a href="#sec-radio">📻 Radio</a><a href="#sec-skill">🛠️ Keterampilan</a><a href="#sec-video">🎬 Video</a><a href="#sec-aktif">🎲 Aktivitas</a><a href="#sec-offline">📚 Offline</a></div>
   <div class="card" id="sec-sinyal">
@@ -563,12 +608,11 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <div class="toast" id="toast" role="status" hidden></div>
 
 <nav><div class="tabs" role="tablist">
-  <button role="tab" data-t="t-fam" aria-selected="true"><span>👪</span>Keluarga</button>
-  <button role="tab" data-t="t-list"><span>✅</span>Stok</button>
-  <button role="tab" data-t="t-plan"><span>🗓️</span>Jauh Hari</button>
-  <button role="tab" data-t="t-act"><span>⚠️</span>Saat Bencana</button>
+  <button role="tab" data-t="t-fam" aria-selected="true"><span>🏠</span>Beranda</button>
+  <button role="tab" data-t="t-list"><span>✅</span>Persiapan</button>
+  <button role="tab" data-t="t-act"><span>⚠️</span>Darurat</button>
+  <button role="tab" data-t="t-community"><span>🤝</span>Komunitas</button>
   <button role="tab" data-t="t-info"><span>📋</span>Rencana</button>
-  <button role="tab" data-t="t-lib"><span>📚</span>Pustaka</button>
 </div></nav>
 
 <script>
@@ -2278,6 +2322,89 @@ function renderFamily(){
       <small class="muted">Disimpan di Firebase (server Jakarta) hanya lokasi terakhir, tidak ada riwayat. Lokasi lebih dari 24 jam tidak ditampilkan; hapus kapan saja. Siapa pun yang tahu kode grup bisa melihat lokasi anggota — bagikan kode hanya ke keluarga.</small>`}`;
 }
 let myPosCache = null;
+
+// ---------- chat keluarga & ruang warga (Firestore REST, kode ruang = credential) ----------
+const COMM_KEY = 'siaga-community-v1';
+function cleanCommunity(v){
+  const x = isObj(v) ? v : {};
+  return {room:validGid(x.room) ? x.room : '', nick:str(x.nick, 40), mid:/^[A-Za-z0-9_-]{12,40}$/.test(x.mid || '') ? x.mid : randId(12), lastFamily:+x.lastFamily || 0, lastRoom:+x.lastRoom || 0};
+}
+let COMM;
+try { COMM = cleanCommunity(JSON.parse(localStorage.getItem(COMM_KEY) || '{}')); } catch { COMM = cleanCommunity({}); }
+function saveCommunity(){ try { localStorage.setItem(COMM_KEY, JSON.stringify(COMM)); } catch {} }
+const CHAT_KINDS = {chat:'Obrolan', help:'Butuh bantuan', offer:'Bisa membantu', info:'Info warga'};
+const chatText = v => String(v || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 280);
+function toChat(m){ return {fields:{name:{stringValue:m.name}, text:{stringValue:m.text}, kind:{stringValue:m.kind}, mid:{stringValue:m.mid}, t:{timestampValue:m.t}, exp:{timestampValue:m.exp}}}; }
+function fromChat(doc){
+  const f = doc.fields || {};
+  return {id:String(doc.name || '').split('/').pop(), name:f.name?.stringValue || '?', text:f.text?.stringValue || '',
+    kind:f.kind?.stringValue || 'chat', mid:f.mid?.stringValue || '', t:f.t?.timestampValue || doc.createTime || ''};
+}
+let familyMessages = null, roomMessages = null, chatBusy = {family:false, room:false}, chatErr = {family:'', room:''};
+const chatConfig = scope => scope === 'family'
+  ? {code:S.famGroup, path:`fam/${S.famGroup}/chat`, list:familyMessages, title:'keluarga'}
+  : {code:COMM.room, path:`community/${COMM.room}/posts`, list:roomMessages, title:'warga'};
+function messageHtml(m){
+  const kind = CHAT_KINDS[m.kind] ? m.kind : 'chat';
+  return `<div class="msg ${kind}"><div class="msg-head"><span><span class="tag">${esc(CHAT_KINDS[kind])}</span> · ${esc(m.name)}</span><time>${esc(agoText(m.t))}</time></div><p>${esc(m.text)}</p></div>`;
+}
+function composeHtml(scope){
+  const nick = scope === 'family' ? (S.live.name || COMM.nick) : COMM.nick;
+  return `<div class="compose"><label>Nama di ruang<input id="${scope}ChatName" maxlength="40" value="${esc(nick)}" placeholder="mis. Budi / Posko RW 03"></label>
+    ${scope === 'room' ? `<label>Kategori<select id="roomChatKind">${Object.entries(CHAT_KINDS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>` : ''}
+    <label>Pesan<textarea id="${scope}ChatText" maxlength="280" placeholder="Tulis kebutuhan, jumlah, area umum, dan waktu. Maks. 280 karakter."></textarea></label>
+    <button class="btn pri" data-chat-send="${scope}">Kirim pesan</button></div>`;
+}
+function chatPanel(scope){
+  const c = chatConfig(scope), list = c.list || [], busy = chatBusy[scope], err = chatErr[scope];
+  return `<div class="tools" style="margin:4px 0"><button class="btn sm" data-chat-refresh="${scope}">Muat ulang</button></div>
+    ${err ? `<div class="badbox">${esc(err)}</div>` : ''}
+    <div class="chat-list" aria-live="polite">${busy && !c.list ? '<div class="chat-empty">Memuat…</div>' : list.length ? list.map(messageHtml).join('') : '<div class="chat-empty">Belum ada pesan dalam 48 jam terakhir.</div>'}</div>
+    ${composeHtml(scope)}<small class="muted">Pesan hanya tampil 48 jam. Kode ruang adalah kunci masuk; tidak ada verifikasi identitas. Jangan gunakan sebagai sumber peringatan resmi.</small>`;
+}
+function renderCommunity(){
+  const can = online() && navigator.onLine;
+  const dot = $('#communityDot'), mode = $('#communityMode');
+  if(!dot || !mode) return;
+  dot.classList.toggle('off', !can); mode.textContent = can ? 'Terhubung.' : 'Chat perlu mode online dan koneksi internet.';
+  $('#familyChat').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet. SMS dari Rencana tetap dapat dipakai saat jaringan data tidak tersedia.</p>'
+    : !validGid(S.famGroup) ? '<p class="muted">Belum ada grup keluarga. Buat atau gabung grup dari Rencana; kode yang sama dipakai untuk lokasi live dan chat.</p><button class="btn" data-go="t-info">Buka Rencana</button>'
+    : `<p class="room-code">Kode keluarga: ${esc(S.famGroup.slice(0,6))}…${esc(S.famGroup.slice(-4))}</p>${chatPanel('family')}`;
+  $('#communityRoom').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet untuk membuka ruang warga.</p>'
+    : !validGid(COMM.room) ? `<div class="tools"><button class="btn pri" id="roomCreate">Buat ruang warga</button></div><div class="geo-tools"><input id="roomJoinCode" maxlength="40" placeholder="atau masukkan kode ruang" aria-label="Kode ruang warga"><button class="btn sm" id="roomJoin">Gabung</button></div>`
+    : `<p class="room-code">Kode ruang: ${esc(COMM.room)}</p><div class="tools"><button class="btn sm" id="roomCopy">Salin kode</button><button class="btn sm" id="roomLeave">Keluar / ganti ruang</button></div>${chatPanel('room')}`;
+}
+async function loadChat(scope){
+  const c = chatConfig(scope);
+  if(!online() || !navigator.onLine || !validGid(c.code)) return;
+  chatBusy[scope] = true; renderCommunity();
+  try {
+    const r = await fsReq('GET', `${c.path}?pageSize=50&orderBy=t%20desc`);
+    const docs = r?.documents || [], cutoff = Date.now() - 48*3600e3;
+    const fresh = docs.map(fromChat).filter(m => Date.parse(m.t) >= cutoff).sort((a,b) => Date.parse(a.t) - Date.parse(b.t));
+    // Best-effort cleanup when someone opens the room; expired messages are also hidden locally.
+    docs.filter(d => Date.parse(d.fields?.exp?.timestampValue || d.createTime || '') < Date.now())
+      .forEach(d => fsReq('DELETE', d.name.split('/documents/')[1]).catch(() => {}));
+    if(scope === 'family') familyMessages = fresh; else roomMessages = fresh;
+    chatErr[scope] = '';
+  } catch(err){ chatErr[scope] = err.message; }
+  finally { chatBusy[scope] = false; renderCommunity(); }
+}
+async function sendChat(scope){
+  const c = chatConfig(scope), now = Date.now(), lastKey = scope === 'family' ? 'lastFamily' : 'lastRoom';
+  if(!online() || !navigator.onLine) throw new Error('Chat perlu mode online dan koneksi internet.');
+  if(!validGid(c.code)) throw new Error('Kode ruang belum tersedia.');
+  if(now - COMM[lastKey] < 10000) throw new Error('Tunggu 10 detik sebelum mengirim pesan berikutnya.');
+  const name = str($(`#${scope}ChatName`)?.value, 40).trim(), text = chatText($(`#${scope}ChatText`)?.value);
+  const kind = scope === 'room' && CHAT_KINDS[$('#roomChatKind')?.value] ? $('#roomChatKind').value : 'chat';
+  if(name.length < 2) throw new Error('Isi nama minimal 2 karakter.');
+  if(text.length < 2) throw new Error('Isi pesan minimal 2 karakter.');
+  const t = new Date(), msg = {name, text, kind, mid:COMM.mid, t:t.toISOString(), exp:new Date(t.getTime()+48*3600e3).toISOString()};
+  await fsReq('POST', `${c.path}?documentId=${randId(12)}`, toChat(msg));
+  COMM.nick = name; COMM[lastKey] = now; saveCommunity();
+  if(scope === 'family' && !S.live.name){ S.live.name = name; save(); }
+  await loadChat(scope);
+}
 // Imports (QR, backup) may carry a family group code. Never switch groups silently while this device shares
 // its location: a different group turns sharing off and removes this device's location from the old group.
 function famImportNote(data){
@@ -2315,6 +2442,10 @@ async function onlineTick(){
   if(validGid(S.famGroup)){
     if(S.live.on && (!S.live.lastSent || Date.now() - Date.parse(S.live.lastSent) > 5*60e3)) await sendMyLocation().catch(err => { famErr = err.message; });
     loadFamily();
+  }
+  if(document.getElementById('t-community')?.classList.contains('on')){
+    if(validGid(S.famGroup)) loadChat('family');
+    if(validGid(COMM.room)) loadChat('room');
   }
 }
 
@@ -2532,12 +2663,21 @@ function saveCustom(){
   S.open[x.cat] = true; editing = null; save(); renderAll(); toast('Barang disimpan.');
 }
 
-function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); }
+function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); renderCommunity(); }
 
 function showTab(id){
+  if(!document.getElementById(id)) id = 't-fam';
   S.tab = id; save();
   document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === id));
-  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.t === id));
+  const navId = id === 't-plan' ? 't-list' : id === 't-lib' ? 't-act' : id;
+  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.t === navId));
+  if(id === 't-community'){
+    renderCommunity();
+    if(online() && navigator.onLine){
+      if(validGid(S.famGroup)) loadChat('family');
+      if(validGid(COMM.room)) loadChat('room');
+    }
+  }
   window.scrollTo(0,0);
   const heading = document.querySelector('#'+id+' h2'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); }
 }
@@ -2596,7 +2736,7 @@ document.addEventListener('click', e => {
   if(t.id === 'svPrev'){ surv.i = Math.max(0, surv.i - 1); return renderSurvival(); }
   if(t.id === 'survClose' || t.closest('#survClose')) return closeSurvival();
   const md = t.closest('[data-mode]');
-  if(md){ S.mode = md.dataset.mode; save(); netStatus(); renderMode(); renderWx(); renderFamily(); renderVideos(); if(online()){ refreshWx(); onlineTick(); } return; }
+  if(md){ S.mode = md.dataset.mode; save(); netStatus(); renderMode(); renderWx(); renderFamily(); renderCommunity(); renderVideos(); if(online()){ refreshWx(); onlineTick(); } return; }
   if(t.id === 'eqClose'){ $('#eqAlert').hidden = true; return; }
   if(t.id === 'eqTest'){ const ref = eqRef() || {name:'contoh', lat:-8.2, lon:112.6};
     return showQuakeAlert({dt:new Date().toISOString(), lat:ref.lat - 0.4, lon:ref.lon + 0.2, mag:5.4, depth:'10 km', wilayah:'Contoh: 50 km dari lokasi Anda', potensi:'Tidak berpotensi tsunami', dirasakan:'', jam:'', tanggal:'UJI'}, ref, true); }
@@ -2604,10 +2744,20 @@ document.addEventListener('click', e => {
   if(t.id === 'eqNotif'){ return Notification.requestPermission().then(() => renderMode()); }
   const ci = t.closest('[data-checkin]'); if(ci){ $('#eqAlert').hidden = true; if(surv) closeSurvival(); return doCheckin(ci.dataset.checkin); }
   if(t.id === 'ci-share'){ const text = $('#ci-text').value; if(navigator.share) return navigator.share({text}).catch(() => {}); return copyText(text).then(ok => toast(ok ? 'Pesan disalin.' : 'Tidak bisa menyalin otomatis.', !ok)); }
-  if(t.id === 'famCreate'){ S.famGroup = randId(16); S.live.name = S.live.name || S.members.find(m => m.nama)?.nama || ''; save(); famList = []; renderFamily(); renderCard(); return toast('Grup dibuat. Bagikan kode atau QR ke keluarga.'); }
+  const cr = t.closest('[data-chat-refresh]'); if(cr) return loadChat(cr.dataset.chatRefresh);
+  const cs = t.closest('[data-chat-send]');
+  if(cs){ cs.disabled = true; return sendChat(cs.dataset.chatSend).then(() => toast('Pesan terkirim.')).catch(err => toast(err.message, true)).finally(() => { cs.disabled = false; }); }
+  if(t.id === 'roomCreate'){ COMM.room = randId(16); roomMessages = []; saveCommunity(); renderCommunity(); return toast('Ruang warga dibuat. Bagikan kodenya kepada warga yang dikenal.'); }
+  if(t.id === 'roomJoin'){ const code = ($('#roomJoinCode').value || '').trim();
+    if(!validGid(code)) return toast('Kode ruang tidak valid.', true);
+    COMM.room = code; roomMessages = null; saveCommunity(); renderCommunity(); return loadChat('room'); }
+  if(t.id === 'roomCopy') return copyText(COMM.room).then(ok => toast(ok ? 'Kode ruang disalin.' : 'Tidak bisa menyalin otomatis.', !ok));
+  if(t.id === 'roomLeave' && confirm('Keluar dari ruang warga ini? Pesan di server tidak ikut terhapus.')){
+    COMM.room = ''; roomMessages = null; saveCommunity(); renderCommunity(); return; }
+  if(t.id === 'famCreate'){ S.famGroup = randId(16); S.live.name = S.live.name || S.members.find(m => m.nama)?.nama || ''; save(); famList = []; familyMessages = []; renderFamily(); renderCommunity(); renderCard(); return toast('Grup dibuat. Bagikan kode atau QR ke keluarga.'); }
   if(t.id === 'famJoin'){ const code = ($('#famJoinCode').value || '').trim();
     if(!validGid(code)) return toast('Kode grup tidak valid.', true);
-    S.famGroup = code; save(); famList = null; renderFamily(); return loadFamily(); }
+    S.famGroup = code; save(); famList = null; familyMessages = null; renderFamily(); renderCommunity(); return loadFamily(); }
   if(t.id === 'famCopy') return copyText(S.famGroup).then(ok => toast(ok ? 'Kode grup disalin.' : 'Tidak bisa menyalin otomatis.', !ok));
   if(t.id === 'famRefresh') return loadFamily();
   if(t.id === 'famSend'){ t.disabled = true; return sendMyLocation().then(() => { toast('Lokasi terkirim.'); loadFamily(); }).catch(err => toast(err.message, true)).finally(() => { t.disabled = false; }); }
@@ -2615,7 +2765,7 @@ document.addEventListener('click', e => {
     S.live.on = false; save();
     return fsReq('DELETE', `fam/${S.famGroup}/m/${S.live.mid}`).then(() => { S.live.lastSent = null; save(); toast('Lokasi Anda dihapus dari grup.'); loadFamily(); }).catch(err => toast(err.message, true)); }
   if(t.id === 'famLeave' && confirm('Keluar dari grup keluarga? Lokasi Anda di grup juga dihapus.')){
-    const g = S.famGroup; S.famGroup = ''; S.live.on = false; save(); famList = null; renderFamily();
+    const g = S.famGroup; S.famGroup = ''; S.live.on = false; save(); famList = null; familyMessages = null; renderFamily(); renderCommunity();
     if(S.live.lastSent) fsReq('DELETE', `fam/${g}/m/${S.live.mid}`).catch(() => {});
     S.live.lastSent = null; save(); return; }
   const pl = t.closest('[data-play]');
@@ -2779,13 +2929,13 @@ if(S.theme) document.documentElement.dataset.theme = S.theme;
 // home-screen shortcuts open ?tab=…&act=…&view=…&survival=…
 let survivalParam = null;
 { const q = new URLSearchParams(location.search);
-  if(['t-fam','t-list','t-plan','t-act','t-info','t-lib'].includes(q.get('tab'))) S.tab = q.get('tab');
+  if(['t-fam','t-list','t-plan','t-act','t-community','t-info','t-lib'].includes(q.get('tab'))) S.tab = q.get('tab');
   if(['bencana','p3k'].includes(q.get('act'))) S.actView = q.get('act');
   if(['list','shop'].includes(q.get('view'))) S.view = q.get('view');
   if(q.has('survival')) survivalParam = q.get('survival');
   if(q.toString()) history.replaceState(null, '', location.pathname + location.hash); }
 if(!S.live.mid) S.live.mid = randId(12);
-renderAll(); renderHaz(); renderInfo(); renderLib(); renderSkills(); renderMode(); renderFamily(); renderVideos(); renderActivities(); showTab(S.tab || 't-fam');
+renderAll(); renderHaz(); renderInfo(); renderLib(); renderSkills(); renderMode(); renderFamily(); renderCommunity(); renderVideos(); renderActivities(); showTab(S.tab || 't-fam');
 if(survivalParam !== null) openSurvival(survivalParam);
 if(navigator.storage?.persist) navigator.storage.persist().catch(() => {});
 
@@ -2805,11 +2955,11 @@ async function importFromHash(){
 importFromHash();
 addEventListener('hashchange', importFromHash);
 refreshWx();
-addEventListener('online', () => { refreshWx(); onlineTick(); renderVideos(); });
+addEventListener('online', () => { refreshWx(); renderCommunity(); onlineTick(); renderVideos(); });
 setTimeout(onlineTick, 1500);
 setInterval(onlineTick, 60000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) onlineTick(); });
-addEventListener('offline', () => { renderWx(); renderVideos(); });
+addEventListener('offline', () => { renderWx(); renderCommunity(); renderVideos(); });
 
 document.addEventListener('visibilitychange', () => { if(!document.hidden){ renderSoon(); renderList(); renderPlan(); progress(); } });
 setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);

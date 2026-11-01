@@ -19,12 +19,43 @@ service cloud.firestore {
         && d.exp is timestamp
         && d.exp <= request.time + duration.value(2, 'd');
     }
+    function validCode(code) {
+      return code.size() >= 20 && code.size() <= 40;
+    }
+    function validChat(d) {
+      return d.keys().hasOnly(['name', 'text', 'kind', 'mid', 't', 'exp'])
+        && d.keys().hasAll(['name', 'text', 'kind', 'mid', 't', 'exp'])
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 40
+        && d.text is string && d.text.size() >= 2 && d.text.size() <= 280
+        && d.kind in ['chat', 'help', 'offer', 'info']
+        && d.mid is string && d.mid.size() >= 12 && d.mid.size() <= 40
+        && d.t is timestamp
+        && d.t > request.time - duration.value(5, 'm')
+        && d.t < request.time + duration.value(5, 'm')
+        && d.exp is timestamp
+        && d.exp > request.time
+        && d.exp <= request.time + duration.value(2, 'd');
+    }
     match /fam/{gid}/m/{mid} {
       allow get, list: if gid.size() >= 20 && gid.size() <= 40;
       allow create, update: if gid.size() >= 20 && gid.size() <= 40
         && mid.size() >= 12 && mid.size() <= 40
         && validMember(request.resource.data);
       allow delete: if gid.size() >= 20 && gid.size() <= 40;
+    }
+    match /fam/{gid}/chat/{messageId} {
+      allow get, list: if validCode(gid);
+      allow create: if validCode(gid)
+        && messageId.size() >= 12 && messageId.size() <= 40
+        && validChat(request.resource.data);
+      allow delete: if validCode(gid) && resource.data.exp < request.time;
+    }
+    match /community/{roomId}/posts/{messageId} {
+      allow get, list: if validCode(roomId);
+      allow create: if validCode(roomId)
+        && messageId.size() >= 12 && messageId.size() <= 40
+        && validChat(request.resource.data);
+      allow delete: if validCode(roomId) && resource.data.exp < request.time;
     }
   }
 }

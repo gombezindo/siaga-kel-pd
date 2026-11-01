@@ -2,6 +2,7 @@ const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const fs = require('node:fs');
+const crypto = require('node:crypto').webcrypto;
 const html = fs.readFileSync(require('node:path').join(__dirname, '../app/index.html'), 'utf8');
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1].split('// ---------- events ----------')[0];
 function app(saved = null){
@@ -9,7 +10,7 @@ function app(saved = null){
   const context = vm.createContext({localStorage:{getItem:()=>saved, setItem:()=>{}}, addEventListener:()=>{},
     document:{querySelector: key => {if(!nodes.has(key)) nodes.set(key,{style:{}}); return nodes.get(key);}},
     location:{origin:'https://siagakel-pd.web.app', pathname:'/'},
-    TextEncoder, TextDecoder, btoa, atob, Blob, Response, CompressionStream, DecompressionStream});
+    TextEncoder, TextDecoder, btoa, atob, Blob, Response, CompressionStream, DecompressionStream, crypto});
   vm.runInContext(script,context);
   return {run: code => vm.runInContext(code,context), nodes};
 }
@@ -327,6 +328,28 @@ test('family location: Firestore field mapping, group codes, check-in message', 
   assert.equal('live' in data, false);   // device-specific sharing consent is never imported
   assert.equal(JSON.stringify(data.videos), '[{"id":"ER92JACcoec","t":"Tas"}]');
   assert.equal(a.run('SHARE_FIELDS.includes("famGroup") && !SHARE_FIELDS.includes("live")'), true);
+});
+
+test('community chat sanitizes messages and maps Firestore fields', ()=>{
+  const a = app();
+  assert.equal(a.run('chatText("  perlu\\n  air \\u0000 sekarang  ")'), 'perlu air sekarang');
+  assert.equal(a.run('chatText("x".repeat(400)).length'), 280);
+  assert.equal(a.run('Object.keys(CHAT_KINDS).join()'), 'chat,help,offer,info');
+  const doc = a.run(`JSON.stringify(toChat({name:"Budi", text:"Butuh dua galon", kind:"help", mid:"device_123456", t:"2026-11-01T07:00:00Z", exp:"2026-11-03T07:00:00Z"}))`);
+  assert.equal(doc, '{"fields":{"name":{"stringValue":"Budi"},"text":{"stringValue":"Butuh dua galon"},"kind":{"stringValue":"help"},"mid":{"stringValue":"device_123456"},"t":{"timestampValue":"2026-11-01T07:00:00Z"},"exp":{"timestampValue":"2026-11-03T07:00:00Z"}}}');
+  const back = a.run(`fromChat({name:"projects/x/databases/(default)/documents/community/room/posts/msg1", fields:${doc}.fields})`);
+  assert.equal(back.id, 'msg1'); assert.equal(back.kind, 'help'); assert.equal(back.text, 'Butuh dua galon');
+  assert.equal(a.run('cleanCommunity({room:"bad/path", nick:"A".repeat(60), mid:"bad"}).room'), '');
+  assert.equal(a.run('cleanCommunity({room:"CommunityRoomCode_12345", nick:"Warga", mid:"device_123456"}).room'), 'CommunityRoomCode_12345');
+});
+
+test('Firestore rules scope family and community chat to random codes', ()=>{
+  const rules = fs.readFileSync(require('node:path').join(__dirname, '../firestore.rules'), 'utf8');
+  assert.match(rules, /match \/fam\/\{gid\}\/chat\/\{messageId\}/);
+  assert.match(rules, /match \/community\/\{roomId\}\/posts\/\{messageId\}/);
+  assert.match(rules, /d\.text\.size\(\) >= 2 && d\.text\.size\(\) <= 280/);
+  assert.match(rules, /d\.kind in \['chat', 'help', 'offer', 'info'\]/);
+  assert.doesNotMatch(rules, /allow (read|write): if true/);
 });
 
 test('videos, workouts and quiz data are well-formed', ()=>{

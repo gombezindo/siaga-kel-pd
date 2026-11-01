@@ -5,7 +5,7 @@ Aplikasi statis kesiapsiagaan keluarga, dengan mode **Malang Selatan** dan **Ind
 ## Firebase
 
 - Hosting: folder `app/` (`firebase deploy --only hosting`).
-- Firestore (lokasi keluarga): `firestore.rules`, `firestore.indexes.json` (`firebase deploy --only firestore`). Database `(default)` di `asia-southeast2`.
+- Firestore (lokasi dan chat): `firestore.rules`, `firestore.indexes.json` (`firebase deploy --only firestore`). Database `(default)` di `asia-southeast2`.
 
 ## Jalankan lokal
 
@@ -15,6 +15,14 @@ node --test tests/readiness.cjs
 ```
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
+
+## Perubahan v1.7 (1 November 2026)
+
+- Navigasi diringkas dari enam menjadi lima kategori utama: **Beranda, Persiapan, Darurat, Komunitas, Rencana**. Stok/belanja dan rencana berkala menjadi subtab Persiapan; Pustaka menjadi subtab Darurat.
+- **Chat keluarga online** memakai kode grup keluarga yang sama dengan lokasi live. Pesan maksimal 280 karakter dan hanya ditampilkan selama 48 jam.
+- **Ruang saling bantu warga** bersifat undangan untuk RT, desa, posko, atau komunitas. Tidak ada daftar ruang global. Pesan dapat ditandai sebagai Obrolan, Butuh bantuan, Bisa membantu, atau Info warga.
+- Kode acak ruang berfungsi sebagai kunci akses. UI memperingatkan pengguna agar tidak membagikan data sensitif, memverifikasi kabar melalui sumber resmi, dan memakai 112/119 untuk ancaman jiwa. Ini bukan sistem identitas atau moderasi penuh; untuk forum publik skala besar perlu Firebase Authentication, App Check, moderasi, pelaporan, dan admin tepercaya.
+- Aturan Firestore membatasi bentuk, panjang, kategori, dan masa berlaku pesan; pembaruan pesan ditolak dan penghapusan oleh klien hanya diizinkan setelah kedaluwarsa. Service worker v7.
 
 ## Perubahan v1.6 (1 November 2026)
 
@@ -98,4 +106,4 @@ Catatan riset lengkap (termasuk celah: pedoman resmi ibu hamil dan panduan disab
 
 ## Publikasi
 
-Branch `v1.2`. Untuk publikasi gunakan proyek Firebase `siagakel-pd` yang sudah dikonfigurasi, setelah memastikan target akun/proyek benar.
+Branch rilis terbaru disiapkan per versi (`v1.6`, `v1.7`, dan seterusnya). Untuk publikasi gunakan proyek Firebase `siagakel-pd` yang sudah dikonfigurasi, setelah memastikan target akun/proyek benar. Fitur chat v1.7 memerlukan deploy Hosting **dan** Firestore rules.
