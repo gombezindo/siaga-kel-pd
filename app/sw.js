@@ -1,7 +1,7 @@
 // Service worker: keeps the whole app available offline.
 // Page: network-first (gets updates when online, falls back to cache offline).
 // Other files: cache-first. Bump VERSION when adding/removing precached files.
-const VERSION = 'siaga-v4';
+const VERSION = 'siaga-v5';
 const FILES = ['./', './index.html', './manifest.webmanifest', './vendor/qrcode.js',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
 
@@ -29,4 +29,13 @@ self.addEventListener('fetch', e => {
     if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
     return res;
   })));
+});
+
+// Earthquake notifications (shown while the app is open): tapping one focuses the app on the disaster guide.
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({type:'window', includeUncontrolled:true}).then(list => {
+    const open = list.find(c => c.url.startsWith(self.registration.scope));
+    return open ? open.focus() : self.clients.openWindow('./?tab=t-act&act=bencana');
+  }));
 });

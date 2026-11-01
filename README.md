@@ -2,6 +2,11 @@
 
 Aplikasi statis kesiapsiagaan keluarga, dengan mode **Malang Selatan** dan **Indonesia (umum)**. Source publik ada di `app/`; konfigurasi Firebase Hosting memakai folder tersebut. Tidak ada build. Satu-satunya pustaka pihak ketiga adalah `app/vendor/qrcode.js` ([qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4, MIT, Kazuhiko Arase) untuk membuat QR code secara offline.
 
+## Firebase
+
+- Hosting: folder `app/` (`firebase deploy --only hosting`).
+- Firestore (lokasi keluarga): `firestore.rules`, `firestore.indexes.json` (`firebase deploy --only firestore`). Database `(default)` di `asia-southeast2`.
+
 ## Jalankan lokal
 
 ```sh
@@ -10,6 +15,18 @@ node --test tests/readiness.cjs
 ```
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
+
+## Perubahan v1.5 (1 November 2026)
+
+- **Mode Online / Offline** (tab Keluarga). Offline: aplikasi tidak mengambil atau mengirim data apa pun ke internet; semua panduan tetap jalan. Online: cuaca, peringatan gempa, video, dan lokasi keluarga.
+- **Peringatan gempa BMKG** (mode online, selama aplikasi terbuka): memantau `autogempa`, `gempaterkini`, dan `gempadirasakan` tiap menit. Banner merah + getar + bunyi (dan notifikasi sistem bila diizinkan) untuk gempa ≤60 menit terakhir dalam radius pilihan (100–1.000 km) dari lokasi/titik kumpul; **berpotensi tsunami** selalu diperingatkan dalam 1.000 km. Tidak dobel untuk gempa yang sama. Tombol uji & cek sekarang. Ditegaskan di UI: bukan peringatan dini, dan untuk notifikasi saat aplikasi tertutup pakai InfoBMKG (push server tidak dibuat — perlu paket Blaze).
+- **Kabar & lokasi keluarga** (tab Rencana):
+  - **Check-in "Saya aman / Butuh bantuan"** dengan koordinat GPS → SMS ke pusat kabar, WhatsApp, atau bagikan — jalan tanpa internet.
+  - **Lokasi live keluarga** via **Cloud Firestore (asia-southeast2, Jakarta)** di project `siagakel-pd`, lewat REST tanpa SDK. Grup dengan kode acak 128-bit (ikut di QR); tiap HP harus setuju sendiri untuk membagikan lokasi; hanya lokasi terakhir (tanpa riwayat), diperbarui tiap 5 menit selama aplikasi terbuka; lokasi >24 jam disembunyikan; bisa hapus lokasi & keluar grup kapan saja. TTL otomatis Firestore butuh paket berbayar — tidak dipakai.
+  - Aturan keamanan `firestore.rules`: hanya path `fam/{gid}/m/{mid}` (gid 20–40 karakter, tidak bisa di-list), validasi bentuk data, status, koordinat, dan timestamp ±1 jam dari waktu server. Diuji: field asing, timestamp palsu, kode pendek, daftar grup, dan koleksi lain ditolak.
+- **Video tutorial** (tab Pustaka, butuh internet): 10 video resmi Info BMKG (diverifikasi via oEmbed) per kelompok sebelum/peringatan dini/saat & setelah; dimuat hanya saat diputar (youtube-nocookie); bisa menambah video YouTube sendiri.
+- **Aktivitas tanpa internet** (tab Pustaka): olahraga tanpa alat dengan pengatur waktu & bunyi (ringan untuk lansia/anak, kebugaran), **Kuis Siaga** 16 soal dari isi aplikasi (skor terbaik tersimpan), **Tebak Morse**, dan ide kegiatan keluarga/belajar/tenang.
+- Service worker v5 (+ klik notifikasi membuka panduan bencana).
 
 ## Perubahan v1.4 (1 November 2026)
 

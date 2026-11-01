@@ -150,3 +150,12 @@ Sumber tambahan:
 - [Sphere Handbook](https://spherestandards.org/handbook/) · [WHO — Psychological First Aid](https://www.who.int/publications/i/item/9789241548205)
 - [Be Ready Utah — Emergency Signaling](https://beready.utah.gov/family-preparedness/12-areas-of-preparedness/communication/signaling/)
 - [Kiwix](https://kiwix.org/en/) · [Kiwix FAQ](https://www.kiwix.org/faq/) · [Kiwix Library](https://library.kiwix.org/) · [Organic Maps](https://organicmaps.app/)
+
+## 14. Riset v1.5 — gempa, lokasi keluarga, video
+- **Feed BMKG** (CORS `*`): `autogempa.json` (gempa terbaru + potensi tsunami), `gempaterkini.json` (15 gempa M5+ + potensi), `gempadirasakan.json` (15 gempa dirasakan + skala MMI). Data dirilis setelah gempa diproses — bukan peringatan dini. Push saat aplikasi tertutup butuh server (Cloud Functions + FCM, paket Blaze) → tidak dibuat; disarankan InfoBMKG.
+- **Firestore:** paket Spark (gratis) cukup untuk lokasi keluarga; **TTL policy butuh billing** sehingga kedaluwarsa ditangani di aplikasi (sembunyikan >24 jam, hapus manual). Database sempat dibuat otomatis di `nam5` saat deploy aturan, lalu dihapus (kosong) dan dibuat ulang di `asia-southeast2` sesuai keputusan pemilik.
+- **Video:** 10 ID video diambil dari halaman resmi BMKG "Edukasi Gempa Bumi dan Tsunami" dan diverifikasi lewat YouTube oEmbed (pemilik: Info BMKG). Video resmi BNPB/PMI tidak berhasil ditemukan/diverifikasi → disediakan "tambah video sendiri".
+
+Sumber tambahan:
+- [BMKG — Edukasi Gempa Bumi dan Tsunami](https://www.bmkg.go.id/gempabumi/mitigasi/edukasi-gempabumi-tsunami)
+- [BMKG Data Terbuka — TEWS](https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json)

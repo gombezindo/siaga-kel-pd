@@ -164,7 +164,43 @@ h3{font-size:16px;margin:0}
 .install-card .txt{flex:1;min-width:0}
 .install-card ol{margin:8px 0 0;padding-left:20px;font-size:14px}
 .install-card .tools{margin:10px 0 0}
-.lib-h{margin:18px 0 8px;font-size:17px}
+.lib-h{margin:18px 0 8px;font-size:17px;scroll-margin-top:96px}
+#sec-sinyal{scroll-margin-top:96px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.chips a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
+.eq-alert{background:var(--bad);color:#fff;padding:10px 16px;font-size:14px}
+.eq-alert.tsu{background:#7f1d1d;animation:pulse 1s ease-in-out 6}
+.eq-alert .eq-in{max-width:760px;margin:0 auto}
+.eq-alert b{font-size:16px}
+.eq-alert .tools{margin:8px 0 4px}
+.eq-alert .btn{background:#fff;color:#111;border-color:#fff}
+.eq-alert small{opacity:.9}
+@keyframes pulse{50%{filter:brightness(1.4)}}
+.eq-set{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.eq-set h4{margin:0 0 6px}
+.eq-set select,#vidUrl,#vidTitle{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 8px}
+.fam-list{margin:10px 0}
+.fam-row{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
+.vid-g{margin:12px 0 6px}
+.vid{display:flex;gap:12px;align-items:center;padding:10px}
+.vid-box{width:120px;flex:none;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
+.vid.playing{display:block}
+.vid.playing .vid-box{width:100%}
+.vid-box iframe{width:100%;height:100%;border:0;display:block}
+.vid-play{width:100%;height:100%;border:0;background:linear-gradient(135deg,#7f1d1d,#c2410c);color:#fff;font-size:28px;cursor:pointer}
+.vid-play[disabled]{background:#555;cursor:not-allowed;opacity:.6}
+.vid-meta{min-width:0}.vid-meta small{display:block;color:var(--muted);margin-top:2px}
+.vid.playing .vid-meta{margin-top:8px}
+.linkbtn{background:none;border:0;padding:0;color:var(--bad);cursor:pointer;font-size:inherit}
+.wk-now{text-align:center;border-radius:14px;padding:14px;margin:10px 0;background:var(--ok-soft)}
+.wk-now.rest{background:var(--warn-soft)}
+.wk-ic{font-size:48px}.wk-name{font-size:20px;font-weight:700}.wk-left{font-size:56px;font-weight:800;line-height:1.1}
+.quiz-opts{display:grid;gap:8px}
+.quiz-opts.mg{grid-template-columns:repeat(4,1fr)}
+.quiz-opt{text-align:left}
+.quiz-opts.mg .quiz-opt{text-align:center;font-size:20px}
+.quiz-opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.quiz-opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
 .sig{position:fixed;inset:0;z-index:40;background:#000;display:flex;align-items:flex-end;justify-content:center;cursor:pointer}
 .sig.on{background:#fff}
 .sig-txt{margin-bottom:40px;padding:8px 14px;border-radius:10px;background:rgba(80,80,80,.85);color:#fff;font-size:15px}
@@ -294,6 +330,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     </div>
     <div class="ring"><b id="pct">0%</b>checklist selesai<div class="bar"><i id="pbar" style="width:0"></i></div></div>
   </div>
+  <div class="eq-alert" id="eqAlert" role="alert" hidden></div>
 </header>
 
 <div class="wrap">
@@ -302,6 +339,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <section id="t-fam" class="on">
   <button class="btn quick-entry" data-go="t-act">Buka tindakan darurat</button>
   <div class="card install-card noprint" id="installCard" hidden></div>
+  <div class="card noprint" id="modeCard"></div>
   <div class="card">
     <h3>Wilayah panduan</h3>
     <p class="muted">Pilih panduan khusus Malang Selatan atau panduan umum untuk seluruh Indonesia.</p>
@@ -406,6 +444,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div id="infoFields"></div>
   </div>
   <div class="card" id="routeCard"></div>
+  <div class="card noprint" id="famCard"></div>
   <div class="card">
     <h3>Anggota keluarga</h3>
     <p class="muted">Kebutuhan khusus dan tugas diisi sendiri, mis. "hamil 7 bulan", "kursi roda", "bawa tas siaga", "jemput adik".</p>
@@ -445,8 +484,9 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 6. PUSTAKA -->
 <section id="t-lib" class="hz">
   <h2>Pustaka Darurat</h2>
-  <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, dan alat sinyal — semuanya bisa dipakai tanpa internet.</p>
-  <div class="card">
+  <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, alat sinyal, video, dan aktivitas saat listrik padam.</p>
+  <div class="chips noprint"><a href="#sec-sinyal">🆘 Sinyal</a><a href="#sec-hidup">🧭 Bertahan hidup</a><a href="#sec-radio">📻 Radio</a><a href="#sec-video">🎬 Video</a><a href="#sec-aktif">🎲 Aktivitas</a><a href="#sec-offline">📚 Offline</a></div>
+  <div class="card" id="sec-sinyal">
     <h3>🆘 Alat sinyal darurat</h3>
     <p class="muted">Kedip SOS membuat layar berkedip putih-hitam — naikkan kecerahan layar. Ketuk layar untuk berhenti.</p>
     <div class="tools sig-tools"><button class="btn pri" data-signal="light">💡 Kedip SOS layar</button><button class="btn" data-signal="sound">🔊 Bunyi SOS</button><button class="btn" data-signal="both">Kedip + bunyi</button><button class="btn" id="openSms">✉️ Pesan darurat (SMS)</button></div>
@@ -455,11 +495,24 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <div class="field noprint"><label for="libSearch">Cari panduan</label><input id="libSearch" type="search" placeholder="mis. air, radio, SOS, luka bakar, kaporit" autocomplete="off"></div>
   <div id="libResults"></div>
   <div id="libBody">
-    <h3 class="lib-h">🧭 Bertahan hidup</h3><div id="libSurvive"></div>
-    <h3 class="lib-h">📻 Komunikasi &amp; radio</h3><div id="libComms"></div>
+    <h3 class="lib-h" id="sec-hidup">🧭 Bertahan hidup</h3><div id="libSurvive"></div>
+    <h3 class="lib-h" id="sec-radio">📻 Komunikasi &amp; radio</h3><div id="libComms"></div>
     <div class="card" id="morseCard"></div>
     <div class="card" id="phonCard"></div>
-    <h3 class="lib-h">📚 Ensiklopedia &amp; peta offline</h3>
+    <h3 class="lib-h" id="sec-video">🎬 Video tutorial <span class="muted">· perlu internet</span></h3>
+    <p class="muted">Video resmi dari kanal Info BMKG. Saat offline, daftar ini tetap jadi pengingat apa yang perlu ditonton.</p>
+    <div id="vidList"></div>
+    <div class="card noprint"><h4 style="margin:0 0 6px">Tambah video sendiri</h4><div class="cform">
+      <input type="text" id="vidUrl" placeholder="Tautan YouTube, mis. https://youtu.be/…" aria-label="Tautan video YouTube">
+      <input type="text" id="vidTitle" maxlength="100" placeholder="Judul (mis. Cara memakai APAR)" aria-label="Judul video">
+      <div><button class="btn sm" id="vidAdd">+ Tambah</button></div></div></div>
+    <h3 class="lib-h" id="sec-aktif">🎲 Aktivitas tanpa internet</h3>
+    <p class="muted">Untuk saat listrik padam atau tidak ada sinyal: tetap bergerak, belajar, dan bersenang-senang.</p>
+    <div class="card" id="workCard"></div>
+    <div class="card" id="quizCard"></div>
+    <div class="card" id="mgCard"></div>
+    <div id="ideaList"></div>
+    <h3 class="lib-h" id="sec-offline">📚 Ensiklopedia &amp; peta offline</h3>
     <p class="muted">Unduh selagi ada internet — setelah itu bisa dibaca tanpa sinyal.</p><div id="libOffline"></div>
   </div>
   <p class="src">Ringkasan disusun 1 November 2026 dari sumber yang dicantumkan di tiap topik. Tautan perlu internet; isi panduan tetap tersedia offline.</p>
@@ -489,6 +542,7 @@ const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,l
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
   have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null, custom:[],
   price:{}, calc:{}, geo:{}, routes:[], place:null, wx:null,
+  mode:'online', eqWatch:true, eqRadius:300, eqSeen:[], famGroup:'', live:{mid:'', name:'', on:false, status:''}, videos:[], quizBest:0,
   view:'list', loc:'semua', sc:'semua', tab:'t-fam'};
 
 // v1 kept one expiry date per item and a "confirmed" snapshot; v2 tracks quantities and purchase batches.
@@ -985,6 +1039,107 @@ function searchGuides(q){
     .filter(r => r.score > 0).sort((a, b) => b.score - a.score).map(r => r.e);
 }
 
+// ---------- videos (online), activities & quiz (offline) ----------
+// Official Info BMKG videos, verified via YouTube oEmbed on 1 Nov 2026 (listed on bmkg.go.id edukasi gempabumi-tsunami)
+const VIDEOS = [
+ {id:'ER92JACcoec', t:'Gerakan Sadar Tas Siaga Bencana', g:'pra'},
+ {id:'mEL6vm1bujc', t:'Mitigasi Menghadapi Gempabumi', g:'pra'},
+ {id:'1nXkJq5OZl0', t:'Apa sih gempabumi itu?', g:'pra'},
+ {id:'YXpIW3GoGco', t:'Mitigasi Menghadapi Tsunami', g:'pra'},
+ {id:'6qWWysS53E4', t:'Mengenal Apa Itu Tsunami', g:'pra'},
+ {id:'n7acRThtShY', t:'Siaga Tsunami Eps. 1: Kesiapsiagaan Menghadapi Tsunami', g:'pra'},
+ {id:'NWt3zORekj4', t:'Mengenal Sistem Peringatan Dini Tsunami Indonesia (InaTEWS)', g:'dini'},
+ {id:'a7GHYjNOQJ8', t:'Siaga Tsunami Eps. 2: InaTEWS', g:'dini'},
+ {id:'dbfvYnpoDFM', t:'Siaga Tsunami Eps. 3: Evakuasi Saat Terjadi Tsunami', g:'saat'},
+ {id:'bs36NO8o-sI', t:'Siaga Tsunami Eps. 4: Cara Bertahan Hidup di Tengah Tsunami', g:'saat'},
+];
+const VIDEO_GROUPS = [['pra','Sebelum bencana (persiapan)'],['dini','Peringatan dini'],['saat','Saat & setelah bencana'],['mine','Video tambahan keluarga']];
+const ytId = s => (/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/.exec(s || '') || [])[1] || (/^[A-Za-z0-9_-]{11}$/.test(s || '') ? s : '');
+
+const WORKOUTS = [
+ {k:'ringan', t:'Gerak ringan keluarga', sub:'cocok untuk lansia & anak', work:30, rest:15, ex:[['🚶','Jalan di tempat'],['🙆','Putar bahu & lengan'],['🪑','Duduk–berdiri dari kursi'],['🧱','Push-up dinding'],['🦵','Angkat lutut bergantian'],['🤸','Peregangan ke samping'],['🦶','Jinjit lalu turun'],['🧘','Tarik napas dalam & peregangan']]},
+ {k:'bugar', t:'Kebugaran tanpa alat', sub:'untuk remaja & dewasa sehat', work:40, rest:20, ex:[['⭐','Jumping jack (atau langkah ke samping)'],['🏋️','Squat'],['💪','Push-up (boleh lutut di lantai)'],['🧱','Plank'],['🦵','Lunge bergantian'],['🏃','Lari di tempat'],['🪑','Dip di tepi kursi'],['🧘','Peregangan seluruh badan']]},
+];
+const workoutSeconds = w => w.ex.length * w.work + (w.ex.length - 1) * w.rest;
+
+// c = index of the correct answer; e = short explanation from the app's own guides
+const QUIZ = [
+ {q:'Gempa terasa saat Anda di dalam rumah. Apa yang dilakukan lebih dulu?', a:['Merunduk, berlindung di bawah meja kuat, lindungi kepala','Lari keluar lewat tangga','Berdiri dekat jendela','Naik lift ke lantai dasar'], c:0, e:'Merunduk · Berlindung · Berpegangan. Keluar setelah guncangan berhenti.'},
+ {q:'Anda di pantai dan merasakan gempa kuat atau lama. Apa yang dilakukan?', a:['Menunggu sirene berbunyi','Segera ke tempat tinggi tanpa menunggu sirene','Melihat apakah air laut surut','Pulang mengambil barang dulu'], c:1, e:'Evakuasi mandiri: gempa kuat/lama di pesisir adalah tanda bahaya tsunami.'},
+ {q:'Berapa air minum & masak per orang per hari yang dihitung aplikasi ini?', a:['0,5 liter','1 liter','3 liter','10 liter'], c:2, e:'Patokan 3 L/orang/hari untuk minum dan masak; air mandi dihitung terpisah.'},
+ {q:'Agar air aman diminum, air direbus sampai mendidih bergolak selama…', a:['Cukup sampai hangat','10 detik','1 menit','Tidak perlu direbus'], c:2, e:'Mendidih bergolak 1 menit (CDC), lalu didinginkan dalam wadah bersih tertutup.'},
+ {q:'Tanda minta tolong dengan peluit adalah…', a:['1 tiupan panjang','3 tiupan, jeda, lalu ulangi','Tiupan terus tanpa henti','Tidak pakai peluit, berteriak saja'], c:1, e:'3 tiupan dikenal luas sebagai tanda minta tolong; berteriak menguras tenaga.'},
+ {q:'SOS dalam kode Morse adalah…', a:['··· ––– ···','––– ··· –––','·– ·– ·–','– – –'], c:0, e:'3 pendek – 3 panjang – 3 pendek.'},
+ {q:'Genset boleh dinyalakan di…', a:['Garasi tertutup','Dapur','Luar ruangan, jauh dari pintu & jendela','Kamar tidur'], c:2, e:'Asap genset mengandung CO yang tidak berbau dan mematikan.'},
+ {q:'Luka bakar sebaiknya didinginkan dengan…', a:['Es batu','Pasta gigi','Air mengalir yang sejuk minimal 20 menit','Mentega'], c:2, e:'Air sejuk mengalir ≥20 menit; jangan es, pasta gigi, atau mentega.'},
+ {q:'HT yang boleh dipakai tanpa izin stasiun radio di Indonesia adalah…', a:['HT di frekuensi apa saja asal darurat','HT PMR 409 MHz yang bersertifikat','HT di frekuensi radio amatir','HT di frekuensi penerbangan'], c:1, e:'PMR 409 MHz (20 kanal, maks. 500 mW) memakai izin kelas; frekuensi lain wajib izin.'},
+ {q:'Jaringan HP padat setelah bencana. Cara yang paling mungkin tersampaikan?', a:['Telepon berulang-ulang','Panggilan video','SMS singkat','Mengirim video'], c:2, e:'SMS lebih mudah terkirim saat jaringan padat.'},
+ {q:'Di mana sebaiknya tas evakuasi disimpan?', a:['Di gudang terkunci','Dekat pintu keluar, semua anggota tahu letaknya','Di loteng','Di rumah saudara'], c:1, e:'Tas harus bisa diambil dalam 5 menit.'},
+ {q:'Torniket untuk perdarahan hebat di lengan/kaki dipasang…', a:['Tepat di sendi','5–7 cm di atas luka, bukan di sendi','Di bawah luka','Longgar saja'], c:1, e:'Kencangkan sampai darah berhenti, catat jamnya, jangan dilonggarkan.'},
+ {q:'Bayi di bawah 1 tahun tersedak dan tidak bisa bernapas. Yang dilakukan…', a:['Hentakan perut seperti orang dewasa','5 tepukan punggung lalu 5 tekanan dada dengan 2 jari','Memberi minum air','Menunggu sampai batuk sendiri'], c:1, e:'Jangan lakukan hentakan perut pada bayi.'},
+ {q:'Saat hujan abu vulkanik, yang tepat adalah…', a:['Membuka jendela agar udara mengalir','Mengucek mata yang perih','Memakai masker N95 dan menutup bak air','Keluar rumah tanpa masker'], c:2, e:'Tutup sumber air & ventilasi; bilas mata dengan air mengalir, jangan dikucek.'},
+ {q:'Digigit anjing yang tidak dikenal. Apa yang dilakukan?', a:['Cuci dengan sabun & air mengalir 15 menit, lalu ke puskesmas untuk vaksin rabies','Tunggu sampai ada gejala','Cukup ditutup plester','Oles minyak'], c:0, e:'Rabies hampir selalu mematikan bila gejala sudah muncul — jangan tunda.'},
+ {q:'Saat listrik padam, isi kulkas yang tertutup rapat aman sekitar…', a:['30 menit','4 jam','2 hari','1 minggu'], c:1, e:'Kulkas ±4 jam; freezer penuh ±48 jam bila tidak dibuka-buka.'},
+];
+const IDEAS = [
+ {ic:'👨‍👩‍👧', t:'Seru bersama keluarga', items:['Permainan tradisional: congklak, bekel, lompat tali, petak umpet (siang hari).','Tebak kata atau tebak gaya bergantian.','Teater bayangan tangan dengan senter.','Cerita bersambung: tiap orang menambah satu kalimat.','Papan permainan buatan sendiri dari kertas dan kancing.']},
+ {ic:'🧠', t:'Belajar siaga sambil bermain', items:['Gambar denah rumah: tandai pintu keluar, MCB, kran gas & air, dan jalan ke titik kumpul.','Lomba evakuasi: siapa paling cepat dan tertib ke titik kumpul sambil membawa tas.','Praktik membalut luka dan posisi pemulihan bergantian.','Kirim pesan Morse dengan senter antarruangan.','Eja nama setiap anggota dengan alfabet fonetik.','Mainkan Kuis Siaga dan Tebak Morse di bawah.']},
+ {ic:'🌙', t:'Tenang & kreatif', items:['Menggambar, mewarnai, atau origami.','Membaca buku atau ensiklopedia offline (Kiwix).','Bernyanyi atau bermain musik tanpa listrik.','Latihan napas kotak: tarik napas 4 hitungan, tahan 4, buang 4, tahan 4 — ulangi beberapa kali.','Menulis jurnal: apa yang sudah siap dan apa yang perlu disiapkan.']},
+];
+
+// ---------- earthquake feed (BMKG) ----------
+const BMKG_FEEDS = ['autogempa','gempaterkini','gempadirasakan'];
+function parseQuakes(json){
+  const g = json?.Infogempa?.gempa;
+  return (Array.isArray(g) ? g : g ? [g] : []).map(q => {
+    const [lat, lon] = String(q.Coordinates).split(',').map(Number);
+    return {dt:q.DateTime, lat, lon, mag:+q.Magnitude, depth:q.Kedalaman || '', wilayah:q.Wilayah || '', potensi:q.Potensi || '', dirasakan:q.Dirasakan || '', jam:q.Jam || '', tanggal:q.Tanggal || ''};
+  }).filter(q => q.dt && validCoord(q.lat, q.lon) && Number.isFinite(q.mag));
+}
+function mergeQuakes(lists){
+  const all = new Map();
+  lists.flat().forEach(q => { const p = all.get(q.dt) || {}; all.set(q.dt, Object.assign({}, p, q, {potensi:q.potensi || p.potensi || '', dirasakan:q.dirasakan || p.dirasakan || ''})); });
+  return [...all.values()].sort((a, b) => Date.parse(b.dt) - Date.parse(a.dt));
+}
+const tsunamiRisk = q => /berpotensi\s+tsunami/i.test(q.potensi) && !/tidak\s+berpotensi/i.test(q.potensi);
+// reference point: chosen/GPS place, else assembly point 1, else the region default
+const eqRef = () => S.place && validCoord(S.place.lat, S.place.lon) ? S.place : S.geo?.titik1 ? {name:'titik kumpul 1', ...S.geo.titik1} : wxPlace();
+// alert only for quakes of the last 60 minutes: within the radius, any tsunami potential within 1000 km, or M ≥ 6 when no location is known
+function eqRelevant(q, ref, radius, now = Date.now()){
+  const age = (now - Date.parse(q.dt)) / 60000;
+  if(!(age <= 60 && age >= -10)) return false;
+  if(tsunamiRisk(q)) return !ref || distKm(ref, q) <= 1000;
+  if(!ref) return q.mag >= 6;
+  return distKm(ref, q) <= radius;
+}
+
+// ---------- family check-in & live location (Firestore REST, group code = credential) ----------
+const FS_BASE = 'https://firestore.googleapis.com/v1/projects/siagakel-pd/databases/(default)/documents';
+const validGid = g => /^[A-Za-z0-9_-]{20,40}$/.test(g || '');
+const randId = n => b64url(crypto.getRandomValues(new Uint8Array(n)));
+function toFs(m){
+  const f = {name:{stringValue:m.name}, t:{timestampValue:m.t}, exp:{timestampValue:m.exp}};
+  if(validCoord(m.lat, m.lon)){ f.lat = {doubleValue:m.lat}; f.lon = {doubleValue:m.lon}; }
+  if(typeof m.acc === 'number') f.acc = {doubleValue:m.acc};
+  if(m.status) f.status = {stringValue:m.status};
+  if(m.note) f.note = {stringValue:m.note};
+  return {fields:f};
+}
+function fromFs(doc){
+  const f = doc.fields || {}, num = v => v ? Number(v.doubleValue ?? v.integerValue) : undefined;
+  return {id:String(doc.name).split('/').pop(), name:f.name?.stringValue || '?', lat:num(f.lat), lon:num(f.lon), acc:num(f.acc),
+    status:f.status?.stringValue || '', note:f.note?.stringValue || '', t:f.t?.timestampValue || doc.updateTime};
+}
+function checkinMessage(kind, who, geo, now = new Date()){
+  const parts = [kind === 'aman' ? 'SAYA AMAN.' : 'BUTUH BANTUAN.'];
+  if(who) parts.push(`${who}.`);
+  if(geo) parts.push(`Lokasi: ${geo.lat},${geo.lon} maps.google.com/?q=${geo.lat},${geo.lon}`);
+  parts.push(`Jam ${pad(now.getHours())}.${pad(now.getMinutes())}`);
+  return parts.join(' ');
+}
+const agoText = iso => { const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
+  return !Number.isFinite(m) ? '—' : m < 1 ? 'baru saja' : m < 60 ? `${m} menit lalu` : m < 1440 ? `${Math.floor(m/60)} jam lalu` : `${Math.floor(m/1440)} hari lalu`; };
+
 // location risk profile for the general region (user-reported, used to put relevant hazards first)
 const RISKS = [['pantai','Dekat pantai'],['gunung','Dekat gunung api'],['lereng','Di lereng / perbukitan'],['sungai','Dekat sungai / dataran rendah rawan banjir'],['asap','Wilayah rawan kabut asap karhutla']];
 
@@ -1257,7 +1412,7 @@ const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 // Returns a clean copy with only known fields; throws when the input is clearly not app data.
 function sanitizeData(o){
   if(!isObj(o)) throw new Error('Isi file bukan data Siaga Keluarga.');
-  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom','geo','routes','price','calc','place'];
+  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom','geo','routes','price','calc','place','famGroup','videos','mode','eqWatch','eqRadius','quizBest'];
   if(!known.some(k => k in o)) throw new Error('File tidak berisi data Siaga Keluarga.');
   const out = {}, warn = [];
   if('custom' in o){
@@ -1294,6 +1449,12 @@ function sanitizeData(o){
   if(isObj(o.price)) out.price = Object.fromEntries(Object.entries(o.price).filter(([k, v]) => findItem(k) && typeof v === 'number' && v > 0 && v < 1e9));
   if(isObj(o.calc)) out.calc = Object.fromEntries(Object.entries(o.calc).filter(([k, v]) => k in CALC_DEF && typeof v === 'number' && v >= 0 && v < 1e7));
   if(isObj(o.place) && validCoord(o.place.lat, o.place.lon)) out.place = {name:str(o.place.name, 80), lat:o.place.lat, lon:o.place.lon};
+  if('famGroup' in o) out.famGroup = validGid(o.famGroup) ? o.famGroup : '';
+  if(Array.isArray(o.videos)) out.videos = o.videos.filter(isObj).slice(0, 30).map(v => ({id:ytId(v.id), t:str(v.t, 100) || 'Video'})).filter(v => v.id);
+  if(['online','offline'].includes(o.mode)) out.mode = o.mode;
+  if(typeof o.eqWatch === 'boolean') out.eqWatch = o.eqWatch;
+  if([100,300,500,1000].includes(o.eqRadius)) out.eqRadius = o.eqRadius;
+  if(int(o.quizBest, 0, 100)) out.quizBest = o.quizBest;
   if(typeof o.v === 'number') out.v = o.v;
   return {data:out, warn};
 }
@@ -1318,7 +1479,7 @@ function summarize(d){
 }
 
 // ---------- share via QR (URL hash) ----------
-const SHARE_FIELDS = ['region','risk','fam','days','special','info','members','geo','routes'];
+const SHARE_FIELDS = ['region','risk','fam','days','special','info','members','geo','routes','famGroup'];
 function b64url(bytes){ let s = ''; for(const b of bytes) s += String.fromCharCode(b); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 function unb64url(s){ const bin = atob(s.replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(bin, ch => ch.charCodeAt(0)); }
 async function pipeBytes(bytes, stream){ return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer()); }
@@ -1692,7 +1853,8 @@ function wxHtml(d){
 function renderWx(){
   const place = wxPlace(), d = S.wx;
   let body;
-  if(!place) body = '<p class="muted">Pilih lokasi untuk melihat cuaca, kualitas udara, dan gempa terbaru.</p>';
+  if(!online()) body = `<p class="muted">Mode offline aktif — tidak mengambil data dari internet.${d ? ' Data terakhir:' : ''}</p>${d ? wxHtml(d) : ''}`;
+  else if(!place) body = '<p class="muted">Pilih lokasi untuk melihat cuaca, kualitas udara, dan gempa terbaru.</p>';
   else if(d && samePlace(d.place, place)) body = wxHtml(d);
   else body = `<p class="muted">${wxBusy ? 'Memuat…' : navigator.onLine ? 'Ketuk "Perbarui" untuk memuat.' : 'Belum ada data. Hubungkan ke internet untuk memuat.'}</p>`;
   $('#wxCard').innerHTML = `<h3>Kondisi sekitar <span class="muted">· perlu internet</span></h3>
@@ -1705,7 +1867,7 @@ function renderWx(){
 }
 async function refreshWx(force){
   const place = wxPlace();
-  if(!place || wxBusy || !navigator.onLine) return renderWx();
+  if(!online() || !place || wxBusy || !navigator.onLine) return renderWx();
   const fresh = S.wx && samePlace(S.wx.place, place) && Date.now() - new Date(S.wx.at) < 30*60e3;
   if(fresh && !force) return renderWx();
   wxBusy = true; renderWx();
@@ -1808,6 +1970,253 @@ function updateSmsLink(){
   const msg = $('#sm-text').value, to = $('#sm-to').value.replace(/[^\d+]/g, '');
   $('#sm-count').textContent = `· ${msg.length} karakter${msg.length > 160 ? ' (lebih dari 1 SMS)' : ''}`;
   $('#sm-send').href = `sms:${to}?&body=${encodeURIComponent(msg)}`;
+}
+
+// ---------- sound (shared) ----------
+let audioCtx = null;
+function tone(freq = 880, ms = 200, type = 'sine', vol = 0.6){
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.resume?.();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq; g.gain.value = vol;
+    o.connect(g).connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + ms / 1000);
+  } catch {}
+}
+const beepAlarm = () => [0, 450, 900].forEach(d => setTimeout(() => tone(1000, 300, 'square', 0.7), d));
+
+// ---------- app mode & earthquake watch ----------
+const online = () => S.mode !== 'offline';
+let eqLast = null, eqLatest = null;
+function renderMode(){
+  const ref = eqRef();
+  const notif = 'Notification' in window ? Notification.permission : 'unsupported';
+  $('#modeCard').innerHTML = `<h3>Mode aplikasi</h3>
+    <div class="seg top" style="margin:8px 0 6px" role="group" aria-label="Mode aplikasi">
+      <button data-mode="online" aria-pressed="${online()}">🌐 Online</button><button data-mode="offline" aria-pressed="${!online()}">📴 Offline</button></div>
+    <p class="muted" style="margin:0">${online()
+      ? 'Online: cuaca, peringatan gempa BMKG, video, dan lokasi keluarga memakai internet. Semua panduan tetap bisa dibuka tanpa sinyal.'
+      : 'Offline: aplikasi tidak mengambil atau mengirim data apa pun ke internet. Semua panduan, stok, rencana, P3K, dan alat sinyal tetap jalan.'}</p>
+    ${online() ? `<div class="eq-set">
+      <h4>⚠️ Peringatan gempa BMKG</h4>
+      <label class="checks" style="margin:0"><span><input type="checkbox" id="eqWatch"${S.eqWatch ? ' checked' : ''}> Pantau gempa selama aplikasi terbuka (dicek tiap menit)</span></label>
+      <div class="geo-tools"><label for="eqRadius" class="muted">Jarak peringatan</label>
+        <select id="eqRadius">${[100,300,500,1000].map(r => `<option value="${r}"${(S.eqRadius||300) === r ? ' selected' : ''}>${r} km</option>`).join('')}</select>
+        <span class="muted">dari ${esc(ref?.name || 'lokasi belum diatur — hanya gempa M≥6')}</span></div>
+      <div class="tools" style="margin:8px 0 0">${notif === 'default' ? '<button class="btn sm" id="eqNotif">🔔 Izinkan notifikasi</button>' : ''}<button class="btn sm" id="eqTest">Uji peringatan</button><button class="btn sm" id="eqNow">Cek sekarang</button></div>
+      <p class="muted" id="eqStatus" style="margin:6px 0 0">${eqStatusText()}</p>
+      <small class="muted">Data muncul setelah BMKG merilis informasi gempa (beberapa menit setelah kejadian) — <b>bukan peringatan dini</b>. Hanya bekerja saat aplikasi terbuka; untuk notifikasi resmi saat aplikasi tertutup, pasang aplikasi InfoBMKG. Tsunami berpotensi selalu diperingatkan dalam radius 1.000 km.</small>
+    </div>` : ''}`;
+}
+function eqStatusText(){
+  if(!S.eqWatch) return 'Pemantauan gempa dimatikan.';
+  if(!eqLast) return navigator.onLine ? 'Menunggu pengecekan pertama…' : 'Sedang tidak ada internet.';
+  const q = eqLatest;
+  return `Dicek ${pad(eqLast.getHours())}.${pad(eqLast.getMinutes())}${q ? ` · gempa terbaru M${q.mag} ${esc(q.tanggal)} ${esc(q.jam)} — ${esc(q.wilayah)}` : ''}.`;
+}
+async function pollQuakes(){
+  if(!online() || !S.eqWatch || !navigator.onLine) return;
+  const got = await Promise.allSettled(BMKG_FEEDS.map(f => fetch(`https://data.bmkg.go.id/DataMKG/TEWS/${f}.json`, {cache:'no-store'}).then(r => r.json())));
+  const ok = got.filter(r => r.status === 'fulfilled');
+  if(!ok.length) return;
+  const quakes = mergeQuakes(ok.map(r => parseQuakes(r.value)));
+  const seen = new Set(S.eqSeen), ref = eqRef(), radius = S.eqRadius || 300;
+  const fresh = quakes.filter(q => !seen.has(q.dt));
+  fresh.forEach(q => seen.add(q.dt));
+  S.eqSeen = [...seen].slice(-100); save();
+  eqLast = new Date(); eqLatest = quakes[0] || null;
+  const hit = fresh.find(q => eqRelevant(q, ref, radius));
+  if(hit) showQuakeAlert(hit, ref);
+  const st = $('#eqStatus'); if(st) st.innerHTML = eqStatusText();
+}
+function showQuakeAlert(q, ref, test){
+  const km = ref ? Math.round(distKm(ref, q)) : null, ts = tsunamiRisk(q);
+  const el = $('#eqAlert');
+  el.className = 'eq-alert' + (ts ? ' tsu' : '');
+  el.innerHTML = `<div class="eq-in"><b>${test ? '[UJI] ' : ''}${ts ? '🌊 BERPOTENSI TSUNAMI — segera jauhi pantai! ' : '⚠️ '}Gempa M${q.mag}${km !== null ? ` · ±${km} km dari ${esc(ref.name || 'lokasi Anda')}` : ''}</b>
+    <div>${esc(q.tanggal)} ${esc(q.jam)} · ${esc(q.wilayah)}${q.depth ? ` · kedalaman ${esc(q.depth)}` : ''}${q.dirasakan ? ` · dirasakan: ${esc(q.dirasakan)}` : ''}${q.potensi ? ` · ${esc(q.potensi)}` : ''}</div>
+    <div class="tools"><button class="btn sm" data-hazlink="${ts ? 'tsunami' : 'gempa'}">Panduan ${ts ? 'tsunami' : 'gempa'}</button><button class="btn sm" data-checkin="aman">✅ Kabari keluarga: aman</button><button class="btn sm" id="eqClose">Tutup</button></div>
+    <small>Sumber BMKG. Info muncul setelah gempa terjadi — bukan peringatan dini. Ikuti arahan BMKG/BPBD.</small></div>`;
+  el.hidden = false;
+  if(navigator.vibrate) navigator.vibrate([600, 200, 600, 200, 600]);
+  beepAlarm();
+  if(!test && 'Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker)
+    navigator.serviceWorker.ready.then(r => r.showNotification(`Gempa M${q.mag}${ts ? ' — berpotensi tsunami' : ''}`,
+      {body:`${km !== null ? `±${km} km · ` : ''}${q.wilayah}`, icon:'icons/icon-192.png', tag:'gempa-' + q.dt, renotify:true})).catch(() => {});
+}
+
+// ---------- family check-in & live location ----------
+let famList = null, famErr = '', famBusy = false, checkin = null;
+async function fsReq(method, path, body){
+  const r = await fetch(`${FS_BASE}/${path}`, {method, headers: body ? {'Content-Type':'application/json'} : undefined, body: body ? JSON.stringify(body) : undefined});
+  if(!r.ok){ const e = await r.json().catch(() => ({})); throw new Error(e.error?.status === 'PERMISSION_DENIED' ? 'Ditolak server (cek jam HP dan kode grup).' : (e.error?.message || 'HTTP ' + r.status)); }
+  return r.status === 204 ? null : r.json().catch(() => null);
+}
+async function sendMyLocation(status){
+  if(!online() || !validGid(S.famGroup) || !S.live.on) return false;
+  let p = null;
+  try { p = await getPosition(); } catch(err){ toast(err.message + ' Status tetap dikirim tanpa lokasi.', true); }
+  const now = new Date();
+  if(status !== undefined) S.live.status = status;
+  const m = {name:(S.live.name || 'Anggota').slice(0, 40), status:S.live.status || '', t:now.toISOString(), exp:new Date(now.getTime() + 24*3600e3).toISOString()};
+  if(p){ m.lat = roundTo(p.lat, 5); m.lon = roundTo(p.lon, 5); m.acc = Math.round(p.acc); myPosCache = {lat:m.lat, lon:m.lon}; }
+  await fsReq('PATCH', `fam/${S.famGroup}/m/${S.live.mid}`, toFs(m));
+  S.live.lastSent = m.t; save();
+  return true;
+}
+async function loadFamily(){
+  if(!online() || !validGid(S.famGroup) || !navigator.onLine) return;
+  famBusy = true; renderFamily();
+  try { const r = await fsReq('GET', `fam/${S.famGroup}/m?pageSize=50`); famList = (r?.documents || []).map(fromFs); famErr = ''; }
+  catch(err){ famErr = err.message; }
+  finally { famBusy = false; renderFamily(); }
+}
+function renderFamily(){
+  const g = S.famGroup, live = S.live;
+  const statusBadge = s => s === 'aman' ? '<span class="badge ok">aman</span>' : s === 'bantuan' ? '<span class="badge bad">butuh bantuan</span>' : '';
+  const ref = myPosCache || (S.place && validCoord(S.place.lat, S.place.lon) ? S.place : null);
+  const fresh = (famList || []).filter(m => Date.now() - Date.parse(m.t) < 24*3600e3);
+  const members = fresh.map(m => `<div class="fam-row"><div><b>${esc(m.name)}</b>${m.id === live.mid ? ' <span class="muted">(HP ini)</span>' : ''} ${statusBadge(m.status)}
+      <div class="muted">${agoText(m.t)}${validCoord(m.lat, m.lon) ? `${m.acc ? ` · akurasi ±${Math.round(m.acc)} m` : ''}${ref && m.id !== live.mid ? ` · ±${fmtNum(round1(distKm(ref, m)))} km dari Anda` : ''}` : ' · tanpa lokasi'}</div></div>
+      ${validCoord(m.lat, m.lon) ? `<a class="btn sm" href="${mapUrl(m)}" target="_blank" rel="noopener noreferrer">🗺️ Peta</a>` : ''}</div>`).join('');
+  $('#famCard').innerHTML = `<h3>Lokasi & kabar keluarga</h3>
+    <p class="muted">Kabari keluarga bahwa Anda aman atau butuh bantuan. SMS jalan tanpa internet; peta lokasi live butuh mode online.</p>
+    <div class="tools" style="margin:6px 0 0"><button class="btn pri" data-checkin="aman">✅ Saya aman</button><button class="btn" data-checkin="bantuan" style="color:var(--bad)">🆘 Butuh bantuan</button></div>
+    <div id="checkinBox">${checkinHtml()}</div>
+    <h4 style="margin:16px 0 6px">📍 Lokasi live keluarga</h4>
+    ${!online() ? '<p class="muted">Aktif hanya di mode online (atur di tab Keluarga).</p>' : !validGid(g) ? `
+      <p class="muted">Buat grup, lalu bagikan kodenya ke anggota keluarga (atau lewat QR di bawah). Hanya yang tahu kode bisa melihat lokasi grup.</p>
+      <div class="tools" style="margin:0"><button class="btn pri" id="famCreate">Buat grup keluarga</button></div>
+      <div class="geo-tools"><input type="text" id="famJoinCode" placeholder="atau masukkan kode grup" aria-label="Kode grup keluarga"><button class="btn sm" id="famJoin">Gabung</button></div>` : `
+      <div class="geo-row" style="border:0;padding:0">Kode grup: <code>${esc(g.slice(0, 6))}…${esc(g.slice(-4))}</code> <button class="btn sm" id="famCopy">Salin kode</button> <button class="btn sm" id="famLeave">Keluar grup</button></div>
+      <div class="field" style="margin-top:10px"><label for="famName">Nama saya di grup</label><input id="famName" maxlength="40" value="${esc(live.name)}" placeholder="mis. Ayah, Budi"></div>
+      <label class="checks" style="margin:0"><span><input type="checkbox" id="famShare"${live.on ? ' checked' : ''}> Saya setuju membagikan lokasi HP ini ke grup (diperbarui tiap 5 menit selama aplikasi terbuka)</span></label>
+      <div class="tools" style="margin:8px 0 0">${live.on ? '<button class="btn sm" id="famSend">📍 Kirim lokasi sekarang</button>' : ''}<button class="btn sm" id="famRefresh">🔄 Muat ulang</button>${live.lastSent ? '<button class="btn sm" id="famDelete" style="color:var(--bad)">Hapus lokasi saya</button>' : ''}</div>
+      ${famErr ? `<div class="badbox">${esc(famErr)}</div>` : ''}
+      <div class="fam-list">${famBusy && !famList ? '<p class="muted">Memuat…</p>' : members || '<p class="muted">Belum ada anggota yang membagikan lokasi dalam 24 jam terakhir.</p>'}</div>
+      <small class="muted">Disimpan di Firebase (server Jakarta) hanya lokasi terakhir, tidak ada riwayat. Lokasi lebih dari 24 jam tidak ditampilkan; hapus kapan saja. Siapa pun yang tahu kode grup bisa melihat lokasi anggota — bagikan kode hanya ke keluarga.</small>`}`;
+}
+let myPosCache = null;
+function checkinHtml(){
+  if(!checkin) return '';
+  const msg = checkin.msg, to = phoneIn(S.info.luar);
+  return `<div class="cform" style="margin-top:10px"><textarea id="ci-text" aria-label="Pesan kabar keluarga">${esc(msg)}</textarea>
+    <div class="tools" style="margin:0"><a class="btn pri" href="sms:${to}?&body=${encodeURIComponent(msg)}">✉️ SMS${to ? ' ke pusat kabar' : ''}</a>
+      <a class="btn" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener noreferrer">WhatsApp</a><button class="btn" id="ci-share">Bagikan…</button></div>
+    ${checkin.sent ? '<p class="muted" style="margin:0">✓ Status juga diperbarui di grup lokasi live.</p>' : ''}</div>`;
+}
+async function doCheckin(kind){
+  const who = S.live.name || S.members.find(m => m.nama)?.nama || '';
+  let geo = null;
+  try { const p = await getPosition(); geo = {lat:roundTo(p.lat, 5), lon:roundTo(p.lon, 5)}; myPosCache = geo; } catch {}
+  checkin = {kind, msg:checkinMessage(kind, who, geo), sent:false};
+  showTab('t-info'); renderFamily();
+  if(online() && S.live.on && validGid(S.famGroup) && navigator.onLine){
+    try { await sendMyLocation(kind); checkin.sent = true; loadFamily(); } catch(err){ toast(err.message, true); }
+  }
+  renderFamily(); document.getElementById('famCard').scrollIntoView({block:'start'});
+}
+async function onlineTick(){
+  if(document.hidden || !online() || !navigator.onLine) return;
+  pollQuakes().catch(() => {});
+  if(validGid(S.famGroup)){
+    if(S.live.on && (!S.live.lastSent || Date.now() - Date.parse(S.live.lastSent) > 5*60e3)) await sendMyLocation().catch(err => { famErr = err.message; });
+    loadFamily();
+  }
+}
+
+// ---------- videos ----------
+function renderVideos(){
+  const can = online() && navigator.onLine;
+  const all = [...VIDEOS.map(v => Object.assign({ch:'Info BMKG'}, v)), ...(S.videos || []).map(v => Object.assign({g:'mine', ch:'ditambahkan keluarga', mine:true}, v))];
+  $('#vidList').innerHTML = (can ? '' : `<div class="warnbox">${online() ? 'Sedang tidak ada internet.' : 'Mode offline aktif.'} Video butuh internet — judul tetap tampil sebagai daftar tonton.</div>`)
+    + VIDEO_GROUPS.map(([g, title]) => { const l = all.filter(v => v.g === g); return l.length ? `<h4 class="vid-g">${title}</h4>` + l.map(v => `<div class="card vid" id="vid-${v.id}">
+      <div class="vid-box"><button class="vid-play" data-play="${v.id}"${can ? '' : ' disabled'} aria-label="Putar ${esc(v.t)}"><span>▶</span></button></div>
+      <div class="vid-meta"><b>${esc(v.t)}</b><small>${esc(v.ch)} · <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener noreferrer">buka di YouTube</a>${v.mine ? ` · <button class="linkbtn" data-vdel="${v.id}">hapus</button>` : ''}</small></div></div>`).join('') : ''; }).join('');
+}
+
+// ---------- activities ----------
+let wk = null, wkTimer = null, wkLock = null;
+function renderWorkout(){
+  const box = $('#workCard');
+  if(!wk){
+    box.innerHTML = `<h3>💪 Olahraga tanpa alat</h3><p class="muted">Ikuti gerakan dengan pengatur waktu; ada bunyi saat ganti gerakan.</p>
+      <div class="tools" style="margin:0">${WORKOUTS.map(w => `<button class="btn" data-work="${w.k}">${esc(w.t)}<br><small class="muted">${Math.round(workoutSeconds(w)/60)} menit · ${esc(w.sub)}</small></button>`).join('')}</div>
+      <small class="muted">Hentikan bila pusing, sesak, atau nyeri dada. Ibu hamil, lansia, dan yang punya penyakit jantung: pilih gerak ringan dan sesuaikan dengan saran dokter.</small>`;
+    return;
+  }
+  const [ic, name] = wk.r.ex[wk.i], next = wk.r.ex[wk.i + 1];
+  box.innerHTML = `<h3>💪 ${esc(wk.r.t)} · ${wk.i + 1}/${wk.r.ex.length}</h3>
+    <div class="wk-now ${wk.phase}"><div class="wk-ic">${wk.phase === 'rest' ? '😮‍💨' : ic}</div>
+      <div class="wk-name">${wk.phase === 'rest' ? 'Istirahat' : esc(name)}</div><div class="wk-left">${wk.left}</div>
+      <div class="muted">${wk.phase === 'rest' ? `Berikutnya: ${esc(next ? next[1] : '')}` : next ? `Berikutnya: ${esc(next[1])}` : 'Gerakan terakhir!'}</div></div>
+    <div class="tools" style="margin:0"><button class="btn" id="wkPause">${wk.paused ? '▶ Lanjut' : '⏸ Jeda'}</button><button class="btn" id="wkStop">⏹ Selesai</button></div>`;
+}
+function startWorkout(k){
+  stopWorkout(true);
+  wk = {r:WORKOUTS.find(w => w.k === k), i:0, phase:'work', left:0, paused:false};
+  wk.left = wk.r.work; tone(880, 400);
+  navigator.wakeLock?.request('screen').then(l => { wkLock = l; }).catch(() => {});
+  wkTimer = setInterval(tickWorkout, 1000); renderWorkout();
+}
+function tickWorkout(){
+  if(!wk || wk.paused) return;
+  wk.left--;
+  if(wk.left > 0 && wk.left <= 3) tone(660, 120);
+  if(wk.left <= 0){
+    if(wk.phase === 'work' && wk.i === wk.r.ex.length - 1){ stopWorkout(); toast('Latihan selesai — hebat! 🎉'); return; }
+    if(wk.phase === 'work'){ wk.phase = 'rest'; wk.left = wk.r.rest; } else { wk.i++; wk.phase = 'work'; wk.left = wk.r.work; }
+    tone(wk.phase === 'work' ? 990 : 520, 450);
+  }
+  renderWorkout();
+}
+function stopWorkout(silent){ clearInterval(wkTimer); wkTimer = null; wk = null; if(wkLock){ wkLock.release().catch(() => {}); wkLock = null; } if(!silent) renderWorkout(); }
+
+let quiz = null;
+const shuffle = a => { const b = a.slice(); for(let i = b.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+function renderQuiz(){
+  const box = $('#quizCard');
+  if(!quiz){
+    box.innerHTML = `<h3>🧩 Kuis Siaga</h3><p class="muted">${QUIZ.length} pertanyaan dari isi aplikasi ini — main bergantian bersama keluarga.${S.quizBest ? ` Skor terbaik: <b>${S.quizBest}/${QUIZ.length}</b>.` : ''}</p>
+      <button class="btn pri" id="quizStart">Mulai kuis</button>`;
+    return;
+  }
+  if(quiz.i >= quiz.order.length){
+    const best = Math.max(S.quizBest || 0, quiz.score);
+    if(best !== S.quizBest){ S.quizBest = best; save(); }
+    box.innerHTML = `<h3>🧩 Kuis Siaga — selesai</h3><div class="big-num">${quiz.score}/${QUIZ.length}</div>
+      <p class="muted">${quiz.score === QUIZ.length ? 'Sempurna! Keluarga Anda siap siaga.' : quiz.score >= QUIZ.length * 0.7 ? 'Bagus! Baca lagi panduan untuk soal yang salah.' : 'Yuk baca panduan Saat Bencana, P3K, dan Pustaka, lalu coba lagi.'}</p>
+      <button class="btn pri" id="quizStart">Main lagi</button>`;
+    return;
+  }
+  const item = QUIZ[quiz.order[quiz.i]], ans = quiz.answered;
+  box.innerHTML = `<h3>🧩 Soal ${quiz.i + 1}/${QUIZ.length} <span class="muted">· skor ${quiz.score}</span></h3>
+    <p style="font-weight:600;margin:8px 0">${esc(item.q)}</p>
+    <div class="quiz-opts">${item.a.map((a, j) => `<button class="btn quiz-opt${ans === null ? '' : j === item.c ? ' right' : j === ans ? ' wrong' : ''}" data-ans="${j}"${ans === null ? '' : ' disabled'}>${esc(a)}</button>`).join('')}</div>
+    ${ans === null ? '' : `<div class="${ans === item.c ? 'note' : 'warnbox'}" style="margin:8px 0">${ans === item.c ? '✅ Benar! ' : '❌ Kurang tepat. '}${esc(item.e)}</div><button class="btn pri" id="quizNext">${quiz.i + 1 < QUIZ.length ? 'Soal berikutnya' : 'Lihat skor'}</button>`}`;
+}
+
+let mg = null;
+const MG_POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+function newMorseQ(){
+  const cur = MG_POOL[Math.floor(Math.random() * MG_POOL.length)];
+  const opts = shuffle([cur, ...shuffle(MG_POOL.filter(x => x !== cur)).slice(0, 3)]);
+  mg = Object.assign(mg || {score:0, total:0}, {cur, opts, picked:null});
+}
+function renderMorseGame(){
+  const box = $('#mgCard');
+  if(!mg){ box.innerHTML = `<h3>📶 Tebak Morse</h3><p class="muted">Tebak huruf dari kode Morse — latihan sebelum memakai senter atau peluit.</p><button class="btn pri" id="mgStart">Mulai</button>`; return; }
+  const code = prettyMorse(mg.cur);
+  box.innerHTML = `<h3>📶 Tebak Morse <span class="muted">· ${mg.score}/${mg.total}</span></h3>
+    <div class="morse-out" style="text-align:center;font-size:32px">${code}</div>
+    <div class="tools" style="margin:0 0 8px"><button class="btn sm" data-signal="sound" data-text="mg">🔊 Dengarkan</button></div>
+    <div class="quiz-opts mg">${mg.opts.map(o => `<button class="btn quiz-opt${mg.picked === null ? '' : o === mg.cur ? ' right' : o === mg.picked ? ' wrong' : ''}" data-mg="${o}"${mg.picked === null ? '' : ' disabled'}>${o}</button>`).join('')}</div>
+    ${mg.picked === null ? '' : `<button class="btn pri" id="mgNext" style="margin-top:8px">Berikutnya</button>`}`;
+}
+function renderActivities(){
+  renderWorkout(); renderQuiz(); renderMorseGame();
+  $('#ideaList').innerHTML = IDEAS.map(g => `<details class="card fa"><summary><span aria-hidden="true">${g.ic}</span> ${esc(g.t)}</summary><ul class="fa-steps">${g.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>`).join('');
 }
 
 const meterCls = (v, target) => v >= target ? '' : v >= target/2 ? 'warn' : 'bad';
@@ -1937,7 +2346,47 @@ document.addEventListener('click', e => {
   const go = t.closest('[data-go]'); if(go) return showTab(go.dataset.go);
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
-  const sg = t.closest('[data-signal]'); if(sg) return startSignal(sg.dataset.signal, sg.dataset.text === 'morse' ? morseText : 'SOS');
+  const sg = t.closest('[data-signal]'); if(sg) return startSignal(sg.dataset.signal, sg.dataset.text === 'morse' ? morseText : sg.dataset.text === 'mg' ? mg.cur : 'SOS');
+  const md = t.closest('[data-mode]');
+  if(md){ S.mode = md.dataset.mode; save(); netStatus(); renderMode(); renderWx(); renderFamily(); renderVideos(); if(online()){ refreshWx(); onlineTick(); } return; }
+  if(t.id === 'eqClose'){ $('#eqAlert').hidden = true; return; }
+  if(t.id === 'eqTest'){ const ref = eqRef() || {name:'contoh', lat:-8.2, lon:112.6};
+    return showQuakeAlert({dt:new Date().toISOString(), lat:ref.lat - 0.4, lon:ref.lon + 0.2, mag:5.4, depth:'10 km', wilayah:'Contoh: 50 km dari lokasi Anda', potensi:'Tidak berpotensi tsunami', dirasakan:'', jam:'', tanggal:'UJI'}, ref, true); }
+  if(t.id === 'eqNow'){ return pollQuakes().then(() => toast('Data gempa BMKG diperbarui.')).catch(() => toast('Gagal mengambil data BMKG.', true)); }
+  if(t.id === 'eqNotif'){ return Notification.requestPermission().then(() => renderMode()); }
+  const ci = t.closest('[data-checkin]'); if(ci){ $('#eqAlert').hidden = true; return doCheckin(ci.dataset.checkin); }
+  if(t.id === 'ci-share'){ const text = $('#ci-text').value; if(navigator.share) return navigator.share({text}).catch(() => {}); return copyText(text).then(ok => toast(ok ? 'Pesan disalin.' : 'Tidak bisa menyalin otomatis.', !ok)); }
+  if(t.id === 'famCreate'){ S.famGroup = randId(16); S.live.name = S.live.name || S.members.find(m => m.nama)?.nama || ''; save(); famList = []; renderFamily(); renderCard(); return toast('Grup dibuat. Bagikan kode atau QR ke keluarga.'); }
+  if(t.id === 'famJoin'){ const code = ($('#famJoinCode').value || '').trim();
+    if(!validGid(code)) return toast('Kode grup tidak valid.', true);
+    S.famGroup = code; save(); famList = null; renderFamily(); return loadFamily(); }
+  if(t.id === 'famCopy') return copyText(S.famGroup).then(ok => toast(ok ? 'Kode grup disalin.' : 'Tidak bisa menyalin otomatis.', !ok));
+  if(t.id === 'famRefresh') return loadFamily();
+  if(t.id === 'famSend'){ t.disabled = true; return sendMyLocation().then(() => { toast('Lokasi terkirim.'); loadFamily(); }).catch(err => toast(err.message, true)).finally(() => { t.disabled = false; }); }
+  if(t.id === 'famDelete' && confirm('Hapus lokasi HP ini dari grup?')){
+    S.live.on = false; save();
+    return fsReq('DELETE', `fam/${S.famGroup}/m/${S.live.mid}`).then(() => { S.live.lastSent = null; save(); toast('Lokasi Anda dihapus dari grup.'); loadFamily(); }).catch(err => toast(err.message, true)); }
+  if(t.id === 'famLeave' && confirm('Keluar dari grup keluarga? Lokasi Anda di grup juga dihapus.')){
+    const g = S.famGroup; S.famGroup = ''; S.live.on = false; save(); famList = null; renderFamily();
+    if(S.live.lastSent) fsReq('DELETE', `fam/${g}/m/${S.live.mid}`).catch(() => {});
+    S.live.lastSent = null; save(); return; }
+  const pl = t.closest('[data-play]');
+  if(pl && !pl.disabled){ const id = pl.dataset.play, card = document.getElementById('vid-' + id);
+    card.classList.add('playing');
+    card.querySelector('.vid-box').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    return; }
+  if(t.id === 'vidAdd'){ const id = ytId($('#vidUrl').value.trim()), title = $('#vidTitle').value.trim().slice(0, 100);
+    if(!id) return toast('Tautan YouTube tidak dikenali.', true);
+    S.videos = (S.videos || []).filter(v => v.id !== id).concat({id, t:title || 'Video tambahan'}).slice(-30); save(); renderVideos(); $('#vidUrl').value = ''; $('#vidTitle').value = ''; return toast('Video ditambahkan.'); }
+  const vd = t.closest('[data-vdel]'); if(vd){ S.videos = S.videos.filter(v => v.id !== vd.dataset.vdel); save(); return renderVideos(); }
+  const wb = t.closest('[data-work]'); if(wb) return startWorkout(wb.dataset.work);
+  if(t.id === 'wkPause'){ wk.paused = !wk.paused; return renderWorkout(); }
+  if(t.id === 'wkStop') return stopWorkout();
+  if(t.id === 'quizStart'){ quiz = {order:shuffle(QUIZ.map((_, i) => i)), i:0, score:0, answered:null}; return renderQuiz(); }
+  const qa = t.closest('[data-ans]'); if(qa && quiz && quiz.answered === null){ quiz.answered = +qa.dataset.ans; if(quiz.answered === QUIZ[quiz.order[quiz.i]].c) quiz.score++; return renderQuiz(); }
+  if(t.id === 'quizNext'){ quiz.i++; quiz.answered = null; return renderQuiz(); }
+  if(t.id === 'mgStart' || t.id === 'mgNext'){ newMorseQ(); return renderMorseGame(); }
+  const mgb = t.closest('[data-mg]'); if(mgb && mg && mg.picked === null){ mg.picked = mgb.dataset.mg; mg.total++; if(mg.picked === mg.cur) mg.score++; return renderMorseGame(); }
   if(t.closest('#sigOverlay')) return stopSignal();
   const gt = t.closest('[data-goto]'); if(gt){ const [type, k] = gt.dataset.goto.split(':'); return gotoGuide(type, k); }
   if(t.id === 'openSms'){ smsOpen = !smsOpen; return renderSms(); }
@@ -2038,6 +2487,11 @@ document.addEventListener('change', e => {
   if(t.dataset.be){ const [id, i] = t.dataset.be.split(':'); S.batches[id][+i].e = t.value; save(); renderAll(); }
   if(t.dataset.special){ S.special[t.dataset.special] = t.checked; save(); renderAll(); }
   if(t.id === 'scSel'){ S.sc = t.value; save(); renderList(); }
+  if(t.id === 'eqWatch'){ S.eqWatch = t.checked; save(); renderMode(); if(S.eqWatch) pollQuakes(); }
+  if(t.id === 'eqRadius'){ S.eqRadius = +t.value; save(); }
+  if(t.id === 'famShare'){
+    if(t.checked && !(S.live.name || '').trim()){ t.checked = false; toast('Isi nama Anda di grup dulu.', true); }
+    else { S.live.on = t.checked; save(); renderFamily(); if(S.live.on) sendMyLocation().then(() => loadFamily()).catch(err => toast(err.message, true)); } }
   if(t.dataset.price){ const v = parseFloat(t.value); if(v > 0) S.price[t.dataset.price] = v; else delete S.price[t.dataset.price]; save(); renderShop(); }
   if(t.dataset.calc){ const v = parseFloat(t.value); if(Number.isFinite(v) && v >= 0) S.calc[t.dataset.calc] = v; else delete S.calc[t.dataset.calc]; save(); renderCalc(); renderRoutes(); }
   if(t.dataset.geotext){ const g = parseCoord(t.value);
@@ -2059,6 +2513,8 @@ document.addEventListener('change', e => {
 document.addEventListener('input', e => {
   const t = e.target;
   if(t.id === 'libSearch') renderSearch(t.value);
+  if(t.id === 'famName'){ S.live.name = t.value.slice(0, 40); save(); }
+  if(t.id === 'ci-text') checkin.msg = t.value;
   if(t.id === 'morseIn'){ morseText = t.value; $('#morseOut').textContent = prettyMorse(morseText); }
   if(/^sm-(who|what|where|cond|need)$/.test(t.id)) updateSms();
   if(t.id === 'sm-text' || t.id === 'sm-to') updateSmsLink();
@@ -2075,7 +2531,8 @@ if(S.theme) document.documentElement.dataset.theme = S.theme;
   if(['bencana','p3k'].includes(q.get('act'))) S.actView = q.get('act');
   if(['list','shop'].includes(q.get('view'))) S.view = q.get('view');
   if(q.toString()) history.replaceState(null, '', location.pathname + location.hash); }
-renderAll(); renderHaz(); renderInfo(); renderLib(); showTab(S.tab || 't-fam');
+if(!S.live.mid) S.live.mid = randId(12);
+renderAll(); renderHaz(); renderInfo(); renderLib(); renderMode(); renderFamily(); renderVideos(); renderActivities(); showTab(S.tab || 't-fam');
 if(navigator.storage?.persist) navigator.storage.persist().catch(() => {});
 
 // QR import: the shared plan arrives as #import=<code>
@@ -2093,8 +2550,11 @@ async function importFromHash(){
 importFromHash();
 addEventListener('hashchange', importFromHash);
 refreshWx();
-addEventListener('online', () => refreshWx());
-addEventListener('offline', renderWx);
+addEventListener('online', () => { refreshWx(); onlineTick(); renderVideos(); });
+setTimeout(onlineTick, 1500);
+setInterval(onlineTick, 60000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) onlineTick(); });
+addEventListener('offline', () => { renderWx(); renderVideos(); });
 
 document.addEventListener('visibilitychange', () => { if(!document.hidden){ renderSoon(); renderList(); renderPlan(); progress(); } });
 setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);
@@ -2103,7 +2563,8 @@ setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);
 let offlineReady = false, installEvt = null;
 function netStatus(){
   const el = $('#net');
-  if(!navigator.onLine){ el.textContent = '● Offline — semua fitur tetap jalan'; el.className = 'net off'; el.hidden = false; }
+  if(!online()){ el.textContent = '📴 Mode offline — tanpa internet'; el.className = 'net off'; el.hidden = false; }
+  else if(!navigator.onLine){ el.textContent = '● Offline — semua fitur tetap jalan'; el.className = 'net off'; el.hidden = false; }
   else if(offlineReady){ el.textContent = '✓ Siap dipakai tanpa internet'; el.className = 'net'; el.hidden = false; }
   else el.hidden = true;
 }

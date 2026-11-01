@@ -287,3 +287,54 @@ test('library and radio guides have sources; PMR facts stated; offline search fi
   assert.equal(types('zzzz'), '');
   assert.equal(a.run('PHONETIC.length'), 26);
 });
+
+test('BMKG feeds: parse, merge, tsunami text, and alert relevance', ()=>{
+  const a = app();
+  const now = Date.parse('2026-11-01T07:00:00Z');
+  const feed = JSON.stringify({Infogempa:{gempa:[
+    {DateTime:'2026-11-01T06:50:00+00:00', Coordinates:'-8.60,112.40', Magnitude:'5.4', Kedalaman:'10 km', Wilayah:'Selatan Malang', Potensi:'Tidak berpotensi tsunami', Tanggal:'01 Nov 2026', Jam:'13:50:00 WIB'},
+    {DateTime:'2026-11-01T06:40:00+00:00', Coordinates:'-10.5,110.0', Magnitude:'7.1', Kedalaman:'20 km', Wilayah:'Samudra Hindia', Potensi:'Berpotensi TSUNAMI'},
+    {DateTime:'2026-11-01T03:00:00+00:00', Coordinates:'-8.30,112.60', Magnitude:'4.0', Wilayah:'lama'},
+    {DateTime:'2026-11-01T06:55:00+00:00', Coordinates:'4.79,96.20', Magnitude:'6.2', Wilayah:'Aceh'}]}});
+  const felt = JSON.stringify({Infogempa:{gempa:[{DateTime:'2026-11-01T06:50:00+00:00', Coordinates:'-8.60,112.40', Magnitude:'5.4', Dirasakan:'III Malang'}]}});
+  a.run(`globalThis.Q = mergeQuakes([parseQuakes(${feed}), parseQuakes(${felt})])`);
+  assert.equal(a.run('Q.length'), 4);
+  assert.equal(a.run('Q.find(q => q.mag === 5.4).dirasakan'), 'III Malang');
+  assert.equal(a.run('Q.find(q => q.mag === 5.4).potensi'), 'Tidak berpotensi tsunami');   // merged, not overwritten
+  assert.equal(a.run('tsunamiRisk({potensi:"Tidak berpotensi tsunami"})'), false);
+  assert.equal(a.run('tsunamiRisk({potensi:"Berpotensi TSUNAMI"})'), true);
+  const rel = ref => a.run(`Q.filter(q => eqRelevant(q, ${ref}, 300, ${now})).map(q => q.mag).join()`);
+  assert.equal(rel('{lat:-8.2, lon:112.6}'), '5.4,7.1');   // nearby recent + tsunami potential; old and far-away skipped
+  assert.equal(rel('null'), '6.2,7.1');                     // unknown location: tsunami or M ≥ 6 only (newest first)
+});
+
+test('family location: Firestore field mapping, group codes, check-in message', ()=>{
+  const a = app();
+  const doc = a.run(`JSON.stringify(toFs({name:"Ayah", lat:-8.2, lon:112.6, acc:12, status:"aman", t:"2026-11-01T07:00:00Z", exp:"2026-11-02T07:00:00Z"}))`);
+  assert.equal(doc, '{"fields":{"name":{"stringValue":"Ayah"},"t":{"timestampValue":"2026-11-01T07:00:00Z"},"exp":{"timestampValue":"2026-11-02T07:00:00Z"},"lat":{"doubleValue":-8.2},"lon":{"doubleValue":112.6},"acc":{"doubleValue":12},"status":{"stringValue":"aman"}}}');
+  const back = a.run(`fromFs({name:"projects/x/databases/(default)/documents/fam/G/m/dev123", fields:${doc}.fields})`);
+  assert.equal(back.id, 'dev123'); assert.equal(back.lat, -8.2); assert.equal(back.status, 'aman');
+  assert.equal(a.run('fromFs({name:"a/b", fields:{name:{stringValue:"X"}, lat:{integerValue:"-8"}, lon:{integerValue:"112"}}}).lat'), -8);
+  assert.equal(a.run('JSON.stringify(Object.keys(toFs({name:"B", t:"x", exp:"y", lat:999, lon:1}).fields))'), '["name","t","exp"]');   // invalid coords dropped
+  assert.equal(a.run('validGid("abc")'), false);
+  assert.equal(a.run('validGid("Abcdefghij_klmnop-1234")'), true);
+  assert.equal(a.run('validGid("bad/../code_12345678901")'), false);
+  assert.equal(a.run('checkinMessage("aman", "Budi", {lat:-8.2, lon:112.6}, new Date(2026, 10, 1, 9, 5))'), 'SAYA AMAN. Budi. Lokasi: -8.2,112.6 maps.google.com/?q=-8.2,112.6 Jam 09.05');
+  assert.equal(a.run('checkinMessage("bantuan", "", null, new Date(2026, 10, 1, 21, 0))'), 'BUTUH BANTUAN. Jam 21.00');
+  const {data} = a.run('sanitizeData({famGroup:"Abcdefghij_klmnop-1234", mode:"offline", eqRadius:500, eqWatch:false, live:{mid:"x", on:true}, videos:[{id:"https://youtu.be/ER92JACcoec", t:"Tas"}, {id:"bad"}]})');
+  assert.equal(data.famGroup, 'Abcdefghij_klmnop-1234');
+  assert.equal(data.mode, 'offline'); assert.equal(data.eqRadius, 500); assert.equal(data.eqWatch, false);
+  assert.equal('live' in data, false);   // device-specific sharing consent is never imported
+  assert.equal(JSON.stringify(data.videos), '[{"id":"ER92JACcoec","t":"Tas"}]');
+  assert.equal(a.run('SHARE_FIELDS.includes("famGroup") && !SHARE_FIELDS.includes("live")'), true);
+});
+
+test('videos, workouts and quiz data are well-formed', ()=>{
+  const a = app();
+  assert.equal(a.run('VIDEOS.every(v => /^[A-Za-z0-9_-]{11}$/.test(v.id) && VIDEO_GROUPS.some(([g]) => g === v.g))'), true);
+  for (const [u, id] of [['https://www.youtube.com/watch?v=ER92JACcoec&t=5', 'ER92JACcoec'], ['https://youtu.be/bs36NO8o-sI', 'bs36NO8o-sI'], ['https://www.youtube.com/shorts/dbfvYnpoDFM', 'dbfvYnpoDFM'], ['javascript:alert(1)', '']])
+    assert.equal(a.run(`ytId(${JSON.stringify(u)})`), id);
+  assert.equal(a.run('WORKOUTS.map(workoutSeconds).join()'), '345,460');
+  assert.equal(a.run('QUIZ.every(x => x.a.length === 4 && x.c >= 0 && x.c < 4 && x.e && new Set(x.a).size === 4)'), true);
+  assert.equal(a.run('QUIZ.length'), 16);
+});

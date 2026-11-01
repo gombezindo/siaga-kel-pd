@@ -1,0 +1,30 @@
+rules_version = '2';
+// Family live location. Knowing the random group code (gid, ≥ 20 chars) is the credential:
+// groups cannot be listed, only one member document per device id, last location only,
+// strict shape and size checks, documents expire via TTL on `exp` (see firestore.indexes.json).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function validMember(d) {
+      return d.keys().hasOnly(['name', 'lat', 'lon', 'acc', 'status', 'note', 't', 'exp'])
+        && d.keys().hasAll(['name', 't', 'exp'])
+        && d.name is string && d.name.size() >= 1 && d.name.size() <= 40
+        && (!('lat' in d) || (d.lat is number && d.lat >= -90 && d.lat <= 90))
+        && (!('lon' in d) || (d.lon is number && d.lon >= -180 && d.lon <= 180))
+        && (!('acc' in d) || (d.acc is number && d.acc >= 0 && d.acc <= 100000))
+        && (!('status' in d) || d.status in ['', 'aman', 'bantuan'])
+        && (!('note' in d) || (d.note is string && d.note.size() <= 120))
+        && d.t is timestamp
+        && d.t > request.time - duration.value(1, 'h')
+        && d.t < request.time + duration.value(1, 'h')
+        && d.exp is timestamp
+        && d.exp <= request.time + duration.value(2, 'd');
+    }
+    match /fam/{gid}/m/{mid} {
+      allow get, list: if gid.size() >= 20 && gid.size() <= 40;
+      allow create, update: if gid.size() >= 20 && gid.size() <= 40
+        && mid.size() >= 12 && mid.size() <= 40
+        && validMember(request.resource.data);
+      allow delete: if gid.size() >= 20 && gid.size() <= 40;
+    }
+  }
+}
