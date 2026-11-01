@@ -122,3 +122,55 @@ test('progress never reaches 100% while something is short', ()=>{
   a.run('S.batches.galon[0].e = "2000-01-01"; progress()');
   assert.notEqual(a.nodes.get('#pct').textContent, '100%');
 });
+
+test('endurance: water vs food, cooking needs stove and gas, expired stock ignored', ()=>{
+  const a = app();   // 4 people: 2 adults, 2 children → 12 L water/day, 1.1 kg rice/day, 1 gas can/day, 4 ready units/day
+  a.run(`S.batches.galon = [{q:2, e:"${future(200)}"}]; S.batches.beras = [{q:5.5, e:"${future(200)}"}]; S.have.gas = 2`);
+  let e = a.run('endurance()');
+  assert.equal(e.water, 3.2);            // 38 L / 12
+  assert.equal(e.rice, 5);
+  assert.equal(e.cook, 0);               // no stove yet
+  assert.equal(e.total, 0);
+  a.run('S.have.kompor = 1');
+  e = a.run('endurance()');
+  assert.equal(e.cook, 2);               // gas limits cooking
+  assert.equal(e.total, 2);
+  a.run(`S.batches.biskuit = [{q:10, e:"${future(200)}"}]; S.batches.kaleng = [{q:6, e:"${future(200)}"}]`);
+  assert.equal(a.run('endurance().ready'), 4);
+  assert.equal(a.run('endurance().total'), 3.2); // now water is the bottleneck
+  a.run('S.batches.galon[0].e = "2000-01-01"');
+  assert.equal(a.run('endurance().water'), 0);
+});
+
+test('hazard readiness scores only that hazard\'s key items', ()=>{
+  const a = app();
+  const pct = k => a.run(`hazardReadiness().find(r => r.h.k === "${k}").pct`);
+  assert.equal(pct('blackout'), 0);
+  a.run('["senter","powerbank","radio","surya","chargermotor","cooler","timba","surge","kompor"].forEach(id => S.have[id] = needOf(findItem(id))); S.have.baterai = 1; S.have.korek = 3');
+  assert.ok(pct('blackout') > 50);
+  assert.ok(pct('tsunami') < 20);
+  assert.equal(a.run('hazardReadiness().some(r => r.h.k === "asap")'), false);   // haze card only in umum mode
+  a.run('S.special.hamil = true');
+  assert.equal(a.run('allItems().filter(it => inScenario(it, "tsunami")).some(it => it.id === "taspersalinan")'), true);
+});
+
+test('custom items join stock, shopping list, scenarios, and survive backup validation', ()=>{
+  const a = app();
+  a.run('S.custom.push({id:"uabc123", t:"Obat asma cadangan", cat:"obat", n:2, u:"inhaler", p:1, loc:"tas", exp:true, sc:["asap","gempa"]})');
+  a.run('S.custom.push({id:"udef456", t:"HT", cat:"alat", n:0, u:"buah", p:2, loc:"rumah", exp:false, sc:[]})');
+  assert.equal(a.run('findItem("uabc123").loc'), 'tas');
+  assert.equal(a.run('stockState(findItem("udef456"))'), 'missing');   // no quantity → checkbox item
+  assert.ok(a.run('shoppingList()').some(s => s.id === 'uabc123' && s.p === 1 && s.buy === 2));
+  assert.equal(a.run('inScenario(findItem("uabc123"), "gempa")'), true);
+  assert.equal(a.run('inScenario(findItem("uabc123"), "banjir")'), false);
+  a.run(`S.batches.uabc123 = [{q:2, e:"${future(100)}"}]`);
+  assert.equal(a.run('stockState(findItem("uabc123"))'), 'ok');
+  const backup = a.run('JSON.stringify(S)');
+  const {data} = a.run(`sanitizeData(${backup})`);
+  assert.equal(data.custom.length, 2);
+  assert.equal(data.batches.uabc123[0].q, 2);    // stock of imported custom items is kept
+  const bad = a.run('sanitizeData({custom:[{id:"../x", t:"a"}, {id:"u1", t:""}, {id:"u2", t:"Senter kepala", cat:"???", sc:["nope","banjir"]}]}).data.custom');
+  assert.equal(bad.length, 1);
+  assert.equal(bad[0].cat, 'alat');
+  assert.equal(JSON.stringify(bad[0].sc), '["banjir"]');
+});

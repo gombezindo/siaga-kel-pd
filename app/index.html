@@ -128,6 +128,24 @@ h3{font-size:16px;margin:0}
 .badge.warn{color:var(--warn);background:var(--warn-soft)}
 .badge.ok{color:var(--ok);background:var(--ok-soft)}
 
+.field select{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 11px}
+.big-num{font-size:34px;font-weight:800;line-height:1.1}
+.big-num small{font-size:15px;font-weight:600;color:var(--muted)}
+.meters{display:grid;gap:10px;margin-top:12px}
+.meter-row{display:grid;grid-template-columns:120px 1fr 64px;gap:8px;align-items:center;font-size:14px}
+.meter-row span:last-child{text-align:right;font-weight:700}
+.meter{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px;background:var(--ok)}
+.meter i.warn{background:var(--warn)}.meter i.bad{background:var(--bad)}
+.mine{font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;margin-left:4px;color:var(--ok);background:var(--ok-soft)}
+.ctools{display:flex;gap:6px;margin-top:6px}
+.linkrow{background:none;border:0;padding:4px 0;width:100%;text-align:left;cursor:pointer;color:inherit}
+.hz-ready{font-size:14px;background:var(--bg);border-radius:10px;padding:10px 12px;margin:4px 0 8px}
+.cform{display:grid;gap:10px}
+.cform .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cform input[type=text],.cform input[type=number],.cform select{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px}
+.cform label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.cform .checks{grid-template-columns:repeat(2,1fr)}
 .shop h3{margin-bottom:6px}
 .shop ul{list-style:none;margin:0;padding:0}
 .shop li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -151,7 +169,7 @@ h3{font-size:16px;margin:0}
 .hz li{margin-bottom:6px}
 .hz .tag{font-size:12px;color:var(--muted);font-weight:400}
 .big{font-size:15px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-weight:600}
-.quick-entry{display:block;width:100%;margin:0 0 16px;text-align:center;background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.quick-entry{display:block;width:100%;margin:0 0 16px;text-align:center;background:var(--bad);border-color:var(--bad);color:#fff}
 .readiness p{margin:8px 0}.readiness small{display:block;color:var(--muted)}
 .hazard-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .hazard-picker button{flex:1 1 95px;min-height:44px;padding:8px;font-size:14px}
@@ -266,6 +284,8 @@ h3{font-size:16px;margin:0}
     <div class="checks" id="specialCtl"></div>
   </div>
   <div class="note"><b>Mulai dari 3 hari</b> (standar BNPB / 72 jam), lalu naikkan bertahap ke 7 hari. Tidak perlu belanja sekaligus — mulai dari kebutuhan <b>utama</b> di daftar belanja.</div>
+  <div class="card" id="endurance" aria-live="polite"></div>
+  <div class="card" id="hazReady"></div>
   <div class="card readiness" id="readiness" aria-live="polite"></div>
   <div class="card" id="soon"></div>
   <div class="card" id="regionInfo"></div>
@@ -282,10 +302,13 @@ h3{font-size:16px;margin:0}
     <div class="seg top" id="locCtl" role="group" aria-label="Lokasi stok">
       <button data-loc="semua">Semua</button><button data-loc="rumah">🏠 Stok rumah</button><button data-loc="tas">🎒 Tas evakuasi</button>
     </div>
+    <div class="field noprint"><label for="scSel">Tampilkan barang penting untuk</label><select id="scSel"></select></div>
     <div class="tools noprint">
       <button class="btn" id="openAll">Buka semua</button>
       <button class="btn" id="printBtn">Cetak checklist</button>
+      <button class="btn pri" id="addCustom">+ Tambah barang sendiri</button>
     </div>
+    <div id="customForm"></div>
     <div id="cats"></div>
   </div>
   <div id="shopView" hidden>
@@ -386,8 +409,8 @@ const SCHEMA = 2;
 const clone = o => JSON.parse(JSON.stringify(o));
 const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3,
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
-  have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null,
-  view:'list', loc:'semua', tab:'t-fam'};
+  have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null, custom:[],
+  view:'list', loc:'semua', sc:'semua', tab:'t-fam'};
 
 // v1 kept one expiry date per item and a "confirmed" snapshot; v2 tracks quantities and purchase batches.
 function migrate(raw){
@@ -528,6 +551,28 @@ const CATS = [
   {id:'letak', t:'Semua anggota tahu letak tas', q:()=>'✔', p:1},
  ]},
 ];
+const BUILTIN_IDS = new Set(CATS.flatMap(cat => cat.items.map(it => it.id)));
+
+// user-added items (S.custom) share the quantity, batch and done maps with built-in items
+const CUSTOM_CATS = CATS.filter(cat => cat.id !== 'khusus');
+function customItems(catId){
+  return (S.custom || []).filter(x => x.cat === catId).map(x => Object.assign(
+    {id:x.id, t:x.t, custom:true, u:x.u || 'buah', p:x.p === 1 ? 1 : 2, loc:x.loc === 'tas' ? 'tas' : 'rumah', exp:x.exp ? 1 : 0, sc:x.sc || []},
+    x.n > 0 ? {n:()=>x.n} : {q:()=>'barang saya'}));
+}
+const catItems = cat => cat.items.concat(customItems(cat.id));
+
+// key items per hazard for the readiness score; special-needs items and routine medicine count for every hazard
+const KITS = {
+  gempa:['galon','biskuit','kaleng','p3k','umum','senter','baterai','powerbank','sepatu','radio','terpal','selimut','peluit','ransel','botol','makantas','sentertas','baju','doktas','tunaitas','letak','fotokopi'],
+  tsunami:['ransel','botol','makantas','obattas','sentertas','peluit','baju','powerbanktas','doktas','tunaitas','jastas','letak','fotokopi','sepatu'],
+  banjir:['galon','jernih','biskuit','kaleng','umum','p3k','higiene','plastik','senter','baterai','powerbank','radio','terpal','fotokopi','tunai','ransel','botol','makantas','jastas','doktas','letak'],
+  erupsi:['n95','kacamata','maskertas','galon','biskuit','kaleng','plastik','umum','ransel','botol','makantas','sentertas','doktas','letak'],
+  cuaca:['senter','baterai','powerbank','radio','terpal','p3k','galon','biskuit','jastas'],
+  asap:['n95','kacamata','maskertas','umum','galon','p3k'],
+  blackout:['senter','baterai','powerbank','radio','surya','chargermotor','cooler','timba','surge','galon','drum','biskuit','kaleng','kompor','gas','korek','tunai'],
+};
+const inScenario = (it, k) => k === 'semua' || (it.custom ? it.sc.includes(k) : (KITS[k] || []).includes(it.id) || it.cat?.id === 'khusus' || it.id === 'rutin');
 
 // ---------- long-term plan ----------
 const PHASES = [
@@ -704,9 +749,9 @@ function expStatus(date){
 // item with its category, storage location, and region-resolved title
 const expand = (it, cat) => Object.assign({}, it, {cat, loc: it.loc || cat.loc || 'rumah', t: R(it.t)});
 function allItems(c = ctx()){
-  return CATS.filter(cat => visible(cat, c)).flatMap(cat => cat.items.filter(it => visible(it, c)).map(it => expand(it, cat)));
+  return CATS.filter(cat => visible(cat, c)).flatMap(cat => catItems(cat).filter(it => visible(it, c)).map(it => expand(it, cat)));
 }
-const findItem = id => { for(const cat of CATS){ const it = cat.items.find(x => x.id === id); if(it) return expand(it, cat); } return null; };
+const findItem = id => { for(const cat of CATS){ const it = catItems(cat).find(x => x.id === id); if(it) return expand(it, cat); } return null; };
 const needOf = (it, c = ctx()) => it.n ? it.n(c) : 1;
 const batchesOf = it => Array.isArray(S.batches[it.id]) ? S.batches[it.id] : [];
 // usable quantity: expired batches do not count
@@ -735,6 +780,31 @@ function shoppingText(list){
   const line = s => `- ${s.t}: ${s.buy !== null ? `beli ${fmtNum(s.buy)} ${s.u}` : `siapkan (${s.q})`}${s.loc === 'tas' ? ' [tas evakuasi]' : ''}`;
   const part = (p, title) => { const l = list.filter(s => s.p === p); return l.length ? `${title}\n${l.map(line).join('\n')}` : ''; };
   return [`Daftar belanja Siaga Keluarga (${S.days} hari, ${ctx().n} orang)`, part(1, 'UTAMA'), part(2, 'TAMBAHAN')].filter(Boolean).join('\n\n');
+}
+
+// ---------- how long current stock lasts ----------
+// Uses the same daily rates as the need formulas: 3 L drinking water, rice 0.35/0.2/0.1 kg, one gas can per 4 people,
+// and one ready-to-eat unit (biscuit pack / can / bread) per person per day.
+function endurance(c = ctx()){
+  const have = id => { const it = findItem(id); return it && visible(it, c) ? haveOf(it) : 0; };
+  const days = (h, perDay) => perDay > 0 ? round1(h / perDay) : 0;
+  const customLiters = allItems(c).filter(it => it.custom && it.cat.id === 'air' && /^(l|liter|litre)$/i.test(it.u)).reduce((s, it) => s + haveOf(it), 0);
+  const waterL = have('galon')*19 + have('botol')*1.5 + customLiters;
+  const water = days(waterL, c.n*3);
+  const rice = days(have('beras'), c.besar*0.35 + c.anak*0.2 + c.bal*0.1);
+  const gas = have('kompor') >= 1 ? days(have('gas'), ceil(c.n/4)) : 0;
+  const cook = Math.min(rice, gas);
+  const ready = days(have('biskuit') + have('kaleng') + have('roti') + have('makantas'), Math.max(1, c.nonBal));
+  const food = Math.max(cook, ready);
+  return {waterL, water, rice, gas, cook, ready, food, total: Math.min(water, food)};
+}
+function hazardReadiness(c = ctx()){
+  const items = allItems(c).filter(it => !it.opt);
+  return hazList().map(h => {
+    const rel = items.filter(it => inScenario(it, h.k));
+    const ok = rel.filter(it => stockState(it, c) === 'ok').length;
+    return {h, ok, total:rel.length, pct: rel.length ? Math.floor(ok / rel.length * 100) : 0};
+  });
 }
 
 // ---------- recurring checks ----------
@@ -772,9 +842,15 @@ const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 // Returns a clean copy with only known fields; throws when the input is clearly not app data.
 function sanitizeData(o){
   if(!isObj(o)) throw new Error('Isi file bukan data Siaga Keluarga.');
-  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed'];
+  const known = ['fam','days','region','info','members','have','batches','done','checks','special','risk','exp','confirmed','custom'];
   if(!known.some(k => k in o)) throw new Error('File tidak berisi data Siaga Keluarga.');
   const out = {}, warn = [];
+  if('custom' in o){
+    if(!Array.isArray(o.custom) || o.custom.length > 100) throw new Error('Daftar barang sendiri tidak valid.');
+    out.custom = o.custom.filter(isObj).map(cleanCustom).filter(Boolean);
+  }
+  const ids = new Set([...BUILTIN_IDS, ...(out.custom || []).map(x => x.id)]);
+  const findItem = k => ids.has(k);   // shadows the global: validate against the imported item set
   if('fam' in o){
     if(!isObj(o.fam) || !['dewasa','anak','balita','lansia'].every(k => int(o.fam[k], 0, 20))) throw new Error('Jumlah anggota keluarga tidak valid.');
     out.fam = {dewasa:o.fam.dewasa, anak:o.fam.anak, balita:o.fam.balita, lansia:o.fam.lansia};
@@ -797,8 +873,17 @@ function sanitizeData(o){
   if(typeof o.v === 'number') out.v = o.v;
   return {data:out, warn};
 }
+function cleanCustom(x){
+  const t = str(x.t, 80).trim();
+  if(!/^u[a-z0-9]{1,20}$/.test(x.id || '') || !t) return null;
+  const n = typeof x.n === 'number' && x.n > 0 && x.n <= 100000 ? round1(x.n) : 0;
+  return {id:x.id, t, cat: CUSTOM_CATS.some(c => c.id === x.cat) ? x.cat : 'alat', n, u: str(x.u, 20).trim() || 'buah',
+    p: x.p === 1 ? 1 : 2, loc: x.loc === 'tas' ? 'tas' : 'rumah', exp: x.exp === true,
+    sc: Array.isArray(x.sc) ? x.sc.filter(k => HAZ.some(h => h.k === k)) : []};
+}
 function summarize(d){
   const parts = [];
+  if(d.custom?.length) parts.push(`${d.custom.length} barang buatan sendiri`);
   if(d.fam) parts.push(`${d.fam.dewasa+d.fam.anak+d.fam.balita+d.fam.lansia} orang`);
   if(d.members) parts.push(`${d.members.length} data anggota`);
   if(d.info) parts.push(`${Object.keys(d.info).length} isian rencana`);
@@ -912,12 +997,14 @@ function renderSoon(){
 function itemHtml(it, c){
   const status = stockState(it, c);
   const tip = it.tip ? it.tip(c) : '';
-  const prio = it.opt ? '<span class="prio p2">opsional</span>' : `<span class="prio p${it.p||2}">${(it.p||2) === 1 ? 'utama' : 'tambahan'}</span>`;
+  const prio = (it.opt ? '<span class="prio p2">opsional</span>' : `<span class="prio p${it.p||2}">${(it.p||2) === 1 ? 'utama' : 'tambahan'}</span>`)
+    + (it.custom ? '<span class="mine">barang saya</span>' : '');
+  const ctools = it.custom ? `<div class="ctools"><button class="btn sm" data-cedit="${it.id}">Ubah</button><button class="btn sm" data-cdel="${it.id}" style="color:var(--bad)">Hapus</button></div>` : '';
   const markTxt = {ok:'✓', short:'!', review:'?', expired:'!', missing:'', optional:''}[status];
   if(!it.n) return `<li class="item st-${status}${status==='ok'?' done':''}">
     <input type="checkbox" id="c-${it.id}" data-id="${it.id}" ${S.done[it.id]?'checked':''}>
     <div class="txt"><label for="c-${it.id}" class="nm">${esc(it.t)}</label> <span class="qty">${esc(it.q(c))}</span>${prio}
-    ${tip?`<div class="tip">${esc(tip)}</div>`:''}</div></li>`;
+    ${tip?`<div class="tip">${esc(tip)}</div>`:''}${ctools}</div></li>`;
   const need = needOf(it, c), have = haveOf(it), short = shortOf(it, c);
   const needLine = `Butuh ${fmtNum(need)} ${esc(it.u)} · ` + (short > 0 ? `<b class="short">kurang ${fmtNum(short)}</b>` : '<b class="okc">cukup</b>');
   let body;
@@ -941,7 +1028,7 @@ function itemHtml(it, c){
     ${tip?`<div class="tip">${esc(tip)}</div>`:''}
     ${status === 'review' ? '<div class="warnbox">Dicentang di versi lama — isi jumlah yang tersedia.</div>' : ''}
     ${expiredQty(it) > 0 ? `<div class="badbox">${fmtNum(expiredQty(it))} ${esc(it.u)} kedaluwarsa — buang/ganti, tidak dihitung tersedia.</div>` : ''}
-    ${body}</div></li>`;
+    ${body}${ctools}</div></li>`;
 }
 
 function renderList(){
@@ -950,9 +1037,10 @@ function renderList(){
   document.querySelectorAll('#locCtl button').forEach(b => b.setAttribute('aria-pressed', b.dataset.loc === S.loc));
   $('#listView').hidden = S.view !== 'list';
   $('#shopView').hidden = S.view !== 'shop';
+  renderScSel(); renderCustomForm();
   $('#cats').innerHTML = CATS.filter(cat => visible(cat, c)).map(cat => {
-    const items = cat.items.filter(it => visible(it, c)).map(it => expand(it, cat))
-      .filter(it => S.loc === 'semua' || it.loc === S.loc);
+    const items = catItems(cat).filter(it => visible(it, c)).map(it => expand(it, cat))
+      .filter(it => (S.loc === 'semua' || it.loc === S.loc) && inScenario(it, S.sc));
     if(!items.length) return '';
     const counted = items.filter(it => !it.opt);
     const n = counted.filter(it => stockState(it, c) === 'ok').length;
@@ -1007,6 +1095,7 @@ function renderHaz(){
   $('#hazards').innerHTML = list.map((h,i) => `<article class="card hazard-panel" id="hazard-${h.k}" ${i?'hidden':''} style="margin-top:14px">
     <h3 tabindex="-1">${h.ic} ${esc(R(h.t))}</h3>
     <ol class="quick-steps">${h.quick.map(step=>`<li>${esc(step)}</li>`).join('')}</ol>
+    <div class="hz-ready noprint" data-hzready="${h.k}"></div>
     <details><summary>Detail panduan ${esc(R(h.t))}</summary>
     ${h.tag?`<p class="tag">${esc(R(h.tag))}</p>`:''}
     ${h.big?`<div class="big">${esc(R(h.big))}</div>`:''}
@@ -1017,6 +1106,7 @@ function renderHaz(){
   </article>`).join('');
   $('#sourceList').innerHTML = Object.values(SOURCES).filter(s => !s.only || s.only === S.region)
     .map(source=>`<li><a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a><br>${source.scope}</li>`).join('');
+  renderHazReady();
 }
 function sourceLinks(ids){
   return ids.map(id => `<a href="${SOURCES[id].url}" target="_blank" rel="noopener noreferrer">${SOURCES[id].title}</a>`).join(' · ');
@@ -1087,7 +1177,77 @@ function progress(){
     <div class="tools"><button class="btn sm" data-go-shop>Lihat daftar belanja</button></div>`;
 }
 
-function renderAll(){ renderRegion(); renderFam(); renderSoon(); renderList(); renderPlan(); progress(); renderSaveState(); }
+const meterCls = (v, target) => v >= target ? '' : v >= target/2 ? 'warn' : 'bad';
+function renderEndurance(){
+  const e = endurance(), c = ctx(), target = S.days;
+  const kompor = findItem('kompor'), hasStove = kompor && haveOf(kompor) >= 1;
+  const row = (l, v, note) => `<div><div class="meter-row"><span>${l}</span><div class="meter"><i class="${meterCls(v, target)}" style="width:${Math.min(100, v/target*100)}%"></i></div><span>${fmtNum(v)} hari</span></div><div class="muted">${note}</div></div>`;
+  let hint;
+  if(e.waterL === 0 && e.food === 0) hint = `<div class="warnbox">Isi jumlah stok yang sudah ada di tab Stok untuk melihat perkiraannya. <button class="btn sm" data-go="t-list">Buka Stok</button></div>`;
+  else if(e.total >= target) hint = `<div class="note" style="margin:12px 0 0">Air dan makanan cukup untuk target ${target} hari.</div>`;
+  else if(e.water <= e.food) hint = `<div class="warnbox">Paling membatasi: <b>air minum</b>. Tambah ±${ceil((target*c.n*3 - e.waterL)/19)} galon untuk mencapai ${target} hari.</div>`;
+  else hint = `<div class="warnbox">Paling membatasi: <b>makanan</b>. Lengkapi beras + gas kaleng${hasStove ? '' : ' + kompor'}, atau makanan siap makan.</div>`;
+  $('#endurance').innerHTML = `<h3>Ketahanan logistik</h3>
+    <p class="muted">Berapa lama stok yang sudah ada cukup untuk ${c.n} orang.</p>
+    <div class="big-num">${fmtNum(e.total)} <small>hari · target ${target} hari</small></div>
+    <div class="meters">
+      ${row('💧 Air minum', e.water, `${fmtNum(round1(e.waterL))} L dari galon & botol`)}
+      ${row('🍚 Masak', e.cook, `beras ${fmtNum(e.rice)} hari · gas ${fmtNum(e.gas)} hari${hasStove ? '' : ' (belum ada kompor)'}`)}
+      ${row('🥫 Siap makan', e.ready, 'biskuit, kaleng, roti, makanan di tas')}
+    </div>${hint}
+    <small class="muted" style="display:block;margin-top:8px">Ketahanan = yang lebih kecil antara air minum dan makanan (masak atau siap makan, mana yang lebih lama). Patokan: air 3 L/orang/hari, beras 0,35 kg dewasa · 0,2 kg anak · 0,1 kg balita, 1 bungkus/kaleng siap makan per orang per hari. Kedaluwarsa tidak dihitung.</small>`;
+}
+function renderHazReady(){
+  const rows = hazardReadiness();
+  $('#hazReady').innerHTML = `<h3>Kesiapan per bencana</h3>
+    <p class="muted">Barang penting untuk tiap bencana yang jumlahnya sudah cukup. Ketuk untuk melihat yang kurang.</p>
+    <div class="meters">${rows.map(r => `<button class="meter-row linkrow" data-sc="${r.h.k}"><span>${r.h.ic} ${esc(r.h.lbl)}</span><div class="meter"><i class="${meterCls(r.pct, 80)}" style="width:${r.pct}%"></i></div><span>${r.pct}%</span></button>`).join('')}</div>`;
+  rows.forEach(r => { const el = document.querySelector(`[data-hzready="${r.h.k}"]`);
+    if(el) el.innerHTML = `Stok penting untuk bencana ini: <b>${r.ok}/${r.total}</b> cukup (${r.pct}%). <button class="btn sm" data-sc="${r.h.k}">Lihat yang kurang</button>`; });
+}
+function renderScSel(){
+  const list = hazList();
+  if(S.sc !== 'semua' && !list.some(h => h.k === S.sc)) S.sc = 'semua';
+  $('#scSel').innerHTML = `<option value="semua">Semua bencana</option>` + list.map(h => `<option value="${h.k}">${h.ic} ${esc(R(h.t))}</option>`).join('');
+  $('#scSel').value = S.sc;
+}
+
+let editing = null;   // custom item being edited: its id, 'new', or null
+function renderCustomForm(){
+  const box = $('#customForm');
+  if(!editing){ box.innerHTML = ''; return; }
+  const x = editing === 'new' ? {t:'', cat:'alat', n:0, u:'buah', p:2, loc:'rumah', exp:false, sc:[]} : S.custom.find(y => y.id === editing);
+  box.innerHTML = `<div class="card"><h3>${editing === 'new' ? 'Tambah barang sendiri' : 'Ubah barang'}</h3>
+   <div class="cform" style="margin-top:10px">
+    <div><label class="lbl" for="cu-t">Nama barang</label><input type="text" id="cu-t" maxlength="80" value="${esc(x.t)}" placeholder="mis. Obat asma cadangan, HT, kacamata minus"></div>
+    <div class="row2"><div><label class="lbl" for="cu-cat">Kategori</label><select id="cu-cat">${CUSTOM_CATS.map(c => `<option value="${c.id}"${c.id === x.cat ? ' selected' : ''}>${c.ic} ${c.t}</option>`).join('')}</select></div>
+      <div><label class="lbl" for="cu-loc">Disimpan di</label><select id="cu-loc"><option value="rumah">🏠 Rumah</option><option value="tas"${x.loc === 'tas' ? ' selected' : ''}>🎒 Tas evakuasi</option></select></div></div>
+    <div class="row2"><div><label class="lbl" for="cu-n">Jumlah dibutuhkan</label><input type="number" id="cu-n" min="0" step="any" inputmode="decimal" value="${x.n || ''}" placeholder="kosong = cukup dicentang"></div>
+      <div><label class="lbl" for="cu-u">Satuan</label><input type="text" id="cu-u" maxlength="20" value="${esc(x.u)}" placeholder="buah, liter, kg"></div></div>
+    <div class="row2"><div><label class="lbl" for="cu-p">Prioritas</label><select id="cu-p"><option value="1"${x.p === 1 ? ' selected' : ''}>Utama</option><option value="2"${x.p !== 1 ? ' selected' : ''}>Tambahan</option></select></div>
+      <label style="display:flex;gap:8px;align-items:center;margin-top:20px"><input type="checkbox" id="cu-exp"${x.exp ? ' checked' : ''}> Bisa kedaluwarsa</label></div>
+    <div><span class="lbl">Penting untuk bencana</span><div class="checks">${HAZ.map(h => `<label><input type="checkbox" data-cusc="${h.k}"${x.sc.includes(h.k) ? ' checked' : ''}> ${h.lbl}</label>`).join('')}</div></div>
+    <p class="muted" style="margin:0">Air dengan satuan "liter" di kategori Air ikut dihitung di ketahanan logistik.</p>
+    <div class="tools" style="margin:0"><button class="btn pri" id="cuSave">Simpan</button><button class="btn" id="cuCancel">Batal</button></div>
+   </div></div>`;
+  $('#cu-t').focus();
+}
+function saveCustom(){
+  const t = $('#cu-t').value.trim();
+  if(!t){ toast('Isi nama barang dulu.', true); return; }
+  const n = parseFloat($('#cu-n').value);
+  const x = cleanCustom({id: editing === 'new' ? 'u' + Date.now().toString(36) : editing, t, cat:$('#cu-cat').value,
+    n: Number.isFinite(n) ? n : 0, u:$('#cu-u').value, p:+$('#cu-p').value, loc:$('#cu-loc').value, exp:$('#cu-exp').checked,
+    sc:[...document.querySelectorAll('[data-cusc]:checked')].map(i => i.dataset.cusc)});
+  const i = S.custom.findIndex(y => y.id === x.id);
+  // keep what was already counted when the item switches between plain quantity and dated purchases
+  if(i >= 0 && x.exp && !S.custom[i].exp && S.have[x.id] > 0 && !batchesOf(x).length) S.batches[x.id] = [{q:S.have[x.id], e:''}];
+  if(i >= 0 && !x.exp && S.custom[i].exp) S.have[x.id] = haveOf(Object.assign({}, x, {exp:1}));
+  if(i >= 0) S.custom[i] = x; else S.custom.push(x);
+  S.open[x.cat] = true; editing = null; save(); renderAll(); toast('Barang disimpan.');
+}
+
+function renderAll(){ renderRegion(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); progress(); renderSaveState(); }
 
 function showTab(id){
   S.tab = id; save();
@@ -1143,6 +1303,18 @@ document.addEventListener('click', e => {
   const go = t.closest('[data-go]'); if(go) return showTab(go.dataset.go);
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
+  const sc = t.closest('[data-sc]');
+  if(sc){ S.sc = sc.dataset.sc; S.view = 'list'; S.loc = 'semua'; CATS.forEach(c => S.open[c.id] = true); save(); renderList(); return showTab('t-list'); }
+  if(t.id === 'addCustom'){ editing = 'new'; return renderCustomForm(); }
+  if(t.id === 'cuCancel'){ editing = null; return renderCustomForm(); }
+  if(t.id === 'cuSave') return saveCustom();
+  const ce = t.closest('[data-cedit]'); if(ce){ editing = ce.dataset.cedit; renderCustomForm(); return $('#customForm').scrollIntoView({block:'start'}); }
+  const cd = t.closest('[data-cdel]');
+  if(cd){ const x = S.custom.find(y => y.id === cd.dataset.cdel);
+    if(x && confirm(`Hapus "${x.t}" beserta jumlah dan tanggalnya?`)){
+      S.custom = S.custom.filter(y => y.id !== x.id); delete S.have[x.id]; delete S.batches[x.id]; delete S.done[x.id];
+      if(editing === x.id) editing = null; save(); renderAll(); }
+    return; }
   const tab = t.closest('nav button'); if(tab) return showTab(tab.dataset.t);
   const st = t.closest('#famCtl button');
   if(st){ S.fam[st.dataset.k] = Math.max(0, Math.min(20, S.fam[st.dataset.k] + +st.dataset.v));
@@ -1197,6 +1369,7 @@ document.addEventListener('change', e => {
   if(t.dataset.bq){ const [id, i] = t.dataset.bq.split(':'); const v = parseFloat(t.value); S.batches[id][+i].q = Number.isFinite(v) && v > 0 ? round1(v) : 0; save(); renderAll(); }
   if(t.dataset.be){ const [id, i] = t.dataset.be.split(':'); S.batches[id][+i].e = t.value; save(); renderAll(); }
   if(t.dataset.special){ S.special[t.dataset.special] = t.checked; save(); renderAll(); }
+  if(t.id === 'scSel'){ S.sc = t.value; save(); renderList(); }
   if(t.dataset.risk){ S.risk[t.dataset.risk] = t.checked; save(); renderHaz(); renderCard(); }
   if(t.id === 'importIn' && t.files[0]){
     const file = t.files[0]; t.value = '';

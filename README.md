@@ -11,6 +11,13 @@ node --test tests/readiness.cjs
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 
+## Perubahan v1.3 (1 November 2026)
+
+- **Ketahanan logistik.** Kartu di tab Keluarga menghitung berapa hari stok yang sudah ada cukup: air minum (galon + botol + air buatan sendiri bersatuan liter), makan dimasak (beras dibatasi gas, perlu kompor), dan makanan siap makan. Ketahanan = minimum air vs makanan; ada petunjuk apa yang paling membatasi. Pembelian kedaluwarsa tidak dihitung.
+- **Kesiapan per bencana.** Tiap bencana punya daftar barang penting (`KITS`); skor persentase tampil di tab Keluarga dan di tiap kartu Saat Bencana. Ketuk untuk membuka Stok yang difilter ke bencana itu. Barang kebutuhan khusus dan obat rutin dihitung untuk semua bencana.
+- **Tambah barang sendiri.** Nama, kategori, lokasi (rumah/tas), jumlah & satuan (kosong = cukup dicentang), prioritas, bisa kedaluwarsa, dan bencana terkait. Ikut di checklist, daftar belanja, progres, skor bencana, dan file cadangan (divalidasi). Tidak ikut QR.
+- Perbaikan: tombol "Buka tindakan darurat" sebelumnya tak terbaca (teks putih di latar putih karena urutan CSS).
+
 ## Perubahan v1.2 (31 Oktober 2026)
 
 - **Stok aktual & daftar belanja.** Barang yang dapat dihitung punya jumlah *tersedia*; aplikasi menghitung kekurangan dari jumlah anggota keluarga dan durasi. Tab Stok punya tampilan **Daftar belanja** yang memisahkan kebutuhan **utama** dan **tambahan**, bisa dibagikan sebagai teks atau dicetak (±3 halaman A4 untuk 6 orang/7 hari).
