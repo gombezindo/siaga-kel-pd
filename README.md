@@ -16,7 +16,7 @@ node --test tests/readiness.cjs
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 
-## Restrukturisasi pengalaman aplikasi (4 November 2026)
+## Perubahan v2.0 — restrukturisasi pengalaman aplikasi (4 November 2026)
 
 - Lima navigasi utama sekarang mengikuti keadaan pengguna: **Beranda, Persiapan, Darurat, Keluarga, Bantuan**. Chat keluarga dipindahkan ke Keluarga; ruang koordinasi warga berada di Bantuan; pustaka darurat diberi nama **Bertahan & Pulih**.
 - Beranda menyediakan alur cepat **Belum sempat bersiap?** untuk empat kondisi: bencana sedang terjadi, sudah berada di tempat aman, terpisah dari keluarga, atau persediaan terbatas. Panduan darurat tetap dapat dibuka tanpa akun dan tanpa mengisi profil.
