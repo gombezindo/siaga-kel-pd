@@ -16,6 +16,14 @@ node --test tests/readiness.cjs
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 
+## Restrukturisasi pengalaman aplikasi (4 November 2026)
+
+- Lima navigasi utama sekarang mengikuti keadaan pengguna: **Beranda, Persiapan, Darurat, Keluarga, Bantuan**. Chat keluarga dipindahkan ke Keluarga; ruang koordinasi warga berada di Bantuan; pustaka darurat diberi nama **Bertahan & Pulih**.
+- Beranda menyediakan alur cepat **Belum sempat bersiap?** untuk empat kondisi: bencana sedang terjadi, sudah berada di tempat aman, terpisah dari keluarga, atau persediaan terbatas. Panduan darurat tetap dapat dibuka tanpa akun dan tanpa mengisi profil.
+- Kartu **Kesiapan tanpa internet** membedakan panduan yang sudah tersimpan, status penyimpanan persisten browser, data lokal, dan cadangan pengguna. Peta, video, chat, serta data terbaru dijelaskan sebagai kebutuhan terpisah.
+- Chat keluarga mempunyai pesan cepat terstruktur: aman, menuju/tiba di titik kumpul, butuh bantuan, dan membutuhkan obat. Status grup di server dibedakan dari pesan yang sudah dibaca penerima; membuka SMS juga tidak dianggap sebagai pesan terkirim.
+- Tombol kecil dinaikkan menjadi target sentuh minimal 44 px. Pengaturan dapat dibuka dari ikon di header. Cache service worker naik ke `siaga-v10`.
+
 ## Perubahan v1.7 (1 November 2026)
 
 - Navigasi diringkas dari enam menjadi lima kategori utama: **Beranda, Persiapan, Darurat, Komunitas, Rencana**. Stok/belanja dan rencana berkala menjadi subtab Persiapan; Pustaka menjadi subtab Darurat.

@@ -435,3 +435,20 @@ test('chat timestamps tolerate small phone clock differences', ()=>{
   const chatRule = rules.slice(rules.indexOf('function validChat'));
   assert.match(chatRule, /d\.t > request\.time - duration\.value\(1, 'h'\)/);
 });
+
+test('restructured information architecture keeps urgent paths visible and honest', ()=>{
+  const nav = [...html.matchAll(/<button[^>]*role="tab" data-t="([^"]+)"[^>]*>[\s\S]*?<\/svg>([^<]+)<\/button>/g)]
+    .map(m => [m[1], m[2]]);
+  assert.deepEqual(nav, [
+    ['t-fam', 'Beranda'], ['t-list', 'Persiapan'], ['t-act', 'Darurat'],
+    ['t-info', 'Keluarga'], ['t-community', 'Bantuan']
+  ]);
+  assert.match(html, /Belum sempat bersiap\?/);
+  assert.match(html, /data-quick="now"/);
+  assert.match(html, /data-quick="safe"/);
+  assert.match(html, /data-quick="separated"/);
+  assert.match(html, /data-quick="limited"/);
+  assert.match(html, /SMS belum terkirim dari layar ini/);
+  assert.match(html, /Ini belum berarti semua anggota sudah membacanya/);
+  assert.match(html, /\.btn\.sm\{[^}]*min-height:44px/);
+});

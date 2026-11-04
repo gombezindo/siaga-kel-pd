@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="utf-8">
@@ -57,6 +57,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
 .logo{width:34px;height:34px;border-radius:8px;flex:none;display:block}
 .head h1{font-size:18px;margin:0;line-height:1.15;letter-spacing:-.01em}
 .head small{color:var(--muted);font-size:13px;display:block;line-height:1.3}
+.head-action{width:44px;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);display:grid;place-items:center;cursor:pointer;flex:none;font-size:20px}
 .net{display:inline-flex!important;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--ok);border:1px solid var(--line);border-radius:99px;padding:3px 9px;background:var(--card);white-space:nowrap;cursor:pointer;flex:none}
 .net:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
 .net.off{color:var(--warn)}
@@ -178,7 +179,7 @@ h3{font-size:18px;line-height:1.25;margin:0}
 .batches{margin-top:8px;display:grid;gap:6px}
 .batch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .batch .x{border:0;background:none;color:var(--bad);font-size:18px;cursor:pointer;padding:0 6px}
-.btn.sm{font-size:14px;padding:6px 11px;min-height:36px}
+.btn.sm{font-size:14px;padding:8px 11px;min-height:44px}
 .badge{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px}
 .badge.bad{color:var(--bad);background:var(--bad-soft)}
 .badge.warn{color:var(--warn);background:var(--warn-soft)}
@@ -273,6 +274,18 @@ body.surv-open{overflow:hidden}
 .subtabs .btn{white-space:nowrap;flex:1;text-align:center;background:none;border:0;border-radius:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 6px 9px;font-size:16px}
 .subtabs .btn.active{color:var(--ink);border-bottom-color:var(--accent)}
 .community-grid{display:grid;gap:14px}
+.quick-entry{margin-bottom:14px}
+.quick-entry h3{margin-bottom:4px}
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.quick-grid button{text-align:left;display:flex;gap:9px;align-items:center;min-height:58px}
+.quick-grid .ic{font-size:23px;line-height:1}
+.quick-grid small{display:block;color:var(--muted);font-weight:400;margin-top:1px}
+.offline-check{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.offline-check div{background:var(--bg);border-radius:10px;padding:9px 10px;font-size:14px}
+.offline-check b{display:block;color:var(--ok)}
+.template-row{display:flex;gap:6px;overflow:auto;padding:2px 0 8px}
+.template-row button{white-space:nowrap}
+@media(max-width:430px){.quick-grid,.offline-check{grid-template-columns:1fr}}
 .chat-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;background:var(--bg);border-radius:12px;padding:10px;margin:10px 0}
 .chat-empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
 .msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;overflow-wrap:anywhere}
@@ -439,7 +452,8 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
       <h1>Siaga Keluarga</h1>
       <small id="subtitle">Panduan darurat</small>
     </div>
-    <button id="net" class="net" hidden title="Atur mode online/offline"></button>
+    <button type="button" id="net" class="net" hidden title="Atur mode online/offline"></button>
+    <button type="button" id="settingsBtn" class="head-action" aria-label="Buka pengaturan" title="Pengaturan">⚙</button>
   </div>
   <div class="eq-alert" id="eqAlert" role="alert" hidden></div>
 </header>
@@ -451,22 +465,33 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <div class="sos-sign noprint"><div class="sos-in">
     <h2>Ada bencana sekarang?</h2>
     <p>Panduan langkah demi langkah. Tetap jalan tanpa internet.</p>
-    <button class="sos-go" data-survival=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Buka Mode Darurat</button>
+    <button type="button" class="sos-go" data-survival=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Buka Mode Darurat</button>
     <div class="sos-row">
       <a href="tel:112"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Telepon 112</a>
-      <button data-checkin="aman"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Saya aman</button>
-      <button data-signal="light"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg>Kedip SOS</button>
+      <button type="button" data-checkin="aman"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Saya aman</button>
+      <button type="button" data-signal="light"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg>Kedip SOS</button>
     </div>
   </div></div>
+  <div class="card quick-entry noprint">
+    <h3>Belum sempat bersiap?</h3>
+    <p class="muted">Pilih keadaan Anda. Panduan tindakan dapat dibuka tanpa mengisi data atau masuk akun.</p>
+    <div class="quick-grid">
+      <button type="button" class="btn" data-quick="now"><span class="ic">⚠️</span><span>Bencana sedang terjadi<small>Buka langkah penyelamatan sekarang</small></span></button>
+      <button type="button" class="btn" data-quick="safe"><span class="ic">🏕️</span><span>Sudah di tempat aman<small>Bertahan, tenang, dan kegiatan keluarga</small></span></button>
+      <button type="button" class="btn" data-quick="separated"><span class="ic">👪</span><span>Terpisah dari keluarga<small>Titik kumpul, SMS, dan kabar keluarga</small></span></button>
+      <button type="button" class="btn" data-quick="limited"><span class="ic">🎒</span><span>Persediaan terbatas<small>Lihat kebutuhan utama lebih dahulu</small></span></button>
+    </div>
+  </div>
   <div class="card status" id="statusCard" aria-live="polite"></div>
   <div class="card install-card noprint" id="installCard" hidden></div>
+  <div class="card noprint" id="offlineCard"></div>
   <div class="card noprint" id="wxCard"></div>
   <h3 class="group-h" id="famHead">Keluarga Anda</h3>
   <p class="lead">Isi jumlah anggota keluarga. Semua jumlah stok dihitung otomatis.</p>
   <div class="card">
     <div class="fam" id="famCtl"></div>
     <div class="seg" id="daysCtl" role="group" aria-label="Durasi stok">
-      <button data-d="3">3 hari</button><button data-d="5">5 hari</button><button data-d="7">7 hari</button>
+      <button type="button" data-d="3">3 hari</button><button type="button" data-d="5">5 hari</button><button type="button" data-d="7">7 hari</button>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -487,20 +512,20 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 2. STOK -->
 <section id="t-list">
   <h2>Persiapan</h2>
-  <div class="subtabs noprint"><button class="btn active" data-go="t-list">Stok &amp; belanja</button><button class="btn" data-go="t-plan">Rencana berkala</button></div>
+  <div class="subtabs noprint"><button type="button" class="btn active" data-go="t-list">Stok &amp; belanja</button><button type="button" class="btn" data-go="t-plan">Rencana berkala</button></div>
   <div class="seg top" id="viewCtl" role="group" aria-label="Tampilan stok">
-    <button data-view="list">Checklist</button><button data-view="shop">Daftar belanja</button>
+    <button type="button" data-view="list">Checklist</button><button type="button" data-view="shop">Daftar belanja</button>
   </div>
   <div id="listView">
     <p class="lead">Isi jumlah yang <b>sudah ada</b>. Aplikasi menghitung kekurangannya. Barang yang bisa kedaluwarsa dicatat per pembelian, lengkap dengan tanggalnya.</p>
     <div class="seg top" id="locCtl" role="group" aria-label="Lokasi stok">
-      <button data-loc="semua">Semua</button><button data-loc="rumah">🏠 Stok rumah</button><button data-loc="tas">🎒 Tas evakuasi</button>
+      <button type="button" data-loc="semua">Semua</button><button type="button" data-loc="rumah">🏠 Stok rumah</button><button type="button" data-loc="tas">🎒 Tas evakuasi</button>
     </div>
     <div class="field noprint"><label for="scSel">Tampilkan barang penting untuk</label><select id="scSel"></select></div>
     <div class="tools noprint">
-      <button class="btn" id="openAll">Buka semua</button>
-      <button class="btn" id="printBtn">Cetak checklist</button>
-      <button class="btn pri" id="addCustom">+ Tambah barang sendiri</button>
+      <button type="button" class="btn" id="openAll">Buka semua</button>
+      <button type="button" class="btn" id="printBtn">Cetak checklist</button>
+      <button type="button" class="btn pri" id="addCustom">+ Tambah barang sendiri</button>
     </div>
     <div id="customForm"></div>
     <div id="cats"></div>
@@ -508,8 +533,8 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <div id="shopView" hidden>
     <p class="lead">Barang yang masih kurang, dikelompokkan menurut prioritas. Penuhi kebutuhan <b>utama</b> dulu bila anggaran terbatas. Setelah belanja, perbarui jumlah di Checklist.</p>
     <div class="tools noprint">
-      <button class="btn pri" id="shareShop">Bagikan / salin teks</button>
-      <button class="btn" id="printShop">Cetak daftar belanja</button>
+      <button type="button" class="btn pri" id="shareShop">Bagikan / salin teks</button>
+      <button type="button" class="btn" id="printShop">Cetak daftar belanja</button>
     </div>
     <div id="shopList"></div>
   </div>
@@ -518,13 +543,13 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 3. JAUH HARI -->
 <section id="t-plan">
   <h2>Persiapan</h2>
-  <div class="subtabs noprint"><button class="btn" data-go="t-list">Stok &amp; belanja</button><button class="btn active" data-go="t-plan">Rencana berkala</button></div>
+  <div class="subtabs noprint"><button type="button" class="btn" data-go="t-list">Stok &amp; belanja</button><button type="button" class="btn active" data-go="t-plan">Rencana berkala</button></div>
   <p class="lead">Stok saja tidak cukup. Menurut riset, <b>rencana keluarga</b> adalah faktor paling menentukan kesiapan rumah tangga. Kerjakan bertahap.</p>
   <div class="card">
     <h3>Jadwal pemeriksaan berkala</h3>
     <p class="muted">Tandai saat selesai. Ekspor ke kalender HP agar diingatkan — aplikasi ini tidak bisa mengirim notifikasi sendiri.</p>
     <div class="sched" id="sched"></div>
-    <div class="tools"><button class="btn" id="icsBtn">Ekspor pengingat ke kalender (.ics)</button></div>
+    <div class="tools"><button type="button" class="btn" id="icsBtn">Ekspor pengingat ke kalender (.ics)</button></div>
   </div>
   <div class="card" id="calcCard"></div>
   <div id="phases"></div>
@@ -533,15 +558,15 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <!-- 4. SAAT BENCANA -->
 <section id="t-act" class="hz">
   <h2>Darurat</h2>
-  <div class="subtabs noprint"><button class="btn active" data-go="t-act">Tindakan &amp; P3K</button><button class="btn" data-go="t-lib">Pustaka darurat</button></div>
+  <div class="subtabs noprint"><button type="button" class="btn active" data-go="t-act">Tindakan &amp; P3K</button><button type="button" class="btn" data-go="t-lib">Bertahan &amp; pulih</button></div>
   <div class="seg top" id="actCtl" role="group" aria-label="Jenis panduan">
-    <button data-act="bencana">Tindakan bencana</button><button data-act="p3k">Pertolongan pertama</button>
+    <button type="button" data-act="bencana">Tindakan bencana</button><button type="button" data-act="p3k">Pertolongan pertama</button>
   </div>
   <div id="hazView">
     <p class="lead">Pilih bencana untuk melihat tiga tindakan utama. Ikuti arahan petugas setempat.</p>
     <div id="hazardPicker" class="hazard-picker" role="group" aria-label="Pilih jenis bencana"></div>
     <div id="hazards"></div>
-    <button class="btn" data-go="t-info">Buka rencana &amp; titik kumpul</button>
+    <button type="button" class="btn" data-go="t-info">Buka rencana &amp; titik kumpul</button>
   </div>
   <div id="p3kView" hidden>
     <div class="big">Darurat medis? Telepon <a href="tel:119" style="color:inherit">119</a> (ambulans) atau <a href="tel:112" style="color:inherit">112</a> lebih dulu, lalu lakukan pertolongan sambil menunggu.</div>
@@ -551,17 +576,12 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   </div>
 </section>
 
-<!-- 5. KOMUNITAS -->
+<!-- 5. BANTUAN -->
 <section id="t-community">
-  <h2>Komunitas</h2>
-  <p class="lead"><span class="online-dot" id="communityDot"></span><span id="communityMode">Perlu mode online.</span> Pesan dipakai untuk koordinasi keluarga dan warga.</p>
+  <h2>Bantuan</h2>
+  <p class="lead"><span class="online-dot" id="communityDot"></span><span id="communityMode">Perlu mode online.</span> Koordinasikan kebutuhan dengan ruang warga yang Anda kenal.</p>
   <div class="warnbox"><b>Jangan bagikan</b> NIK, foto dokumen, nomor rekening, kata sandi, atau lokasi rumah yang terlalu rinci. Informasi keselamatan tetap harus dikonfirmasi ke BMKG, BPBD, atau petugas.</div>
   <div class="community-grid">
-    <div class="card">
-      <h3>Chat keluarga</h3>
-      <p class="muted">Memakai kode grup lokasi keluarga yang sama. Siapa pun yang mengetahui kode dapat membaca dan menulis. Pesan tampil selama 48 jam.</p>
-      <div id="familyChat"></div>
-    </div>
     <div class="card">
       <h3>Ruang saling bantu warga</h3>
       <p class="muted">Ruang undangan untuk RT, desa, posko, atau komunitas. Tidak ada daftar ruang publik; bagikan kode hanya kepada warga yang dikenal. Gunakan kategori agar kebutuhan mudah dipilah.</p>
@@ -570,7 +590,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div class="card">
       <h3>Tanpa internet?</h3>
       <p class="muted">Chat ini butuh internet. Saat jaringan data mati: kirim <b>SMS</b> (tombol Saya aman / Pesan darurat), pakai <b>HT PMR 409 MHz</b>, atau aplikasi chat Bluetooth seperti <b>Briar</b> yang dipasang sebelum bencana.</p>
-      <button class="btn sm" data-goto="lib:mesh">Panduan chat tanpa internet</button>
+      <button type="button" class="btn sm" data-goto="lib:mesh">Panduan chat tanpa internet</button>
     </div>
     <div class="card">
       <h3>Aturan ruang</h3>
@@ -584,10 +604,10 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   </div>
 </section>
 
-<!-- 6. RENCANA -->
+<!-- 6. KELUARGA -->
 <section id="t-info">
-  <h2>Rencana Keluarga</h2>
-  <p class="lead">Ketuk nomor untuk menelepon. Cetak kartu darurat — HP bisa mati.</p>
+  <h2>Keluarga</h2>
+  <p class="lead">Simpan rencana, titik kumpul, tugas, dan cara memberi kabar. Cetak kartu darurat karena HP bisa mati.</p>
   <div class="nums" id="nums"></div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:12px">Rencana keluarga kami</h3>
@@ -596,22 +616,27 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   <div class="card" id="routeCard"></div>
   <div class="card noprint" id="famCard"></div>
   <div class="card">
+    <h3>Chat keluarga</h3>
+    <p class="muted">Memakai kode grup keluarga yang sama. Chat perlu internet; SMS tidak perlu internet tetapi tetap memerlukan sinyal seluler. Pesan tampil selama 48 jam.</p>
+    <div id="familyChat"></div>
+  </div>
+  <div class="card">
     <h3>Anggota keluarga</h3>
     <p class="muted">Kebutuhan khusus dan tugas diisi sendiri, mis. "hamil 7 bulan", "kursi roda", "bawa tas siaga", "jemput adik".</p>
     <div id="members"></div>
-    <button class="btn" id="addMem">+ Tambah anggota</button>
+    <button type="button" class="btn" id="addMem">+ Tambah anggota</button>
   </div>
   <div class="card">
     <h3>Kartu darurat keluarga</h3>
     <p class="muted">Satu halaman berisi titik kumpul, nomor penting, data anggota, tugas, dan tindakan saat bencana. Cetak, lipat, simpan di dompet dan tas siaga.</p>
     <div class="preview"><div id="ecardPreview"></div></div>
-    <div class="tools"><button class="btn pri" id="printCard">Cetak kartu darurat</button></div>
+    <div class="tools"><button type="button" class="btn pri" id="printCard">Cetak kartu darurat</button></div>
   </div>
   <div class="card">
     <h3>Bagikan ke HP keluarga</h3>
     <p class="muted">Salin rencana, kontak, dan data anggota ke HP lain lewat QR code. Stok tidak ikut. HP penerima perlu pernah membuka aplikasi ini sekali saat online agar QR bisa dibuka tanpa internet.</p>
     <div class="warnbox">QR berisi nomor HP dan data kesehatan keluarga. Tunjukkan hanya kepada anggota keluarga.</div>
-    <div class="tools"><button class="btn pri" id="makeQr">Buat QR code</button><button class="btn" id="copyLink" hidden>Salin tautan</button></div>
+    <div class="tools"><button type="button" class="btn pri" id="makeQr">Buat QR code</button><button type="button" class="btn" id="copyLink" hidden>Salin tautan</button></div>
     <div id="qrBox"></div>
   </div>
   <h3 class="group-h" id="settingsHead">Pengaturan</h3>
@@ -620,7 +645,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <h3>Wilayah panduan</h3>
     <p class="muted">Pilih panduan khusus Malang Selatan atau panduan umum untuk seluruh Indonesia.</p>
     <div class="seg top" id="regionCtl" role="group" aria-label="Wilayah panduan">
-      <button data-region="malang">Malang Selatan</button><button data-region="umum">Indonesia (umum)</button>
+      <button type="button" data-region="malang">Malang Selatan</button><button type="button" data-region="umum">Indonesia (umum)</button>
     </div>
   </div>
   <div class="card" id="dataCard">
@@ -629,19 +654,19 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div class="noprint">
       <h4 style="margin:12px 0 0">Tampilan layar</h4>
       <div class="theme-grid" role="group" aria-label="Pilih tampilan layar">
-        <button class="btn" data-theme-mode="auto">🔄 Otomatis</button>
-        <button class="btn" data-theme-mode="light">☀️ Light</button>
-        <button class="btn" data-theme-mode="dark">🌑 Dark</button>
-        <button class="btn" data-theme-mode="night">🌙 Night</button>
-        <button class="btn" data-theme-mode="battery">🔋 Hemat baterai</button>
+        <button type="button" class="btn" data-theme-mode="auto">🔄 Otomatis</button>
+        <button type="button" class="btn" data-theme-mode="light">☀️ Light</button>
+        <button type="button" class="btn" data-theme-mode="dark">🌑 Dark</button>
+        <button type="button" class="btn" data-theme-mode="night">🌙 Night</button>
+        <button type="button" class="btn" data-theme-mode="battery">🔋 Hemat baterai</button>
       </div>
       <small class="theme-note" id="themeNote"></small>
     </div>
     <div class="tools noprint">
-      <button class="btn pri" id="installBtn" data-install hidden>📲 Pasang di HP</button>
-      <button class="btn" id="exportBtn">Simpan cadangan (.json)</button>
+      <button type="button" class="btn pri" id="installBtn" data-install hidden>📲 Pasang di HP</button>
+      <button type="button" class="btn" id="exportBtn">Simpan cadangan (.json)</button>
       <label class="btn">Pulihkan cadangan<input type="file" id="importIn" accept=".json,application/json" hidden></label>
-      <button class="btn" id="resetBtn" style="color:var(--bad)">Hapus semua data</button>
+      <button type="button" class="btn" id="resetBtn" style="color:var(--bad)">Hapus semua data</button>
     </div>
   </div>
   <div class="card src" id="sources"><h3>Sumber resmi &amp; batas panduan</h3>
@@ -652,14 +677,15 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 
 <!-- PUSTAKA (bagian kategori Darurat) -->
 <section id="t-lib" class="hz">
-  <h2>Darurat</h2>
-  <div class="subtabs noprint"><button class="btn" data-go="t-act">Tindakan &amp; P3K</button><button class="btn active" data-go="t-lib">Pustaka darurat</button></div>
-  <p class="lead">Panduan bertahan hidup, komunikasi &amp; radio, alat sinyal, video, dan aktivitas saat listrik padam.</p>
+  <h2>Bertahan &amp; Pulih</h2>
+  <div class="subtabs noprint"><button type="button" class="btn" data-go="t-act">Tindakan &amp; P3K</button><button type="button" class="btn active" data-go="t-lib">Bertahan &amp; pulih</button></div>
+  <p class="lead">Gunakan setelah berada di tempat yang aman: komunikasi, kebutuhan dasar, alat sinyal, dan kegiatan keluarga tanpa internet.</p>
+  <div class="note"><b>Pastikan keselamatan dahulu.</b> Jika lokasi masih terancam, kembali ke <button type="button" class="linkbtn" data-go="t-act">Tindakan darurat</button> atau buka Mode Darurat.</div>
   <div class="chips noprint"><a href="#sec-sinyal">🆘 Sinyal</a><a href="#sec-hidup">🧭 Bertahan hidup</a><a href="#sec-radio">📻 Radio</a><a href="#sec-skill">🛠️ Keterampilan</a><a href="#sec-video">🎬 Video</a><a href="#sec-aktif">🎲 Aktivitas</a><a href="#sec-offline">📚 Offline</a></div>
   <div class="card" id="sec-sinyal">
     <h3>🆘 Alat sinyal darurat</h3>
     <p class="muted">Kedip SOS membuat layar berkedip putih-hitam — naikkan kecerahan layar. Ketuk layar untuk berhenti.</p>
-    <div class="tools sig-tools"><button class="btn pri" data-signal="light">💡 Kedip SOS layar</button><button class="btn" data-signal="sound">🔊 Bunyi SOS</button><button class="btn" data-signal="both">Kedip + bunyi</button><button class="btn" id="openSms">✉️ Pesan darurat (SMS)</button></div>
+    <div class="tools sig-tools"><button type="button" class="btn pri" data-signal="light">💡 Kedip SOS layar</button><button type="button" class="btn" data-signal="sound">🔊 Bunyi SOS</button><button type="button" class="btn" data-signal="both">Kedip + bunyi</button><button type="button" class="btn" id="openSms">✉️ Pesan darurat (SMS)</button></div>
     <div id="smsBox"></div>
   </div>
   <div class="field noprint"><label for="libSearch">Cari panduan</label><input id="libSearch" type="search" placeholder="mis. air, radio, SOS, luka bakar, kaporit" autocomplete="off"></div>
@@ -678,7 +704,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
     <div class="card noprint"><h4 style="margin:0 0 6px">Tambah video sendiri</h4><div class="cform">
       <input type="text" id="vidUrl" placeholder="Tautan YouTube, mis. https://youtu.be/…" aria-label="Tautan video YouTube">
       <input type="text" id="vidTitle" maxlength="100" placeholder="Judul (mis. Cara memakai APAR)" aria-label="Judul video">
-      <div><button class="btn sm" id="vidAdd">+ Tambah</button></div></div></div>
+      <div><button type="button" class="btn sm" id="vidAdd">+ Tambah</button></div></div></div>
     <h3 class="lib-h" id="sec-aktif">🎲 Aktivitas tanpa internet</h3>
     <p class="muted">Untuk saat listrik padam atau tidak ada sinyal: tetap bergerak, belajar, dan bersenang-senang.</p>
     <div class="card" id="workCard"></div>
@@ -695,24 +721,25 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
 <div class="print-sheet" id="ecardPrint"></div>
 <div class="surv" id="surv" role="dialog" aria-modal="true" aria-label="Mode darurat" hidden>
   <div class="surv-body" id="survBody"></div>
-  <div class="surv-bar"><button data-signal="light">🔦<span>Kedip SOS</span></button><button data-signal="sound">🔊<span>Bunyi SOS</span></button><button data-checkin="aman">✅<span>Saya aman</span></button><button data-checkin="bantuan">🆘<span>Butuh bantuan</span></button><a href="tel:112">📞<span>112</span></a><button id="survClose">✕<span>Keluar</span></button></div>
+  <div class="surv-bar"><button type="button" data-signal="light">🔦<span>Kedip SOS</span></button><button type="button" data-signal="sound">🔊<span>Bunyi SOS</span></button><button type="button" data-checkin="aman">✅<span>Saya aman</span></button><button type="button" data-checkin="bantuan">🆘<span>Butuh bantuan</span></button><a href="tel:112">📞<span>112</span></a><button type="button" id="survClose">✕<span>Keluar</span></button></div>
 </div>
 <div class="sig" id="sigOverlay" role="button" aria-label="Hentikan sinyal" hidden><div class="sig-txt" id="sigTxt">SOS · ketuk layar untuk berhenti</div></div>
 <div class="print-sheet" id="shopPrint"></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <nav><div class="tabs" role="tablist">
-  <button role="tab" data-t="t-fam" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Beranda</button>
-  <button role="tab" data-t="t-list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="m3 6 1.5 1.5L7 5"/><path d="m3 12 1.5 1.5L7 11"/><path d="m3 18 1.5 1.5L7 17"/></svg>Persiapan</button>
-  <button role="tab" data-t="t-act"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Darurat</button>
-  <button role="tab" data-t="t-community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M18 14.5a5.5 5.5 0 0 1 3 5.5"/></svg>Komunitas</button>
-  <button role="tab" data-t="t-info"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6v3H9z"/><path d="M7 5H5v16h14V5h-2"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>Rencana</button>
+  <button type="button" role="tab" data-t="t-fam" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Beranda</button>
+  <button type="button" role="tab" data-t="t-list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="m3 6 1.5 1.5L7 5"/><path d="m3 12 1.5 1.5L7 11"/><path d="m3 18 1.5 1.5L7 17"/></svg>Persiapan</button>
+  <button type="button" role="tab" data-t="t-act"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Darurat</button>
+  <button type="button" role="tab" data-t="t-info"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0"/><path d="M13 15a4.5 4.5 0 0 1 8.5 2"/></svg>Keluarga</button>
+  <button type="button" role="tab" data-t="t-community"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Bantuan</button>
 </div></nav>
 
 <script>
 // ---------- state ----------
 const KEY = 'siaga-keluarga-v1';
 const SCHEMA = 2;
+let offlineReady = false, storagePersistent = false, installEvt = null;
 const clone = o => JSON.parse(JSON.stringify(o));
 const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3,
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
@@ -798,7 +825,7 @@ const CATS = [
   {id:'lunak', t:'Makanan lunak lansia (bubur instan, oat)', n:c=>c.lan*c.d*2, u:'porsi', p:2, exp:1, show:c=>c.lan>0},
   {id:'alatlansia', t:'Kacamata cadangan, alat bantu dengar + baterai, tongkat', q:()=>'sesuai kebutuhan', p:1, show:c=>c.lan>0},
   {id:'kia', t:'Buku KIA + fotokopi hasil pemeriksaan kehamilan', q:()=>'map kedap air', p:1, loc:'tas', show:c=>c.hamil},
-  {id:'bidan', t:'Nomor bidan, puskesmas & RS rujukan dicatat di tab Rencana', q:()=>'✔', p:1, show:c=>c.hamil},
+  {id:'bidan', t:'Nomor bidan, puskesmas & RS rujukan dicatat di menu Keluarga', q:()=>'✔', p:1, show:c=>c.hamil},
   {id:'taspersalinan', t:'Tas persalinan: kain/jarik, pembalut nifas, baju & selimut bayi, perlengkapan ibu', q:()=>'1 tas', p:1, loc:'tas', show:c=>c.hamil, tip:()=>'Isi dan waktu menyiapkannya ikuti saran bidan.'},
   {id:'vithamil', t:'Vitamin / tablet tambah darah', q:()=>'sesuai resep', p:1, show:c=>c.hamil, tip:()=>'Hanya sesuai resep atau saran bidan.'},
   {id:'bateraialat', t:'Baterai / charger cadangan alat bantu (alat bantu dengar, kursi roda listrik)', q:()=>'sesuai alat', p:1, show:c=>c.alat},
@@ -841,7 +868,7 @@ const CATS = [
   {id:'fotokopi', t:'Fotokopi KK, KTP, akta, BPJS, ijazah, sertifikat tanah, buku tabungan', q:()=>'map kedap air', p:1},
   {id:'scan', t:'Scan dokumen ke penyimpanan online / kirim ke diri sendiri', q:()=>'1×', p:1},
   {id:'tunai', t:'Uang tunai cadangan di rumah (ATM & QRIS bisa mati)', n:c=>c.n*150, u:'ribu rupiah', st:50, p:1},
-  {id:'kertas', t:'Daftar nomor penting di kertas', q:()=>'cetak kartu darurat', p:1, tip:()=>'Cetak dari tab Rencana.'},
+  {id:'kertas', t:'Daftar nomor penting di kertas', q:()=>'cetak kartu darurat', p:1, tip:()=>'Cetak dari menu Keluarga.'},
  ]},
  {id:'tas', ic:'🎒', t:'Tas evakuasi', sub:'Siap angkut dalam 5 menit — taruh dekat pintu', loc:'tas', items:[
   {id:'ransel', t:'Ransel tahan air, 1 per orang dewasa', n:c=>c.bags, u:'tas', p:1},
@@ -1104,7 +1131,7 @@ const LIB = [
   'Setelah gempa: jangan menyalakan api atau saklar bila tercium bau gas; buka jendela dan keluar.']},
  {k:'navigasi', ic:'🧭', t:'Menemukan arah tanpa internet', src:['organicmaps'], steps:[
   'GPS di HP tetap bekerja tanpa internet — tetapi peta harus diunduh lebih dulu (Google Maps "Peta offline", atau Organic Maps).',
-  'Simpan koordinat titik kumpul di tab Rencana; koordinat itu bisa dibuka di aplikasi peta.',
+  'Simpan koordinat titik kumpul di menu Keluarga; koordinat itu bisa dibuka di aplikasi peta.',
   'Cetak atau gambar peta sederhana ke titik kumpul dengan patokan (masjid, sekolah, jembatan).',
   'Arah kasar: matahari terbit di timur dan terbenam di barat.',
   'Ikuti rambu jalur evakuasi; hindari tepi sungai, lereng curam, dan jembatan rusak.']},
@@ -1137,12 +1164,12 @@ const COMMS = [
  {k:'fm', ic:'📻', t:'Radio FM/AM untuk informasi resmi', src:['rri'], steps:[
   'Siapkan radio baterai atau engkol — tetap bisa menerima siaran saat listrik dan internet mati.',
   'Dengarkan RRI dan radio lokal: RRI menyiarkan informasi kebencanaan dan siaran darurat dari lokasi bencana.',
-  'Catat frekuensi RRI dan radio lokal daerah Anda di kolom "Radio" tab Rencana.']},
+  'Catat frekuensi RRI dan radio lokal daerah Anda di kolom "Radio" menu Keluarga.']},
  {k:'pmr', ic:'📡', t:'HT keluarga tanpa izin (PMR 409 MHz)', src:['permenpmr'], steps:[
   'Indonesia membolehkan HT PMR di pita 409,74375–409,99375 MHz (20 kanal, daya maksimal 500 mW) dengan izin kelas — tanpa izin stasiun radio (ISR).',
   'Syaratnya: HT bersertifikat Kominfo/Komdigi untuk PMR 409 MHz dan dipakai sesuai ketentuan. HT di frekuensi lain wajib izin.',
   'Jangkauannya pendek dan mudah terhalang bangunan atau bukit — cocok antar-rumah atau ke titik kumpul, bukan jarak jauh.',
-  'Sepakati kanal utama, kanal cadangan, dan jadwal mendengar (mis. tiap jam tepat selama 5 menit) agar baterai awet. Catat di tab Rencana.'],
+  'Sepakati kanal utama, kanal cadangan, dan jadwal mendengar (mis. tiap jam tepat selama 5 menit) agar baterai awet. Catat di menu Keluarga.'],
   note:'Dasar: Permenkominfo 2/2023 tentang izin kelas, yang telah diubah dengan Permen Komdigi 2/2025 — cek teks resminya untuk ketentuan terbaru.'},
  {k:'orari', ic:'🎙️', t:'Radio amatir (ORARI) & RAPI', src:['natuna'], steps:[
   'ORARI (radio amatir) dan RAPI (radio antar penduduk) adalah organisasi resmi yang sering membantu jaringan komunikasi saat bencana, termasuk atas permintaan BNPB.',
@@ -1150,7 +1177,7 @@ const COMMS = [
   'Saat darurat, cari anggota ORARI/RAPI terdekat atau posko; mereka bisa meneruskan berita keluar wilayah.',
   'Ingin lebih siap? Bergabung dan ikut latihan komunikasi darurat bersama organisasi lokal.']},
  {k:'mesh', ic:'📶', t:'Chat antar-HP tanpa internet (Bluetooth/Wi-Fi)', src:['briar'], steps:[
-  'Chat di tab Komunitas butuh internet. Aplikasi web ini tidak bisa mengirim pesan langsung antar-HP lewat Bluetooth — itu keterbatasan browser.',
+  'Chat keluarga dan ruang Bantuan butuh internet. Aplikasi web ini tidak bisa mengirim pesan langsung antar-HP lewat Bluetooth — itu keterbatasan browser.',
   'Untuk chat tanpa internet, pasang aplikasi Briar (Android, gratis): saat internet mati, pesan disinkronkan lewat Bluetooth atau Wi-Fi ke HP yang berdekatan.',
   'Siapkan SEBELUM bencana: pasang Briar di HP tiap anggota keluarga, lalu tambahkan kontak dengan bertemu langsung dan saling memindai QR.',
   'Jangkauannya pendek (antar-HP yang berdekatan) — cocok di pengungsian atau satu lingkungan, bukan antar-kota.',
@@ -1848,7 +1875,7 @@ function cardHtml(){
     ${S.routes.some(r => r.nama || r.tujuan) ? `<h5>Rute evakuasi</h5><div>${S.routes.filter(r => r.nama || r.tujuan).map(r => `${esc(r.nama || 'Rute')} → ${esc(r.tujuan || '?')}${r.km ? ` (${fmtNum(r.km)} km)` : ''}${r.via ? `, lewat ${esc(r.via)}` : ''}`).join('<br>')}</div>` : ''}
     <h5>Nomor darurat</h5><div>${esc(nums)}</div>
     <h5>Anggota keluarga</h5>
-    ${members.length ? `<table><tr>${MEMBER_FIELDS.map(([, l]) => `<th>${l}</th>`).join('')}</tr>${members.map(m => `<tr>${MEMBER_FIELDS.map(([k]) => `<td>${esc(m[k])}</td>`).join('')}</tr>`).join('')}</table>` : '<div style="color:#888">Belum ada data anggota — isi di tab Rencana.</div>'}
+    ${members.length ? `<table><tr>${MEMBER_FIELDS.map(([, l]) => `<th>${l}</th>`).join('')}</tr>${members.map(m => `<tr>${MEMBER_FIELDS.map(([k]) => `<td>${esc(m[k])}</td>`).join('')}</tr>`).join('')}</table>` : '<div style="color:#888">Belum ada data anggota — isi di menu Keluarga.</div>'}
     ${i.catatan ? `<h5>Catatan</h5><div>${esc(i.catatan)}</div>` : ''}
     <h5>Saat bencana</h5>
     <div class="acts">${hazList().map(h => `<div><b>${h.ic} ${esc(R(h.t))}</b><ol>${h.quick.map(s => `<li>${esc(s)}</li>`).join('')}</ol></div>`).join('')}</div>
@@ -1879,9 +1906,9 @@ function renderFam(){
   const labels = {dewasa:'Dewasa', anak:'Anak (3–12)', balita:'Balita (0–2)', lansia:'Lansia'};
   $('#famCtl').innerHTML = Object.keys(labels).map(k => `
     <div class="step"><label>${labels[k]}</label>
-      <div class="ctl"><button data-k="${k}" data-v="-1" aria-label="Kurangi ${labels[k]}">−</button>
+      <div class="ctl"><button type="button" data-k="${k}" data-v="-1" aria-label="Kurangi ${labels[k]}">−</button>
       <output>${S.fam[k]}</output>
-      <button data-k="${k}" data-v="1" aria-label="Tambah ${labels[k]}">+</button></div></div>`).join('');
+      <button type="button" data-k="${k}" data-v="1" aria-label="Tambah ${labels[k]}">+</button></div></div>`).join('');
   document.querySelectorAll('#daysCtl button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.d === S.days));
   const c = ctx();
   $('#stats').innerHTML = `
@@ -1894,7 +1921,7 @@ function renderFam(){
     <label><input type="checkbox" data-special="hamil" ${sp.hamil?'checked':''}> Ada ibu hamil</label>
     <label><input type="checkbox" data-special="obat" ${sp.obat?'checked':''}> Ada anggota dengan obat rutin</label>
     <label><input type="checkbox" data-special="alatbantu" ${sp.alatbantu?'checked':''}> Ada penyandang disabilitas / pengguna alat bantu</label>
-    <div class="pets">Hewan peliharaan <span class="stepper" style="margin:0"><button data-pet="-1" aria-label="Kurangi hewan">−</button><output>${sp.hewan||0}</output><button data-pet="1" aria-label="Tambah hewan">+</button></span></div>`;
+    <div class="pets">Hewan peliharaan <span class="stepper" style="margin:0"><button type="button" data-pet="-1" aria-label="Kurangi hewan">−</button><output>${sp.hewan||0}</output><button type="button" data-pet="1" aria-label="Tambah hewan">+</button></span></div>`;
 }
 
 function renderSoon(){
@@ -1913,7 +1940,7 @@ function itemHtml(it, c){
   const tip = it.tip ? it.tip(c) : '';
   const prio = (it.opt ? '<span class="prio p2">opsional</span>' : `<span class="prio p${it.p||2}">${(it.p||2) === 1 ? 'utama' : 'tambahan'}</span>`)
     + (it.custom ? '<span class="mine">barang saya</span>' : '');
-  const ctools = it.custom ? `<div class="ctools"><button class="btn sm" data-cedit="${it.id}">Ubah</button><button class="btn sm" data-cdel="${it.id}" style="color:var(--bad)">Hapus</button></div>` : '';
+  const ctools = it.custom ? `<div class="ctools"><button type="button" class="btn sm" data-cedit="${it.id}">Ubah</button><button type="button" class="btn sm" data-cdel="${it.id}" style="color:var(--bad)">Hapus</button></div>` : '';
   const markTxt = {ok:'✓', short:'!', review:'?', expired:'!', missing:'', optional:''}[status];
   if(!it.n) return `<li class="item st-${status}${status==='ok'?' done':''}">
     <input type="checkbox" id="c-${it.id}" data-id="${it.id}" ${S.done[it.id]?'checked':''}>
@@ -1928,12 +1955,12 @@ function itemHtml(it, c){
         <input type="number" inputmode="decimal" min="0" step="${it.st||1}" data-bq="${it.id}:${i}" value="${+b.q||0}" aria-label="Jumlah pembelian ${i+1} ${esc(it.t)}"> ${esc(it.u)} · kedaluwarsa
         <input type="date" data-be="${it.id}:${i}" value="${esc(b.e)}" aria-label="Tanggal kedaluwarsa pembelian ${i+1} ${esc(it.t)}">
         ${st ? `<span class="badge ${st[0]}">${st[1]}</span>` : '<span class="badge warn">isi tanggal</span>'}
-        <button class="x" data-bdel="${it.id}:${i}" aria-label="Hapus pembelian ${i+1}">×</button></div>`; }).join('')}
-      <div><button class="btn sm" data-badd="${it.id}">+ Catat pembelian</button></div></div>`;
+        <button type="button" class="x" data-bdel="${it.id}:${i}" aria-label="Hapus pembelian ${i+1}">×</button></div>`; }).join('')}
+      <div><button type="button" class="btn sm" data-badd="${it.id}">+ Catat pembelian</button></div></div>`;
   } else {
-    body = `<div class="stepper">Tersedia <button data-hstep="${it.id}" data-v="-1" aria-label="Kurangi ${esc(it.t)}">−</button>
+    body = `<div class="stepper">Tersedia <button type="button" data-hstep="${it.id}" data-v="-1" aria-label="Kurangi ${esc(it.t)}">−</button>
       <input type="number" inputmode="decimal" min="0" step="${it.st||1}" data-have="${it.id}" value="${have}" aria-label="Jumlah tersedia ${esc(it.t)}">
-      <button data-hstep="${it.id}" data-v="1" aria-label="Tambah ${esc(it.t)}">+</button> ${esc(it.u)}</div>`;
+      <button type="button" data-hstep="${it.id}" data-v="1" aria-label="Tambah ${esc(it.t)}">+</button> ${esc(it.u)}</div>`;
   }
   return `<li class="item st-${status}${status==='ok'?' done':''}">
     <span class="mark" aria-hidden="true">${markTxt}</span>
@@ -2010,13 +2037,13 @@ function renderPlan(){
   $('#sched').innerHTML = CHECKS.map(ch => { const st = checkStatus(ch), d = checkDue(ch); return `<div class="sched-row">
     <div class="txt"><b>${esc(ch.t)}</b><div class="muted">Tiap ${ch.every} bulan · terakhir ${d.last ? fmtDate(d.last) : '—'}</div></div>
     <span class="badge ${st[0]}">${st[1]}</span>
-    <button class="btn sm" data-checked="${ch.id}">Sudah hari ini</button></div>`; }).join('');
+    <button type="button" class="btn sm" data-checked="${ch.id}">Sudah hari ini</button></div>`; }).join('');
 }
 
 function renderHaz(){
   const list = hazList();
   const rel = h => S.region === 'umum' && (h.rel || []).some(k => S.risk[k]);
-  $('#hazardPicker').innerHTML = list.map((h,i) => `<button class="btn${rel(h)?' rel':''}" data-hazard="${h.k}" aria-pressed="${i===0}" aria-controls="hazard-${h.k}">${h.lbl}</button>`).join('');
+  $('#hazardPicker').innerHTML = list.map((h,i) => `<button type="button" class="btn${rel(h)?' rel':''}" data-hazard="${h.k}" aria-pressed="${i===0}" aria-controls="hazard-${h.k}">${h.lbl}</button>`).join('');
   $('#hazards').innerHTML = list.map((h,i) => `<article class="card hazard-panel" id="hazard-${h.k}" ${i?'hidden':''} style="margin-top:14px">
     <h3 tabindex="-1">${h.ic} ${esc(R(h.t))}</h3>
     <ol class="quick-steps">${h.quick.map(step=>`<li>${esc(step)}</li>`).join('')}</ol>
@@ -2077,7 +2104,7 @@ function renderInfo(){
 function renderMembers(){
   $('#members').innerHTML = S.members.map((m,i) => `<div class="mem">
     <div class="row">${MEMBER_FIELDS.map(([k,l]) => `<input data-m="${i}" data-f="${k}" placeholder="${l}" aria-label="${l} anggota ${i+1}" value="${esc(m[k])}"${k==='hp'?' inputmode="tel"':''}>`).join('')}</div>
-    <button class="btn del" data-del="${i}">Hapus</button></div>`).join('')
+    <button type="button" class="btn del" data-del="${i}">Hapus</button></div>`).join('')
     || '<p class="lead">Belum ada. Tambahkan nama, nomor HP, golongan darah, obat/alergi, kebutuhan khusus, dan tugas tiap anggota.</p>';
 }
 function renderCard(){
@@ -2114,7 +2141,7 @@ function progress(){
     <p><b>${mainOk}/${main.length}</b> kebutuhan utama cukup · <b>${stock}/${items.length}</b> semua barang · <b>${plan}/${plans.length}</b> persiapan selesai</p>
     <p>${count('short')} masih kurang · ${count('expired')} perlu diganti (kedaluwarsa) · ${count('review')} perlu diisi jumlahnya</p>
     <small>Persentase mencatat pekerjaan yang selesai, bukan jaminan aman. Barang dihitung cukup bila jumlah tersedia memenuhi kebutuhan dan tidak kedaluwarsa menurut tanggal yang diisi.</small>
-    <div class="tools"><button class="btn sm" data-go-shop>Lihat daftar belanja</button></div>`;
+    <div class="tools"><button type="button" class="btn sm" data-go-shop>Lihat daftar belanja</button></div>`;
 }
 
 // Beranda summary: how long the stock lasts, and the next three things worth doing.
@@ -2139,7 +2166,7 @@ function renderStatus(p, mainShort, expired){
       <div><h3>${title}</h3><p class="muted">Air minum dan makanan untuk ${c.n} orang. Target ${target} hari.</p></div></div>
     <div class="pbar"><span>Checklist</span><div class="bar"><i id="pbar" style="width:${p}%"></i></div><b id="pct">${p}%</b></div>
     <div class="steps-h">Langkah berikutnya</div>
-    <ol class="steps">${steps.map(([t, sub, lbl, attr], i) => `<li><span class="n">${i+1}</span><span class="t"><b>${t}</b>${sub}</span><button class="btn sm" ${attr}>${lbl}</button></li>`).join('')}</ol>`;
+    <ol class="steps">${steps.map(([t, sub, lbl, attr], i) => `<li><span class="n">${i+1}</span><span class="t"><b>${t}</b>${sub}</span><button type="button" class="btn sm" ${attr}>${lbl}</button></li>`).join('')}</ol>`;
 }
 
 function renderCalc(){
@@ -2158,7 +2185,7 @@ function renderCalc(){
       ${out(`±<b>${fmtNum(r.charges)} kali</b> isi penuh HP → ±<b>${fmtNum(r.pbDays)} hari</b> bila tiap HP diisi sekali sehari.`, r.pbDays >= S.days ? '' : 'warn')}</div>
     <div class="calc"><h4>🏍️ Kendaraan evakuasi</h4>
       ${inp('tank', 'Isi tangki', 'liter', 0.5)}${inp('kmpl', 'Konsumsi', 'km/liter', 1)}${inp('reserve', 'Cadangan aman', '%', 5)}
-      ${out(`Jangkauan ±<b>${r.range} km</b>, aman ±<b>${r.safeRange} km</b>.` + (far ? ` Rute terjauh ${fmtNum(far)} km pulang-pergi ${fmtNum(far*2)} km: <b>${far*2 <= r.safeRange ? 'cukup' : 'tidak cukup — isi BBM atau cari rute lebih dekat'}</b>.` : ' Isi rute evakuasi di tab Rencana untuk membandingkan.'), far*2 > r.safeRange ? 'warn' : '')}</div>
+      ${out(`Jangkauan ±<b>${r.range} km</b>, aman ±<b>${r.safeRange} km</b>.` + (far ? ` Rute terjauh ${fmtNum(far)} km pulang-pergi ${fmtNum(far*2)} km: <b>${far*2 <= r.safeRange ? 'cukup' : 'tidak cukup — isi BBM atau cari rute lebih dekat'}</b>.` : ' Isi rute evakuasi di menu Keluarga untuk membandingkan.'), far*2 > r.safeRange ? 'warn' : '')}</div>
     <div class="calc"><h4>☀️ Panel surya</h4>
       ${inp('wp', 'Daya panel', 'Wp', 10)}${inp('sunH', 'Matahari efektif', 'jam/hari', 0.5)}${inp('loss', 'Rugi sistem', '%', 5)}
       ${out(`±<b>${fmtNum(r.solarWh)} Wh</b> per hari ≈ <b>${fmtNum(r.solarCharges)} kali</b> isi penuh HP.`)}</div>
@@ -2169,7 +2196,7 @@ function renderRoutes(){
   const g = S.geo || {};
   const pt = (k, label) => { const v = g[k]; return `<div class="geo-row"><b>${label}</b>: ${esc(S.info[k]) || '<span class="muted">nama belum diisi</span>'}<br>
     ${v ? `<span class="muted">${v.lat}, ${v.lon}</span> <a class="btn sm" href="${mapUrl(v)}" target="_blank" rel="noopener noreferrer">🗺️ Buka di peta</a>` : '<span class="muted">Koordinat belum disimpan.</span>'}
-    <div class="geo-tools"><button class="btn sm" data-geohere="${k}">📍 Simpan lokasi saya di sini</button>
+    <div class="geo-tools"><button type="button" class="btn sm" data-geohere="${k}">📍 Simpan lokasi saya di sini</button>
       <input type="text" data-geotext="${k}" placeholder="atau tempel koordinat: -8.2, 112.6" aria-label="Koordinat ${label}"></div></div>`; };
   $('#routeCard').innerHTML = `<h3>Titik kumpul &amp; rute evakuasi</h3>
     <p class="muted">Simpan koordinat saat berdiri di titik kumpul, atau tempel dari aplikasi peta. Koordinat ikut di kartu darurat dan QR.</p>
@@ -2181,8 +2208,8 @@ function renderRoutes(){
       <div class="row"><input data-r="${i}" data-rf="km" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Jarak (km)" aria-label="Jarak rute ${i+1}" value="${x.km || ''}">
         <input data-r="${i}" data-rf="via" placeholder="Lewat jalan…" aria-label="Jalur rute ${i+1}" value="${esc(x.via)}"></div>
       ${x.km ? `<div class="muted">Jalan kaki ±${Math.round(x.km / 4 * 60)} menit (4 km/jam; lebih lama untuk anak & lansia) · kendaraan butuh BBM ±${fmtNum(fuelFor(x.km))} L sekali jalan.</div>` : ''}
-      <button class="btn del" data-rdel="${i}">Hapus</button></div>`).join('') || '<p class="muted">Belum ada rute.</p>'}
-    <button class="btn" id="addRoute"${S.routes.length >= 10 ? ' disabled' : ''}>+ Tambah rute</button>`;
+      <button type="button" class="btn del" data-rdel="${i}">Hapus</button></div>`).join('') || '<p class="muted">Belum ada rute.</p>'}
+    <button type="button" class="btn" id="addRoute"${S.routes.length >= 10 ? ' disabled' : ''}>+ Tambah rute</button>`;
 }
 
 let wxBusy = false;
@@ -2196,7 +2223,7 @@ function wxHtml(d){
   if(d.eq){ const [la, lo] = String(d.eq.Coordinates).split(',').map(Number);
     const km = validCoord(la, lo) ? ` · ±${Math.round(distKm(d.place, {lat:la, lon:lo}))} km dari lokasi` : '';
     parts.push(`<p style="margin:8px 0">Gempa terbaru (BMKG): <b>M${esc(d.eq.Magnitude)}</b> · ${esc(d.eq.Tanggal)} ${esc(d.eq.Jam)}${km}<br><span class="muted">${esc(d.eq.Wilayah)}. ${esc(d.eq.Potensi)}</span></p>`); }
-  wxAlerts(d).forEach(([cls, txt, k]) => parts.push(`<div class="${cls === 'bad' ? 'badbox' : 'warnbox'}">${esc(txt)} <button class="btn sm" data-hazlink="${k}">Lihat panduan</button></div>`));
+  wxAlerts(d).forEach(([cls, txt, k]) => parts.push(`<div class="${cls === 'bad' ? 'badbox' : 'warnbox'}">${esc(txt)} <button type="button" class="btn sm" data-hazlink="${k}">Lihat panduan</button></div>`));
   parts.push(`<p class="muted" style="margin:6px 0 0">Diperbarui ${fmtTime(d.at)}${navigator.onLine ? '' : ' · sedang offline, menampilkan data terakhir'}.</p>`);
   return parts.join('');
 }
@@ -2210,9 +2237,9 @@ function renderWx(){
   $('#wxCard').innerHTML = `<h3>Kondisi sekitar <span class="muted">· perlu internet</span></h3>
     <p class="muted" style="margin:4px 0 8px">Lokasi: <b>${esc(place?.name || 'belum dipilih')}</b>${wxBusy ? ' · memuat…' : ''}</p>
     ${body}
-    <div class="tools wx-tools"><button class="btn sm" id="wxHere">📍 Pakai lokasi saya</button>
-      <input type="text" id="wxCity" placeholder="Cari kota / kecamatan" aria-label="Cari lokasi"><button class="btn sm" id="wxFind">Cari</button>
-      ${place ? '<button class="btn sm" id="wxRefresh">Perbarui</button>' : ''}</div>
+    <div class="tools wx-tools"><button type="button" class="btn sm" id="wxHere">📍 Pakai lokasi saya</button>
+      <input type="text" id="wxCity" placeholder="Cari kota / kecamatan" aria-label="Cari lokasi"><button type="button" class="btn sm" id="wxFind">Cari</button>
+      ${place ? '<button type="button" class="btn sm" id="wxRefresh">Perbarui</button>' : ''}</div>
     <small class="muted">Lokasi dibulatkan (±1 km) lalu dikirim ke Open-Meteo untuk cuaca &amp; kualitas udara; data gempa dari BMKG. Ini bukan peringatan resmi — ikuti InfoBMKG dan BPBD.</small>`;
 }
 async function refreshWx(force){
@@ -2242,7 +2269,7 @@ function renderLib(){
   $('#morseCard').innerHTML = `<h3>📶 Kode Morse</h3><p class="muted">Ketik pesan pendek, lalu kirim lewat kedipan layar atau bunyi. SOS = ··· ––– ···</p>
     <input type="text" id="morseIn" maxlength="40" value="${esc(morseText)}" aria-label="Teks untuk kode Morse" style="width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px">
     <div class="morse-out" id="morseOut">${esc(prettyMorse(morseText))}</div>
-    <div class="tools" style="margin:0"><button class="btn sm" data-signal="light" data-text="morse">💡 Kedip</button><button class="btn sm" data-signal="sound" data-text="morse">🔊 Bunyi</button></div>`;
+    <div class="tools" style="margin:0"><button type="button" class="btn sm" data-signal="light" data-text="morse">💡 Kedip</button><button type="button" class="btn sm" data-signal="sound" data-text="morse">🔊 Bunyi</button></div>`;
   $('#phonCard').innerHTML = `<h3>🔤 Alfabet fonetik</h3><p class="muted">Untuk mengeja nama dan alamat lewat radio atau telepon yang suaranya tidak jelas.</p>
     <div class="phon">${PHONETIC.map(w => `<div><b>${w[0]}</b>${w}</div>`).join('')}</div>`;
   $('#libOffline').innerHTML = OFFLINE_RES.map(r => `<div class="card"><h3><a href="${r.url}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">${esc(r.t)}</a></h3><p class="muted" style="margin:6px 0 0">${esc(r.d)}</p></div>`).join('');
@@ -2251,7 +2278,7 @@ function renderSearch(q){
   const res = q.trim().length >= 2 ? searchGuides(q) : null;
   $('#libBody').hidden = !!res;
   $('#libResults').innerHTML = !res ? '' : res.length
-    ? res.slice(0, 20).map(e => `<button class="res" data-goto="${e.type}:${e.k}">${e.ic} <b>${esc(e.t)}</b><small>${e.where}</small></button>`).join('')
+    ? res.slice(0, 20).map(e => `<button type="button" class="res" data-goto="${e.type}:${e.k}">${e.ic} <b>${esc(e.t)}</b><small>${e.where}</small></button>`).join('')
     : '<p class="muted">Tidak ada panduan yang cocok. Coba kata lain.</p>';
 }
 function gotoGuide(type, k){
@@ -2301,12 +2328,12 @@ function renderSms(){
     <div class="row2"><div><label class="lbl" for="sm-who">Siapa</label><input type="text" id="sm-who" value="${esc(who ? `${who} (${ctx().n} orang)` : '')}" placeholder="nama, jumlah orang"></div>
       <div><label class="lbl" for="sm-what">Kejadian</label><input type="text" id="sm-what" list="sm-what-list" placeholder="mis. banjir"><datalist id="sm-what-list">${HAZ.map(h => `<option value="${esc(h.lbl.toLowerCase())}">`).join('')}</datalist></div></div>
     <div><label class="lbl" for="sm-where">Di mana</label><input type="text" id="sm-where" value="${esc(S.info.alamat || '')}" placeholder="alamat atau patokan"></div>
-    <div class="geo-tools" style="margin:0"><button class="btn sm" id="sm-gps">📍 Tambahkan lokasi GPS</button><span class="muted" id="sm-gpsinfo">${smsGeo ? `${smsGeo.lat}, ${smsGeo.lon}` : 'GPS bekerja tanpa internet'}</span></div>
+    <div class="geo-tools" style="margin:0"><button type="button" class="btn sm" id="sm-gps">📍 Tambahkan lokasi GPS</button><span class="muted" id="sm-gpsinfo">${smsGeo ? `${smsGeo.lat}, ${smsGeo.lon}` : 'GPS bekerja tanpa internet'}</span></div>
     <div class="row2"><div><label class="lbl" for="sm-cond">Kondisi</label><input type="text" id="sm-cond" placeholder="mis. 1 lansia luka kaki"></div>
       <div><label class="lbl" for="sm-need">Butuh</label><input type="text" id="sm-need" placeholder="mis. evakuasi, air minum"></div></div>
     <div><label class="lbl" for="sm-to">Kirim ke (nomor HP)</label><input type="tel" id="sm-to" value="${esc(phoneIn(S.info.luar))}" placeholder="nomor pusat kabar / keluarga"></div>
     <div><label class="lbl" for="sm-text">Pesan <span class="muted" id="sm-count"></span></label><textarea id="sm-text" aria-label="Isi pesan darurat"></textarea></div>
-    <div class="tools" style="margin:0"><a class="btn pri" id="sm-send" href="#">✉️ Kirim SMS</a><button class="btn" id="sm-share">Bagikan…</button><button class="btn" id="sm-copy">Salin</button></div>
+    <div class="tools" style="margin:0"><a class="btn pri" id="sm-send" href="#">✉️ Kirim SMS</a><button type="button" class="btn" id="sm-share">Bagikan…</button><button type="button" class="btn" id="sm-copy">Salin</button></div>
     <p class="muted" style="margin:0">Dikirim lewat aplikasi SMS di HP — tidak perlu internet, cukup sinyal seluler. Mengubah kolom di atas akan menyusun ulang pesan.</p></div>`;
   updateSms();
 }
@@ -2344,7 +2371,7 @@ function renderMode(){
   const notif = 'Notification' in window ? Notification.permission : 'unsupported';
   $('#modeCard').innerHTML = `<h3>Mode aplikasi</h3>
     <div class="seg top" style="margin:8px 0 6px" role="group" aria-label="Mode aplikasi">
-      <button data-mode="online" aria-pressed="${online()}">🌐 Online</button><button data-mode="offline" aria-pressed="${!online()}">📴 Offline</button></div>
+      <button type="button" data-mode="online" aria-pressed="${online()}">🌐 Online</button><button type="button" data-mode="offline" aria-pressed="${!online()}">📴 Offline</button></div>
     <p class="muted" style="margin:0">${online()
       ? 'Online: cuaca, peringatan gempa BMKG, video, dan lokasi keluarga memakai internet. Semua panduan tetap bisa dibuka tanpa sinyal.'
       : 'Offline: aplikasi tidak mengambil atau mengirim data apa pun ke internet. Semua panduan, stok, rencana, P3K, dan alat sinyal tetap jalan.'}</p>
@@ -2354,7 +2381,7 @@ function renderMode(){
       <div class="geo-tools"><label for="eqRadius" class="muted">Jarak peringatan</label>
         <select id="eqRadius">${[100,300,500,1000].map(r => `<option value="${r}"${(S.eqRadius||300) === r ? ' selected' : ''}>${r} km</option>`).join('')}</select>
         <span class="muted">dari ${esc(ref?.name || 'lokasi belum diatur — hanya gempa M≥6')}</span></div>
-      <div class="tools" style="margin:8px 0 0">${notif === 'default' ? '<button class="btn sm" id="eqNotif">🔔 Izinkan notifikasi</button>' : ''}<button class="btn sm" id="eqTest">Uji peringatan</button><button class="btn sm" id="eqNow">Cek sekarang</button></div>
+      <div class="tools" style="margin:8px 0 0">${notif === 'default' ? '<button type="button" class="btn sm" id="eqNotif">🔔 Izinkan notifikasi</button>' : ''}<button type="button" class="btn sm" id="eqTest">Uji peringatan</button><button type="button" class="btn sm" id="eqNow">Cek sekarang</button></div>
       <p class="muted" id="eqStatus" style="margin:6px 0 0">${eqStatusText()}</p>
       <small class="muted">Data muncul setelah BMKG merilis informasi gempa (beberapa menit setelah kejadian) — <b>bukan peringatan dini</b>. Hanya bekerja saat aplikasi terbuka; untuk notifikasi resmi saat aplikasi tertutup, pasang aplikasi InfoBMKG. Tsunami berpotensi selalu diperingatkan dalam radius 1.000 km.</small>
     </div>` : ''}`;
@@ -2386,7 +2413,7 @@ function showQuakeAlert(q, ref, test){
   el.className = 'eq-alert' + (ts ? ' tsu' : '');
   el.innerHTML = `<div class="eq-in"><b>${test ? '[UJI] ' : ''}${ts ? '🌊 BERPOTENSI TSUNAMI — segera jauhi pantai! ' : '⚠️ '}Gempa M${q.mag}${km !== null ? ` · ±${km} km dari ${esc(ref.name || 'lokasi Anda')}` : ''}</b>
     <div>${esc(q.tanggal)} ${esc(q.jam)} · ${esc(q.wilayah)}${q.depth ? ` · kedalaman ${esc(q.depth)}` : ''}${q.dirasakan ? ` · dirasakan: ${esc(q.dirasakan)}` : ''}${q.potensi ? ` · ${esc(q.potensi)}` : ''}</div>
-    <div class="tools"><button class="btn sm" data-survival="${ts ? 'tsunami' : 'gempa'}">🆘 Mode darurat ${ts ? 'tsunami' : 'gempa'}</button><button class="btn sm" data-hazlink="${ts ? 'tsunami' : 'gempa'}">Panduan</button><button class="btn sm" data-checkin="aman">✅ Kabari keluarga: aman</button><button class="btn sm" id="eqClose">Tutup</button></div>
+    <div class="tools"><button type="button" class="btn sm" data-survival="${ts ? 'tsunami' : 'gempa'}">🆘 Mode darurat ${ts ? 'tsunami' : 'gempa'}</button><button type="button" class="btn sm" data-hazlink="${ts ? 'tsunami' : 'gempa'}">Panduan</button><button type="button" class="btn sm" data-checkin="aman">✅ Kabari keluarga: aman</button><button type="button" class="btn sm" id="eqClose">Tutup</button></div>
     <small>Sumber BMKG. Info muncul setelah gempa terjadi — bukan peringatan dini. Ikuti arahan BMKG/BPBD.</small></div>`;
   el.hidden = false;
   if(navigator.vibrate) navigator.vibrate([600, 200, 600, 200, 600]);
@@ -2431,18 +2458,18 @@ function renderFamily(){
       <div class="muted">${agoText(m.t)}${validCoord(m.lat, m.lon) ? `${m.acc ? ` · akurasi ±${Math.round(m.acc)} m` : ''}${ref && m.id !== live.mid ? ` · ±${fmtNum(round1(distKm(ref, m)))} km dari Anda` : ''}` : ' · tanpa lokasi'}</div></div>
       ${validCoord(m.lat, m.lon) ? `<a class="btn sm" href="${mapUrl(m)}" target="_blank" rel="noopener noreferrer">🗺️ Peta</a>` : ''}</div>`).join('');
   $('#famCard').innerHTML = `<h3>Lokasi & kabar keluarga</h3>
-    <p class="muted">Kabari keluarga bahwa Anda aman atau butuh bantuan. SMS jalan tanpa internet; peta lokasi live butuh mode online.</p>
-    <div class="tools" style="margin:6px 0 0"><button class="btn pri" data-checkin="aman">✅ Saya aman</button><button class="btn" data-checkin="bantuan" style="color:var(--bad)">🆘 Butuh bantuan</button></div>
+    <p class="muted">Kabari keluarga bahwa Anda aman atau butuh bantuan. SMS tidak memakai internet, tetapi tetap memerlukan sinyal seluler; lokasi keluarga perlu mode online.</p>
+    <div class="tools" style="margin:6px 0 0"><button type="button" class="btn pri" data-checkin="aman">✅ Saya aman</button><button type="button" class="btn" data-checkin="bantuan" style="color:var(--bad)">🆘 Butuh bantuan</button></div>
     <div id="checkinBox">${checkinHtml()}</div>
     <h4 style="margin:16px 0 6px">📍 Lokasi live keluarga</h4>
-    ${!online() ? '<p class="muted">Aktif hanya di mode online (atur di tab Keluarga).</p>' : !validGid(g) ? `
+    ${!online() ? '<p class="muted">Aktif hanya di mode online (atur melalui tombol ⚙ di atas).</p>' : !validGid(g) ? `
       <p class="muted">Buat grup, lalu bagikan kodenya ke anggota keluarga (atau lewat QR di bawah). Hanya yang tahu kode bisa melihat lokasi grup.</p>
-      <div class="tools" style="margin:0"><button class="btn pri" id="famCreate">Buat grup keluarga</button></div>
-      <div class="geo-tools"><input type="text" id="famJoinCode" placeholder="atau masukkan kode grup" aria-label="Kode grup keluarga"><button class="btn sm" id="famJoin">Gabung</button></div>` : `
-      <div class="geo-row" style="border:0;padding:0">Kode grup: <code>${esc(g.slice(0, 6))}…${esc(g.slice(-4))}</code> <button class="btn sm" id="famCopy">Salin kode</button> <button class="btn sm" id="famLeave">Keluar grup</button></div>
+      <div class="tools" style="margin:0"><button type="button" class="btn pri" id="famCreate">Buat grup keluarga</button></div>
+      <div class="geo-tools"><input type="text" id="famJoinCode" placeholder="atau masukkan kode grup" aria-label="Kode grup keluarga"><button type="button" class="btn sm" id="famJoin">Gabung</button></div>` : `
+      <div class="geo-row" style="border:0;padding:0">Kode grup: <code>${esc(g.slice(0, 6))}…${esc(g.slice(-4))}</code> <button type="button" class="btn sm" id="famCopy">Salin kode</button> <button type="button" class="btn sm" id="famLeave">Keluar grup</button></div>
       <div class="field" style="margin-top:10px"><label for="famName">Nama saya di grup</label><input id="famName" maxlength="40" value="${esc(live.name)}" placeholder="mis. Ayah, Budi"></div>
       <label class="checks" style="margin:0"><span><input type="checkbox" id="famShare"${live.on ? ' checked' : ''}> Saya setuju membagikan lokasi HP ini ke grup (diperbarui tiap 5 menit selama aplikasi terbuka)</span></label>
-      <div class="tools" style="margin:8px 0 0">${live.on ? '<button class="btn sm" id="famSend">📍 Kirim lokasi sekarang</button>' : ''}<button class="btn sm" id="famRefresh">🔄 Muat ulang</button>${live.lastSent ? '<button class="btn sm" id="famDelete" style="color:var(--bad)">Hapus lokasi saya</button>' : ''}</div>
+      <div class="tools" style="margin:8px 0 0">${live.on ? '<button type="button" class="btn sm" id="famSend">📍 Kirim lokasi sekarang</button>' : ''}<button type="button" class="btn sm" id="famRefresh">🔄 Muat ulang</button>${live.lastSent ? '<button type="button" class="btn sm" id="famDelete" style="color:var(--bad)">Hapus lokasi saya</button>' : ''}</div>
       ${famErr ? `<div class="badbox">${esc(famErr)}</div>` : ''}
       <div class="fam-list">${famBusy && !famList ? '<p class="muted">Memuat…</p>' : members || '<p class="muted">Belum ada anggota yang membagikan lokasi dalam 24 jam terakhir.</p>'}</div>
       <small class="muted">Disimpan di Firebase (server Jakarta) hanya lokasi terakhir, tidak ada riwayat. Lokasi lebih dari 24 jam tidak ditampilkan; hapus kapan saja. Siapa pun yang tahu kode grup bisa melihat lokasi anggota — bagikan kode hanya ke keluarga.</small>`}`;
@@ -2460,6 +2487,13 @@ let COMM;
 try { COMM = cleanCommunity(JSON.parse(localStorage.getItem(COMM_KEY) || '{}')); } catch { COMM = cleanCommunity({}); }
 function saveCommunity(){ try { localStorage.setItem(COMM_KEY, JSON.stringify(COMM)); } catch {} }
 const CHAT_KINDS = {chat:'Obrolan', help:'Butuh bantuan', offer:'Bisa membantu', info:'Info warga'};
+const FAMILY_TEMPLATES = [
+  ['aman','Saya aman.'],
+  ['menuju','Saya menuju titik kumpul.'],
+  ['tiba','Saya sudah tiba di titik kumpul.'],
+  ['bantuan','Saya butuh bantuan.'],
+  ['obat','Saya membutuhkan obat atau kebutuhan khusus.']
+];
 const chatText = v => String(v || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 280);
 function toChat(m){ return {fields:{name:{stringValue:m.name}, text:{stringValue:m.text}, kind:{stringValue:m.kind}, mid:{stringValue:m.mid}, t:{timestampValue:m.t}, exp:{timestampValue:m.exp}}}; }
 function fromChat(doc){
@@ -2475,22 +2509,22 @@ function messageHtml(m){
   const kind = CHAT_KINDS[m.kind] ? m.kind : 'chat';
   const mine = m.mid === COMM.mid;
   return `<div class="msg ${kind}"><div class="msg-head"><span><span class="tag">${esc(CHAT_KINDS[kind])}</span> · ${esc(m.name)}${mine ? ' (Anda)' : ''}</span><time>${esc(agoText(m.t))}</time></div><p>${esc(m.text)}</p>
-    ${mine || !m.mid ? '' : `<button class="linkbtn mute" data-mute="${esc(m.mid)}">Sembunyikan pengirim ini</button>`}</div>`;
+    ${mine || !m.mid ? '' : `<button type="button" class="linkbtn mute" data-mute="${esc(m.mid)}">Sembunyikan pengirim ini</button>`}</div>`;
 }
 function composeHtml(scope){
   const nick = scope === 'family' ? (S.live.name || COMM.nick) : COMM.nick;
-  return `<div class="compose"><label>Nama di ruang<input id="${scope}ChatName" maxlength="40" value="${esc(nick)}" placeholder="mis. Budi / Posko RW 03"></label>
+  return `${scope === 'family' ? `<div class="template-row" aria-label="Pesan cepat keluarga">${FAMILY_TEMPLATES.map(([k,v]) => `<button type="button" class="btn sm" data-chat-template="${k}">${esc(v)}</button>`).join('')}</div>` : ''}<div class="compose"><label>Nama di ruang<input id="${scope}ChatName" maxlength="40" value="${esc(nick)}" placeholder="mis. Budi / Posko RW 03"></label>
     ${scope === 'room' ? `<label>Kategori<select id="roomChatKind">${Object.entries(CHAT_KINDS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>` : ''}
     <label>Pesan<textarea id="${scope}ChatText" maxlength="280" placeholder="Tulis kebutuhan, jumlah, area umum, dan waktu. Maks. 280 karakter."></textarea></label>
-    <button class="btn pri" data-chat-send="${scope}">Kirim pesan</button></div>`;
+    <button type="button" class="btn pri" data-chat-send="${scope}">Kirim pesan</button></div>`;
 }
 function chatPanel(scope){
   const c = chatConfig(scope), all = c.list || [], busy = chatBusy[scope], err = chatErr[scope];
   const list = all.filter(m => !COMM.muted.includes(m.mid)), hidden = all.length - list.length;
-  return `<div class="tools" style="margin:4px 0"><button class="btn sm" data-chat-refresh="${scope}">Muat ulang</button></div>
+  return `<div class="tools" style="margin:4px 0"><button type="button" class="btn sm" data-chat-refresh="${scope}">Muat ulang</button></div>
     ${err ? `<div class="badbox">${esc(err)}</div>` : ''}
     <div class="chat-list" aria-live="polite">${busy && !c.list ? '<div class="chat-empty">Memuat…</div>' : list.length ? list.map(messageHtml).join('') : '<div class="chat-empty">Belum ada pesan dalam 48 jam terakhir.</div>'}</div>
-    ${hidden ? `<p class="muted" style="margin:0">${hidden} pesan dari pengirim yang Anda sembunyikan. <button class="linkbtn" data-unmute>Tampilkan semua lagi</button></p>` : ''}
+    ${hidden ? `<p class="muted" style="margin:0">${hidden} pesan dari pengirim yang Anda sembunyikan. <button type="button" class="linkbtn" data-unmute>Tampilkan semua lagi</button></p>` : ''}
     ${composeHtml(scope)}<small class="muted">Pesan hanya tampil 48 jam. Kode ruang adalah kunci masuk; tidak ada verifikasi identitas. Jangan gunakan sebagai sumber peringatan resmi.</small>`;
 }
 // Chat panels are re-rendered on every refresh (also every 60 s): keep what the user is typing and where the cursor is.
@@ -2508,12 +2542,12 @@ function renderCommunity(){
 }
 function renderCommunityPanels(can, dot, mode){
   dot.classList.toggle('off', !can); mode.textContent = can ? 'Terhubung.' : 'Chat perlu mode online dan koneksi internet.';
-  $('#familyChat').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet. SMS dari Rencana tetap dapat dipakai saat jaringan data tidak tersedia.</p>'
-    : !validGid(S.famGroup) ? '<p class="muted">Belum ada grup keluarga. Buat atau gabung grup dari Rencana; kode yang sama dipakai untuk lokasi live dan chat.</p><button class="btn" data-go="t-info">Buka Rencana</button>'
+  $('#familyChat').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet. SMS dari menu Keluarga dapat dipakai tanpa internet selama sinyal seluler tersedia.</p>'
+    : !validGid(S.famGroup) ? '<p class="muted">Belum ada grup keluarga. Buat atau gabung grup dari menu Keluarga; kode yang sama dipakai untuk lokasi dan chat.</p><button type="button" class="btn" data-go="t-info">Buka Keluarga</button>'
     : `<p class="room-code">Kode keluarga: ${esc(S.famGroup.slice(0,6))}…${esc(S.famGroup.slice(-4))}</p>${chatPanel('family')}`;
   $('#communityRoom').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet untuk membuka ruang warga.</p>'
-    : !validGid(COMM.room) ? `<div class="tools"><button class="btn pri" id="roomCreate">Buat ruang warga</button></div><div class="geo-tools"><input id="roomJoinCode" maxlength="40" placeholder="atau masukkan kode ruang" aria-label="Kode ruang warga"><button class="btn sm" id="roomJoin">Gabung</button></div>`
-    : `<p class="room-code">Kode ruang: ${esc(COMM.room)}</p><div class="tools"><button class="btn sm" id="roomCopy">Salin kode</button><button class="btn sm" id="roomLeave">Keluar / ganti ruang</button></div>${chatPanel('room')}`;
+    : !validGid(COMM.room) ? `<div class="tools"><button type="button" class="btn pri" id="roomCreate">Buat ruang warga</button></div><div class="geo-tools"><input id="roomJoinCode" maxlength="40" placeholder="atau masukkan kode ruang" aria-label="Kode ruang warga"><button type="button" class="btn sm" id="roomJoin">Gabung</button></div>`
+    : `<p class="room-code">Kode ruang: ${esc(COMM.room)}</p><div class="tools"><button type="button" class="btn sm" id="roomCopy">Salin kode</button><button type="button" class="btn sm" id="roomLeave">Keluar / ganti ruang</button></div>${chatPanel('room')}`;
 }
 async function loadChat(scope){
   const c = chatConfig(scope);
@@ -2564,9 +2598,10 @@ function checkinHtml(){
   if(!checkin) return '';
   const msg = checkin.msg, to = phoneIn(S.info.luar);
   return `<div class="cform" style="margin-top:10px"><textarea id="ci-text" aria-label="Pesan kabar keluarga">${esc(msg)}</textarea>
-    <div class="tools" style="margin:0"><a class="btn pri" href="sms:${to}?&body=${encodeURIComponent(msg)}">✉️ SMS${to ? ' ke pusat kabar' : ''}</a>
-      <a class="btn" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener noreferrer">WhatsApp</a><button class="btn" id="ci-share">Bagikan…</button></div>
-    ${checkin.sent ? '<p class="muted" style="margin:0">✓ Status juga diperbarui di grup lokasi live.</p>' : ''}</div>`;
+    <div class="tools" style="margin:0"><a class="btn pri" href="sms:${to}?&body=${encodeURIComponent(msg)}">✉️ Buka SMS${to ? ' ke pusat kabar' : ''}</a>
+      <a class="btn" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener noreferrer">WhatsApp</a><button type="button" class="btn" id="ci-share">Bagikan…</button></div>
+    <p class="muted" style="margin:0">SMS belum terkirim dari layar ini. Periksa penerima dan isi pesan, lalu tekan Kirim di aplikasi SMS.</p>
+    ${checkin.sent ? '<p class="muted" style="margin:0">✓ Status grup berhasil diperbarui di server. Ini belum berarti semua anggota sudah membacanya.</p>' : ''}</div>`;
 }
 async function doCheckin(kind){
   const who = S.live.name || S.members.find(m => m.nama)?.nama || '';
@@ -2587,9 +2622,9 @@ async function onlineTick(){
     loadFamily();
   }
   if(document.getElementById('t-community')?.classList.contains('on')){
-    if(validGid(S.famGroup)) loadChat('family');
     if(validGid(COMM.room)) loadChat('room');
   }
+  if(document.getElementById('t-info')?.classList.contains('on') && validGid(S.famGroup)) loadChat('family');
 }
 
 // ---------- videos ----------
@@ -2598,8 +2633,8 @@ function renderVideos(){
   const all = [...VIDEOS.map(v => Object.assign({ch:'Info BMKG'}, v)), ...(S.videos || []).map(v => Object.assign({g:'mine', ch:'ditambahkan keluarga', mine:true}, v))];
   $('#vidList').innerHTML = (can ? '' : `<div class="warnbox">${online() ? 'Sedang tidak ada internet.' : 'Mode offline aktif.'} Video butuh internet — judul tetap tampil sebagai daftar tonton.</div>`)
     + VIDEO_GROUPS.map(([g, title]) => { const l = all.filter(v => v.g === g); return l.length ? `<h4 class="vid-g">${title}</h4>` + l.map(v => `<div class="card vid" id="vid-${v.id}">
-      <div class="vid-box"><button class="vid-play" data-play="${v.id}"${can ? '' : ' disabled'} aria-label="Putar ${esc(v.t)}"><span>▶</span></button></div>
-      <div class="vid-meta"><b>${esc(v.t)}</b><small>${esc(v.ch)} · <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener noreferrer">buka di YouTube</a>${v.mine ? ` · <button class="linkbtn" data-vdel="${v.id}">hapus</button>` : ''}</small></div></div>`).join('') : ''; }).join('');
+      <div class="vid-box"><button type="button" class="vid-play" data-play="${v.id}"${can ? '' : ' disabled'} aria-label="Putar ${esc(v.t)}"><span>▶</span></button></div>
+      <div class="vid-meta"><b>${esc(v.t)}</b><small>${esc(v.ch)} · <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener noreferrer">buka di YouTube</a>${v.mine ? ` · <button type="button" class="linkbtn" data-vdel="${v.id}">hapus</button>` : ''}</small></div></div>`).join('') : ''; }).join('');
 }
 
 // ---------- activities ----------
@@ -2608,7 +2643,7 @@ function renderWorkout(){
   const box = $('#workCard');
   if(!wk){
     box.innerHTML = `<h3>💪 Olahraga tanpa alat</h3><p class="muted">Ikuti gerakan dengan pengatur waktu; ada bunyi saat ganti gerakan.</p>
-      <div class="tools" style="margin:0">${WORKOUTS.map(w => `<button class="btn" data-work="${w.k}">${esc(w.t)}<br><small class="muted">${Math.round(workoutSeconds(w)/60)} menit · ${esc(w.sub)}</small></button>`).join('')}</div>
+      <div class="tools" style="margin:0">${WORKOUTS.map(w => `<button type="button" class="btn" data-work="${w.k}">${esc(w.t)}<br><small class="muted">${Math.round(workoutSeconds(w)/60)} menit · ${esc(w.sub)}</small></button>`).join('')}</div>
       <small class="muted">Hentikan bila pusing, sesak, atau nyeri dada. Ibu hamil, lansia, dan yang punya penyakit jantung: pilih gerak ringan dan sesuaikan dengan saran dokter.</small>`;
     return;
   }
@@ -2617,7 +2652,7 @@ function renderWorkout(){
     <div class="wk-now ${wk.phase}"><div class="wk-ic">${wk.phase === 'rest' ? '😮‍💨' : ic}</div>
       <div class="wk-name">${wk.phase === 'rest' ? 'Istirahat' : esc(name)}</div><div class="wk-left">${wk.left}</div>
       <div class="muted">${wk.phase === 'rest' ? `Berikutnya: ${esc(next ? next[1] : '')}` : next ? `Berikutnya: ${esc(next[1])}` : 'Gerakan terakhir!'}</div></div>
-    <div class="tools" style="margin:0"><button class="btn" id="wkPause">${wk.paused ? '▶ Lanjut' : '⏸ Jeda'}</button><button class="btn" id="wkStop">⏹ Selesai</button></div>`;
+    <div class="tools" style="margin:0"><button type="button" class="btn" id="wkPause">${wk.paused ? '▶ Lanjut' : '⏸ Jeda'}</button><button type="button" class="btn" id="wkStop">⏹ Selesai</button></div>`;
 }
 function startWorkout(k){
   stopWorkout(true);
@@ -2645,7 +2680,7 @@ function renderQuiz(){
   const box = $('#quizCard');
   if(!quiz){
     box.innerHTML = `<h3>🧩 Kuis Siaga</h3><p class="muted">${QUIZ.length} pertanyaan dari isi aplikasi ini — main bergantian bersama keluarga.${S.quizBest ? ` Skor terbaik: <b>${S.quizBest}/${QUIZ.length}</b>.` : ''}</p>
-      <button class="btn pri" id="quizStart">Mulai kuis</button>`;
+      <button type="button" class="btn pri" id="quizStart">Mulai kuis</button>`;
     return;
   }
   if(quiz.i >= quiz.order.length){
@@ -2653,14 +2688,14 @@ function renderQuiz(){
     if(best !== S.quizBest){ S.quizBest = best; save(); }
     box.innerHTML = `<h3>🧩 Kuis Siaga — selesai</h3><div class="big-num">${quiz.score}/${QUIZ.length}</div>
       <p class="muted">${quiz.score === QUIZ.length ? 'Sempurna! Keluarga Anda siap siaga.' : quiz.score >= QUIZ.length * 0.7 ? 'Bagus! Baca lagi panduan untuk soal yang salah.' : 'Yuk baca panduan Saat Bencana, P3K, dan Pustaka, lalu coba lagi.'}</p>
-      <button class="btn pri" id="quizStart">Main lagi</button>`;
+      <button type="button" class="btn pri" id="quizStart">Main lagi</button>`;
     return;
   }
   const item = QUIZ[quiz.order[quiz.i]], ans = quiz.answered;
   box.innerHTML = `<h3>🧩 Soal ${quiz.i + 1}/${QUIZ.length} <span class="muted">· skor ${quiz.score}</span></h3>
     <p style="font-weight:600;margin:8px 0">${esc(item.q)}</p>
-    <div class="quiz-opts">${item.a.map((a, j) => `<button class="btn quiz-opt${ans === null ? '' : j === item.c ? ' right' : j === ans ? ' wrong' : ''}" data-ans="${j}"${ans === null ? '' : ' disabled'}>${esc(a)}</button>`).join('')}</div>
-    ${ans === null ? '' : `<div class="${ans === item.c ? 'note' : 'warnbox'}" style="margin:8px 0">${ans === item.c ? '✅ Benar! ' : '❌ Kurang tepat. '}${esc(item.e)}</div><button class="btn pri" id="quizNext">${quiz.i + 1 < QUIZ.length ? 'Soal berikutnya' : 'Lihat skor'}</button>`}`;
+    <div class="quiz-opts">${item.a.map((a, j) => `<button type="button" class="btn quiz-opt${ans === null ? '' : j === item.c ? ' right' : j === ans ? ' wrong' : ''}" data-ans="${j}"${ans === null ? '' : ' disabled'}>${esc(a)}</button>`).join('')}</div>
+    ${ans === null ? '' : `<div class="${ans === item.c ? 'note' : 'warnbox'}" style="margin:8px 0">${ans === item.c ? '✅ Benar! ' : '❌ Kurang tepat. '}${esc(item.e)}</div><button type="button" class="btn pri" id="quizNext">${quiz.i + 1 < QUIZ.length ? 'Soal berikutnya' : 'Lihat skor'}</button>`}`;
 }
 
 let mg = null;
@@ -2672,13 +2707,13 @@ function newMorseQ(){
 }
 function renderMorseGame(){
   const box = $('#mgCard');
-  if(!mg){ box.innerHTML = `<h3>📶 Tebak Morse</h3><p class="muted">Tebak huruf dari kode Morse — latihan sebelum memakai senter atau peluit.</p><button class="btn pri" id="mgStart">Mulai</button>`; return; }
+  if(!mg){ box.innerHTML = `<h3>📶 Tebak Morse</h3><p class="muted">Tebak huruf dari kode Morse — latihan sebelum memakai senter atau peluit.</p><button type="button" class="btn pri" id="mgStart">Mulai</button>`; return; }
   const code = prettyMorse(mg.cur);
   box.innerHTML = `<h3>📶 Tebak Morse <span class="muted">· ${mg.score}/${mg.total}</span></h3>
     <div class="morse-out" style="text-align:center;font-size:32px">${code}</div>
-    <div class="tools" style="margin:0 0 8px"><button class="btn sm" data-signal="sound" data-text="mg">🔊 Dengarkan</button></div>
-    <div class="quiz-opts mg">${mg.opts.map(o => `<button class="btn quiz-opt${mg.picked === null ? '' : o === mg.cur ? ' right' : o === mg.picked ? ' wrong' : ''}" data-mg="${o}"${mg.picked === null ? '' : ' disabled'}>${o}</button>`).join('')}</div>
-    ${mg.picked === null ? '' : `<button class="btn pri" id="mgNext" style="margin-top:8px">Berikutnya</button>`}`;
+    <div class="tools" style="margin:0 0 8px"><button type="button" class="btn sm" data-signal="sound" data-text="mg">🔊 Dengarkan</button></div>
+    <div class="quiz-opts mg">${mg.opts.map(o => `<button type="button" class="btn quiz-opt${mg.picked === null ? '' : o === mg.cur ? ' right' : o === mg.picked ? ' wrong' : ''}" data-mg="${o}"${mg.picked === null ? '' : ' disabled'}>${o}</button>`).join('')}</div>
+    ${mg.picked === null ? '' : `<button type="button" class="btn pri" id="mgNext" style="margin-top:8px">Berikutnya</button>`}`;
 }
 function renderActivities(){
   renderWorkout(); renderQuiz(); renderMorseGame();
@@ -2701,20 +2736,20 @@ function renderSurvival(){
   const box = $('#survBody');
   if(!surv.k){
     box.innerHTML = `<h2>🆘 Mode Darurat</h2><p class="sv-lead">Apa yang sedang terjadi? Pilih untuk panduan langkah demi langkah — tetap jalan tanpa internet.</p>
-      <div class="sv-pick">${SURVIVAL.map(s => `<button data-surv="${s.k}"><span>${s.ic}</span>${esc(s.lbl)}</button>`).join('')}</div>`;
+      <div class="sv-pick">${SURVIVAL.map(s => `<button type="button" data-surv="${s.k}"><span>${s.ic}</span>${esc(s.lbl)}</button>`).join('')}</div>`;
     return;
   }
   const sv = SURVIVAL.find(s => s.k === surv.k), n = sv.steps.length, done = surv.i >= n;
   const g = S.geo || {}, pts = ['titik1','titik2'].filter(k => S.info[k] || g[k]);
   const bring = survivalBring(sv);
-  box.innerHTML = `<div class="sv-head"><button class="sv-back" data-surv="">◀ Ganti</button><b>${sv.ic} ${esc(sv.lbl)}</b></div>
+  box.innerHTML = `<div class="sv-head"><button type="button" class="sv-back" data-surv="">◀ Ganti</button><b>${sv.ic} ${esc(sv.lbl)}</b></div>
     <div class="sv-go"><b>Tujuan aman:</b> ${esc(sv.go)}</div>
     ${done ? `<div class="sv-step done"><div class="sv-n">✓ Semua langkah selesai</div>
         <p>Tetap di tempat aman, pantau info resmi BMKG/BPBD, dan kabari keluarga.</p>
-        ${sv.next ? `<button class="btn sv-big" data-surv="${sv.next}">Lanjut: Mode ${esc(SURVIVAL.find(s => s.k === sv.next).lbl)}</button>` : ''}</div>`
+        ${sv.next ? `<button type="button" class="btn sv-big" data-surv="${sv.next}">Lanjut: Mode ${esc(SURVIVAL.find(s => s.k === sv.next).lbl)}</button>` : ''}</div>`
       : `<div class="sv-step"><div class="sv-n">Langkah ${surv.i + 1} dari ${n}</div><div class="sv-bar"><i style="width:${surv.i / n * 100}%"></i></div>
         <p class="sv-text">${esc(sv.steps[surv.i])}</p>
-        <div class="sv-nav"><button class="btn" id="svPrev"${surv.i ? '' : ' disabled'}>◀ Kembali</button><button class="btn sv-big" id="svNext">✓ Sudah, lanjut</button></div></div>`}
+        <div class="sv-nav"><button type="button" class="btn" id="svPrev"${surv.i ? '' : ' disabled'}>◀ Kembali</button><button type="button" class="btn sv-big" id="svNext">✓ Sudah, lanjut</button></div></div>`}
     ${pts.length || S.routes.length ? `<div class="sv-card"><b>📍 Titik kumpul keluarga</b>${pts.map(k => `<div>${esc(S.info[k] || (k === 'titik1' ? 'Titik kumpul 1' : 'Titik kumpul 2'))}${g[k] ? ` · <a href="${mapUrl(g[k])}" target="_blank" rel="noopener noreferrer">buka peta</a>` : ''}</div>`).join('')}
       ${S.routes.filter(r => r.nama || r.tujuan).map(r => `<div class="muted">Rute: ${esc(r.nama || '')} → ${esc(r.tujuan || '')}${r.km ? ` (${fmtNum(r.km)} km)` : ''}</div>`).join('')}</div>` : ''}
     <div class="sv-card"><b>🎒 Bawa ini</b>${bring.map((x, i) => `<label class="sv-chk"><input type="checkbox" data-svgot="${i}"${surv.got.has(i) ? ' checked' : ''}> ${esc(x)}</label>`).join('')}</div>
@@ -2742,7 +2777,7 @@ function renderEndurance(){
   const kompor = findItem('kompor'), hasStove = kompor && haveOf(kompor) >= 1;
   const row = (l, v, note) => `<div><div class="meter-row"><span>${l}</span><div class="meter"><i class="${meterCls(v, target)}" style="width:${Math.min(100, v/target*100)}%"></i></div><span>${fmtNum(v)} hari</span></div><div class="muted">${note}</div></div>`;
   let hint;
-  if(e.waterL === 0 && e.food === 0) hint = `<div class="warnbox">Isi jumlah stok yang sudah ada di tab Stok untuk melihat perkiraannya. <button class="btn sm" data-go="t-list">Buka Stok</button></div>`;
+  if(e.waterL === 0 && e.food === 0) hint = `<div class="warnbox">Isi jumlah stok yang sudah ada di tab Stok untuk melihat perkiraannya. <button type="button" class="btn sm" data-go="t-list">Buka Stok</button></div>`;
   else if(e.total >= target) hint = `<div class="note" style="margin:12px 0 0">Air dan makanan cukup untuk target ${target} hari.</div>`;
   else if(e.water <= e.food) hint = `<div class="warnbox">Paling membatasi: <b>air minum</b>. Tambah ±${ceil((target*c.n*3 - e.waterL)/19)} galon untuk mencapai ${target} hari.</div>`;
   else hint = `<div class="warnbox">Paling membatasi: <b>makanan</b>. Lengkapi beras + gas kaleng${hasStove ? '' : ' + kompor'}, atau makanan siap makan.</div>`;
@@ -2760,9 +2795,9 @@ function renderHazReady(){
   const rows = hazardReadiness();
   $('#hazReady').innerHTML = `<h3>Kesiapan per bencana</h3>
     <p class="muted">Barang penting untuk tiap bencana yang jumlahnya sudah cukup. Ketuk untuk melihat yang kurang.</p>
-    <div class="meters">${rows.map(r => `<button class="meter-row linkrow" data-sc="${r.h.k}"><span>${r.h.ic} ${esc(r.h.lbl)}</span><div class="meter"><i class="${meterCls(r.pct, 80)}" style="width:${r.pct}%"></i></div><span>${r.pct}%</span></button>`).join('')}</div>`;
+    <div class="meters">${rows.map(r => `<button type="button" class="meter-row linkrow" data-sc="${r.h.k}"><span>${r.h.ic} ${esc(r.h.lbl)}</span><div class="meter"><i class="${meterCls(r.pct, 80)}" style="width:${r.pct}%"></i></div><span>${r.pct}%</span></button>`).join('')}</div>`;
   rows.forEach(r => { const el = document.querySelector(`[data-hzready="${r.h.k}"]`);
-    if(el) el.innerHTML = `Stok penting untuk bencana ini: <b>${r.ok}/${r.total}</b> cukup (${r.pct}%). <button class="btn sm" data-sc="${r.h.k}">Lihat yang kurang</button>`; });
+    if(el) el.innerHTML = `Stok penting untuk bencana ini: <b>${r.ok}/${r.total}</b> cukup (${r.pct}%). <button type="button" class="btn sm" data-sc="${r.h.k}">Lihat yang kurang</button>`; });
 }
 function renderScSel(){
   const list = hazList();
@@ -2787,7 +2822,7 @@ function renderCustomForm(){
       <label style="display:flex;gap:8px;align-items:center;margin-top:20px"><input type="checkbox" id="cu-exp"${x.exp ? ' checked' : ''}> Bisa kedaluwarsa</label></div>
     <div><span class="lbl">Penting untuk bencana</span><div class="checks">${HAZ.map(h => `<label><input type="checkbox" data-cusc="${h.k}"${x.sc.includes(h.k) ? ' checked' : ''}> ${h.lbl}</label>`).join('')}</div></div>
     <p class="muted" style="margin:0">Air dengan satuan "liter" di kategori Air ikut dihitung di ketahanan logistik.</p>
-    <div class="tools" style="margin:0"><button class="btn pri" id="cuSave">Simpan</button><button class="btn" id="cuCancel">Batal</button></div>
+    <div class="tools" style="margin:0"><button type="button" class="btn pri" id="cuSave">Simpan</button><button type="button" class="btn" id="cuCancel">Batal</button></div>
    </div></div>`;
   $('#cu-t').focus();
 }
@@ -2806,7 +2841,7 @@ function saveCustom(){
   S.open[x.cat] = true; editing = null; save(); renderAll(); toast('Barang disimpan.');
 }
 
-function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); renderCommunity(); }
+function renderAll(){ renderRegion(); renderWx(); renderFam(); renderEndurance(); renderHazReady(); renderSoon(); renderList(); renderPlan(); renderCalc(); progress(); renderSaveState(); renderCommunity(); renderOfflineCard(); }
 
 const THEME_INFO = {
   auto:['Mengikuti pengaturan terang/gelap HP.','#f1f4f1'],
@@ -2834,12 +2869,13 @@ function showTab(id){
   document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === id));
   const navId = id === 't-plan' ? 't-list' : id === 't-lib' ? 't-act' : id;
   document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.t === navId));
+  if(id === 't-info'){
+    renderCommunity();
+    if(online() && navigator.onLine && validGid(S.famGroup)) loadChat('family');
+  }
   if(id === 't-community'){
     renderCommunity();
-    if(online() && navigator.onLine){
-      if(validGid(S.famGroup)) loadChat('family');
-      if(validGid(COMM.room)) loadChat('room');
-    }
+    if(online() && navigator.onLine && validGid(COMM.room)) loadChat('room');
   }
   window.scrollTo(0,0);
   const heading = document.querySelector('#'+id+' h2'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); }
@@ -2890,6 +2926,14 @@ async function copyText(text){
 document.addEventListener('click', e => {
   const t = e.target;
   const go = t.closest('[data-go]'); if(go) return showTab(go.dataset.go);
+  const quick = t.closest('[data-quick]');
+  if(quick){
+    if(quick.dataset.quick === 'now') return openSurvival('');
+    if(quick.dataset.quick === 'safe'){ showTab('t-lib'); return document.getElementById('sec-aktif').scrollIntoView({block:'start'}); }
+    if(quick.dataset.quick === 'separated'){ showTab('t-info'); return document.getElementById('famCard').scrollIntoView({block:'start'}); }
+    if(quick.dataset.quick === 'limited'){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
+  }
+  if(t.id === 'settingsBtn'){ showTab('t-info'); return document.getElementById('settingsHead').scrollIntoView({block:'start'}); }
   if(t.closest('[data-go-shop]')){ S.view = 'shop'; save(); renderList(); return showTab('t-list'); }
   const hz = t.closest('[data-hazard]'); if(hz) return selectHazard(hz.dataset.hazard);
   const sg = t.closest('[data-signal]'); if(sg) return startSignal(sg.dataset.signal, sg.dataset.text === 'morse' ? morseText : sg.dataset.text === 'mg' ? mg.cur : 'SOS');
@@ -2913,6 +2957,13 @@ document.addEventListener('click', e => {
   if(t.closest('[data-unmute]')){ COMM.muted = []; saveCommunity(); return renderCommunity(); }
   const cs = t.closest('[data-chat-send]');
   if(cs){ cs.disabled = true; return sendChat(cs.dataset.chatSend).then(() => toast('Pesan terkirim.')).catch(err => toast(err.message, true)).finally(() => { cs.disabled = false; }); }
+  const ct = t.closest('[data-chat-template]');
+  if(ct){
+    const template = FAMILY_TEMPLATES.find(([k]) => k === ct.dataset.chatTemplate);
+    const box = document.getElementById('familyChatText');
+    if(template && box){ box.value = template[1]; box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
+    return;
+  }
   if(t.id === 'roomCreate'){ COMM.room = randId(16); roomMessages = []; saveCommunity(); renderCommunity(); return toast('Ruang warga dibuat. Bagikan kodenya kepada warga yang dikenal.'); }
   if(t.id === 'roomJoin'){ const code = ($('#roomJoinCode').value || '').trim();
     if(!validGid(code)) return toast('Kode ruang tidak valid.', true);
@@ -3100,7 +3151,10 @@ let survivalParam = null;
 if(!S.live.mid) S.live.mid = randId(12);
 renderAll(); renderHaz(); renderInfo(); renderLib(); renderSkills(); renderMode(); renderFamily(); renderCommunity(); renderVideos(); renderActivities(); showTab(S.tab || 't-fam');
 if(survivalParam !== null) openSurvival(survivalParam);
-if(navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+if(navigator.storage?.persisted){
+  navigator.storage.persisted().then(isPersistent => isPersistent || navigator.storage.persist?.())
+    .then(isPersistent => { storagePersistent = !!isPersistent; renderOfflineCard(); }).catch(() => {});
+}
 
 // QR import: the shared plan arrives as #import=<code>
 async function importFromHash(){
@@ -3128,7 +3182,19 @@ document.addEventListener('visibilitychange', () => { if(!document.hidden){ rend
 setInterval(() => { if(!document.hidden){ renderSoon(); progress(); } }, 60000);
 
 // ---------- offline (PWA) ----------
-let offlineReady = false, installEvt = null;
+function renderOfflineCard(){
+  const el = document.getElementById('offlineCard');
+  if(!el) return;
+  const backup = S.lastBackup ? `Terakhir ${fmtDate(S.lastBackup)}` : 'Belum dibuat';
+  el.innerHTML = `<h3>Kesiapan tanpa internet</h3>
+    <p class="muted">Periksa sebelum bencana. Peta, video, chat, dan data terbaru tetap memerlukan persiapan atau koneksi tersendiri.</p>
+    <div class="offline-check">
+      <div><b>${offlineReady ? '✓ Panduan tersimpan' : '○ Belum terkonfirmasi'}</b>${offlineReady ? 'Mode Darurat dan panduan inti siap dibuka offline.' : 'Pasang atau buka aplikasi saat online hingga status “Siap offline” muncul.'}</div>
+      <div><b>${storagePersistent ? '✓ Penyimpanan dilindungi' : '○ Penyimpanan standar'}</b>${storagePersistent ? 'Browser menyetujui penyimpanan persisten.' : 'Data bisa dibersihkan oleh browser atau pengguna.'}</div>
+      <div><b>✓ Rencana tersimpan lokal</b>Data keluarga berada di perangkat ini; cetak kartu untuk cadangan tanpa HP.</div>
+      <div><b>${S.lastBackup ? '✓ Cadangan dibuat' : '○ Buat cadangan'}</b>${backup}. Simpan salinan di tempat yang Anda percaya.</div>
+    </div>`;
+}
 function netStatus(){
   const el = $('#net');
   const [txt, title, off] = !online() ? ['Mode offline', 'Mode offline: aplikasi tidak memakai internet. Ketuk untuk mengubah.', true]
@@ -3143,7 +3209,7 @@ addEventListener('offline', netStatus);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   navigator.serviceWorker.register('sw.js')
     .then(() => navigator.serviceWorker.ready)
-    .then(() => { offlineReady = true; netStatus(); })
+    .then(() => { offlineReady = true; netStatus(); renderOfflineCard(); })
     .catch(() => {});
 }
 netStatus();
@@ -3175,7 +3241,7 @@ function renderInstall(){
     <div class="txt"><h3>Pasang Siaga Keluarga di HP</h3>
       <p class="muted" style="margin:4px 0 0">Buka dari layar utama seperti aplikasi biasa. Tetap jalan tanpa internet.</p>
       ${how ? `<details${showHowTo ? ' open' : ''}><summary>Cara memasang</summary><ol>${HOWTO[installPlatform()].map(s => `<li>${s}</li>`).join('')}</ol></details>` : ''}
-      <div class="tools">${installEvt ? '<button class="btn pri" data-install>📲 Pasang aplikasi</button>' : ''}<button class="btn" id="installLater">Nanti</button></div></div>`;
+      <div class="tools">${installEvt ? '<button type="button" class="btn pri" data-install>📲 Pasang aplikasi</button>' : ''}<button type="button" class="btn" id="installLater">Nanti</button></div></div>`;
 }
 async function doInstall(){
   if(!installEvt){ showHowTo = true; S.installLater = null; save(); renderInstall(); showTab('t-fam'); return; }

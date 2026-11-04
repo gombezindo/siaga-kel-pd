@@ -104,8 +104,8 @@
       ]
     },
     {
-      "name": "Rencana & kartu darurat",
-      "short_name": "Rencana",
+      "name": "Keluarga & kartu darurat",
+      "short_name": "Keluarga",
       "url": "./?tab=t-info",
       "icons": [
         {
