@@ -274,6 +274,13 @@ body.surv-open{overflow:hidden}
 .subtabs .btn{white-space:nowrap;flex:1;text-align:center;background:none;border:0;border-radius:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 6px 9px;font-size:16px}
 .subtabs .btn.active{color:var(--ink);border-bottom-color:var(--accent)}
 .community-grid{display:grid;gap:14px}
+#sources>summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:2px}
+#sources>summary::-webkit-details-marker{display:none}
+#sources>summary h3:after{content:' ▾';color:var(--muted)}
+#sources[open]>summary h3:after{content:' ▴'}
+#sources[open]>summary span{display:none}
+.nowcast{margin:8px 0}.nowcast ul{margin:4px 0 0;padding-left:18px}
+.fb-intro{margin:0 0 8px}
 .quick-entry{margin-bottom:14px}
 .quick-entry h3{margin-bottom:4px}
 .quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
@@ -289,7 +296,7 @@ body.surv-open{overflow:hidden}
 .chat-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;background:var(--bg);border-radius:12px;padding:10px;margin:10px 0}
 .chat-empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
 .msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;overflow-wrap:anywhere}
-.msg.help{border-left:5px solid var(--bad)}.msg.offer{border-left:5px solid var(--ok)}.msg.info{border-left:5px solid var(--warn)}
+.msg.help{border-left:5px solid var(--bad)}.msg.offer{border-left:5px solid var(--ok)}.msg.info{border-left:5px solid var(--warn)}.msg.kritik,.msg.bug{border-left:5px solid var(--warn)}.msg.apresiasi{border-left:5px solid var(--ok)}.msg.saran{border-left:5px solid var(--accent)}
 .msg-head{display:flex;gap:8px;justify-content:space-between;font-size:12px;color:var(--muted)}
 .msg p{margin:4px 0 0;white-space:pre-wrap}.msg .mute{font-size:12px;margin-top:4px;color:var(--muted)}.msg .tag{font-weight:700;color:var(--ink)}
 .compose{display:grid;gap:8px}.compose textarea{width:100%;min-height:76px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;resize:vertical}
@@ -482,6 +489,7 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
       <button type="button" class="btn" data-quick="limited"><span class="ic">🎒</span><span>Persediaan terbatas<small>Lihat kebutuhan utama lebih dahulu</small></span></button>
     </div>
   </div>
+  <div class="noprint" id="localAlert" role="alert" hidden></div>
   <div class="card status" id="statusCard" aria-live="polite"></div>
   <div class="card install-card noprint" id="installCard" hidden></div>
   <div class="card noprint" id="offlineCard"></div>
@@ -641,13 +649,6 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
   </div>
   <h3 class="group-h" id="settingsHead">Pengaturan</h3>
   <div class="card noprint" id="modeCard"></div>
-  <div class="card">
-    <h3>Wilayah panduan</h3>
-    <p class="muted">Pilih panduan khusus Malang Selatan atau panduan umum untuk seluruh Indonesia.</p>
-    <div class="seg top" id="regionCtl" role="group" aria-label="Wilayah panduan">
-      <button type="button" data-region="malang">Malang Selatan</button><button type="button" data-region="umum">Indonesia (umum)</button>
-    </div>
-  </div>
   <div class="card" id="dataCard">
     <h3>Data &amp; cadangan</h3>
     <div id="dataStatus"></div>
@@ -669,10 +670,15 @@ a.btn{display:inline-block;color:var(--ink);text-decoration:none}
       <button type="button" class="btn" id="resetBtn" style="color:var(--bad)">Hapus semua data</button>
     </div>
   </div>
-  <div class="card src" id="sources"><h3>Sumber resmi &amp; batas panduan</h3>
+  <div class="card noprint" id="feedbackCard">
+    <h3>Kritik &amp; saran untuk lebih baik</h3>
+    <p class="muted fb-intro">Forum terbuka untuk semua pengguna di seluruh Indonesia. Ceritakan apa yang membingungkan, fitur yang Anda butuhkan, atau kesalahan yang ditemukan agar aplikasi ini makin berguna. Pesan dapat dibaca semua pengguna dan tampil 30 hari.</p>
+    <div id="feedbackChat"></div>
+  </div>
+  <details class="card src" id="sources"><summary><h3>Sumber resmi &amp; batas panduan</h3><span class="muted">Ketuk untuk melihat rujukan</span></summary>
   <p>Rujukan ditinjau 31 Oktober 2026. Ringkasan ini bukan peringatan bencana langsung. Arahan BMKG, BPBD, dan petugas setempat tetap menjadi acuan saat kejadian. Tautan luar memerlukan internet; ringkasan tetap tersedia offline.</p>
   <ul id="sourceList" class="source-list"></ul>
-  <p>Jumlah kebutuhan adalah estimasi aplikasi, bukan standar yang seragam untuk setiap keluarga. Sesuaikan dengan kondisi anggota keluarga. Nomor darurat umum belum diuji sambung; cakupan layanan dapat berbeda antarwilayah.</p></div>
+  <p>Jumlah kebutuhan adalah estimasi aplikasi, bukan standar yang seragam untuk setiap keluarga. Sesuaikan dengan kondisi anggota keluarga. Nomor darurat umum belum diuji sambung; cakupan layanan dapat berbeda antarwilayah.</p></details>
 </section>
 
 <!-- PUSTAKA (bagian kategori Darurat) -->
@@ -741,7 +747,7 @@ const KEY = 'siaga-keluarga-v1';
 const SCHEMA = 2;
 let offlineReady = false, storagePersistent = false, installEvt = null;
 const clone = o => JSON.parse(JSON.stringify(o));
-const DEF = {v:SCHEMA, region:'malang', risk:{}, fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3,
+const DEF = {v:SCHEMA, region:'umum', risk:{}, fam:{dewasa:2,anak:2,balita:0,lansia:0}, days:3,
   special:{hamil:false, obat:false, alatbantu:false, hewan:0},
   have:{}, batches:{}, done:{}, open:{}, info:{}, members:[], checks:{}, lastBackup:null, custom:[],
   price:{}, calc:{}, geo:{}, routes:[], place:null, wx:null,
@@ -757,6 +763,7 @@ function migrate(raw){
     for(const [id, date] of Object.entries(s.exp || {})) if(date && !s.batches[id]) s.batches[id] = [{q:0, e:date}];
   }
   delete s.exp; delete s.confirmed;
+  s.region = 'umum';   // v3: one nationwide guide; local conditions follow the user's location
   s.v = SCHEMA;
   return s;
 }
@@ -772,8 +779,8 @@ function save(){
   return saveState.ok;
 }
 
-// region-specific text: {malang, umum} objects resolve to the active region
-const R = v => (v && typeof v === 'object' && !Array.isArray(v) && 'umum' in v) ? (v[S.region] ?? v.umum) : v;
+// legacy region-specific text objects ({umum}) resolve to the nationwide text
+const R = v => (v && typeof v === 'object' && !Array.isArray(v) && 'umum' in v) ? v.umum : v;
 
 // family context used by quantity formulas
 function ctx(){
@@ -796,7 +803,7 @@ const airHigiene = c => c.n*10*c.d;     // L washing/toilet
 const CATS = [
  {id:'air', ic:'💧', t:'Air', items:[
   {id:'galon', t:'Galon air minum (segel, belum dibuka)', n:c=>ceil(air(c)/19), u:'galon', p:1, exp:1, tip:c=>`≈ ${air(c)} L untuk minum & masak (3 L/orang/hari). Jangan dijatah — minum sesuai kebutuhan.`},
-  {id:'drum', t:'Air untuk mandi & WC (drum / ember tertutup)', n:c=>airHigiene(c), u:'liter', st:10, p:1, tip:()=>R({malang:'Penting di wilayah kapur saat kemarau. Tutup rapat agar tidak jadi sarang nyamuk / kena abu.', umum:'Penting saat kemarau atau pasokan air terputus. Tutup rapat agar tidak jadi sarang nyamuk.'})},
+  {id:'drum', t:'Air untuk mandi & WC (drum / ember tertutup)', n:c=>airHigiene(c), u:'liter', st:10, p:1, tip:()=>R('Penting saat kemarau atau pasokan air terputus. Tutup rapat agar tidak jadi sarang nyamuk.')},
   {id:'jernih', t:'Tablet penjernih air / kaporit cair / saringan portabel', n:()=>1, u:'set', p:2, exp:1},
  ]},
  {id:'mkn', ic:'🍚', t:'Makanan siap makan', sub:'Prioritas — listrik & gas bisa putus', items:[
@@ -841,7 +848,7 @@ const CATS = [
   {id:'umum', t:'Paracetamol (dewasa + sirup anak), oralit, obat diare, maag, alergi', n:()=>1, u:'set', p:1, exp:1},
   {id:'p3k', t:'Kotak P3K: plester, perban, kasa, antiseptik, gunting, termometer', n:()=>1, u:'kotak', p:1, exp:1},
   {id:'higiene', t:'Sabun, sikat & pasta gigi, pembalut, hand sanitizer, tisu basah', n:()=>1, u:'paket', p:1},
-  {id:'n95', t:'Masker N95 / KN95', n:c=>c.nonBal*c.d, u:'buah', p:2, tip:()=>R({malang:'Untuk abu Semeru & debu reruntuhan. N95 tidak dirancang untuk bayi/balita — lindungi mereka di dalam ruangan.', umum:'Untuk abu vulkanik, asap karhutla & debu reruntuhan. N95 tidak dirancang untuk bayi/balita — lindungi mereka di dalam ruangan.'})},
+  {id:'n95', t:'Masker N95 / KN95', n:c=>c.nonBal*c.d, u:'buah', p:2, tip:()=>R('Untuk abu vulkanik, asap karhutla & debu reruntuhan. N95 tidak dirancang untuk bayi/balita — lindungi mereka di dalam ruangan.')},
   {id:'kacamata', t:'Kacamata pelindung (abu / asap)', n:c=>c.nonBal, u:'buah', p:2},
   {id:'plastik', t:'Kantong plastik besar (sampah / toilet darurat)', n:()=>20, u:'lembar', p:2},
  ]},
@@ -852,7 +859,7 @@ const CATS = [
   {id:'sepatu', t:'Sandal / sepatu kuat di dekat tempat tidur', n:c=>c.n, u:'pasang', p:1, tip:()=>'Setelah gempa, lantai penuh pecahan kaca.'},
   {id:'radio', t:'Radio kecil (baterai / engkol)', n:()=>1, u:'buah', p:2},
   {id:'terpal', t:'Terpal + tali rafia', n:()=>1, u:'set', p:2},
-  {id:'selimut', t:{malang:'Selimut / sarung (malam di Malang Selatan dingin)', umum:'Selimut / sarung'}, n:c=>c.n, u:'lembar', p:2},
+  {id:'selimut', t:'Selimut / sarung', n:c=>c.n, u:'lembar', p:2},
   {id:'pisau', t:'Pisau lipat / multitool, lakban, sarung tangan kerja', n:()=>1, u:'set', p:2},
  ]},
  {id:'listrik', ic:'⚡', t:'Blackout massal', sub:'Listrik padam berhari-hari', items:[
@@ -915,9 +922,9 @@ const PHASES = [
  {id:'p1', t:'Minggu ini', items:[
   ['wa','Buat grup WA keluarga + daftar kontak yang ditulis di kertas'],
   ['titik','Tentukan 2 titik kumpul: dekat rumah (lapangan terbuka) & di luar lingkungan (sekolah / masjid / rumah saudara)'],
-  ['jalur',{malang:'Tanya jalur evakuasi & tempat aman ke kantor desa atau BPBD Kab. Malang', umum:'Cek risiko lokasi rumah di InaRISK, lalu tanyakan jalur evakuasi & tempat aman ke kelurahan/desa atau BPBD setempat'},
-   {malang:'Jalur tsunami Malang Selatan belum terdokumentasi lengkap online — tanyakan langsung.', umum:'InaRISK (inarisk.bnpb.go.id) adalah portal risiko bencana resmi BNPB.'}],
-  ['apps',{malang:'Pasang aplikasi InfoBMKG (gempa, cuaca) & MAGMA Indonesia (status Semeru)', umum:'Pasang InfoBMKG (gempa, cuaca, peringatan dini); tambahkan MAGMA Indonesia bila dekat gunung api'}],
+  ['jalur','Cek risiko lokasi rumah di InaRISK, lalu tanyakan jalur evakuasi & tempat aman ke kelurahan/desa atau BPBD setempat',
+   'InaRISK (inarisk.bnpb.go.id) adalah portal risiko bencana resmi BNPB.'],
+  ['apps','Pasang InfoBMKG (gempa, cuaca, peringatan dini); tambahkan MAGMA Indonesia bila dekat gunung api'],
   ['kontakluar','Pilih 1 kontak keluarga di luar kota sebagai "pusat kabar"','Saat jaringan lokal padat, telepon ke luar kota sering lebih mudah tersambung.'],
   ['tangki','Biasakan tangki motor/mobil selalu minimal setengah','Saat blackout, SPBU tanpa genset tidak bisa memompa BBM.'],
  ]},
@@ -970,7 +977,7 @@ const HAZ = [
   'Di luar: jauhi tiang listrik, pohon, tebing, dan bangunan.'],
   after:['Pakai alas kaki, ambil tas evakuasi, keluar ke titik kumpul.','Matikan gas & listrik bila aman. Jangan nyalakan api bila tercium bau gas.','Waspada gempa susulan. Jangan masuk rumah yang retak parah.','Cek anggota keluarga & tetangga. Kabari kontak luar kota.']},
  {k:'tsunami', lbl:'Tsunami', ic:'🌊', t:'Tsunami', rel:['pantai'], src:['bnpb'],
-  tag:{malang:'warga pesisir: Donomulyo, Bantur, Gedangan, Sumbermanjing Wetan, Tirtoyudo, Ampelgading', umum:'untuk warga yang tinggal atau beraktivitas di pesisir'},
+  tag:'untuk warga yang tinggal atau beraktivitas di pesisir',
   big:'Di pesisir setelah gempa kuat atau lama: segera evakuasi ke tempat tinggi. Jangan tunggu sirene.',
   quick:['Di pesisir setelah gempa kuat atau lama: evakuasi, jangan tunggu sirene.', 'Ikuti jalur ke tempat tinggi, menjauhi pantai.', 'Tetap di tempat aman sampai petugas menyatakan aman.'],
   a:['Tanda alam: air laut surut tiba-tiba, suara gemuruh dari laut.',
@@ -978,14 +985,14 @@ const HAZ = [
   'Bila terjebak: naik ke lantai atas bangunan beton yang kokoh.',
   'Tsunami datang beberapa gelombang — jangan turun sampai ada pernyataan aman dari BMKG/BPBD.']},
  {k:'banjir', lbl:'Banjir / longsor', ic:'🌧️', t:'Banjir & longsor', rel:['sungai','lereng'], src:['bnpb'],
-  tag:{malang:'November–Maret', umum:'banjir adalah bencana paling sering di Indonesia (data BNPB 2025–2026)'},
+  tag:'banjir adalah bencana paling sering di Indonesia (data BNPB 2025–2026)',
   quick:['Menjauh dari lereng yang retak atau menunjukkan tanda longsor.', 'Evakuasi lebih awal ke tempat aman sesuai arahan petugas.', 'Jangan menyeberangi arus banjir.'],
   a:['Hujan deras berjam-jam di daerah lereng: siaga, siapkan tas, pantau kabar desa.',
   'Tanda longsor: retakan baru di tanah/dinding, pohon & tiang miring, mata air tiba-tiba keruh atau hilang, suara gemuruh. Segera menjauh.',
   'Banjir: matikan listrik dari MCB, naikkan barang & dokumen, evakuasi lebih awal.',
   'Jangan menyeberangi arus — air setinggi lutut bisa menyeret orang dewasa.']},
- {k:'erupsi', lbl:'Abu vulkanik', ic:'🌋', t:{malang:'Hujan abu Semeru', umum:'Erupsi & hujan abu vulkanik'}, rel:['gunung'], src:['bnpb','magma'],
-  tag:{malang:'pantau MAGMA Indonesia', umum:'bila tinggal dekat gunung api — pantau status di MAGMA Indonesia'},
+ {k:'erupsi', lbl:'Abu vulkanik', ic:'🌋', t:'Erupsi & hujan abu vulkanik', rel:['gunung'], src:['bnpb','magma'],
+  tag:'bila tinggal dekat gunung api — pantau status di MAGMA Indonesia',
   quick:['Berlindung di dalam; tutup pintu dan jendela.', 'Jika harus keluar, gunakan masker dan pelindung mata.', 'Ikuti arahan evakuasi petugas; jauhi wilayah terlarang.'],
   a:['Pakai masker N95 & kacamata. Lindungi bayi/balita di dalam rumah.',
   'Tutup bak, sumur, tandon, dan wadah makanan. Putus talang penampung air hujan sebelum abu turun.',
@@ -1000,7 +1007,7 @@ const HAZ = [
   'Jauhi pohon besar, baliho, tiang listrik, dan bangunan semi permanen.',
   'Amankan barang di halaman yang bisa terbawa angin.',
   'Tunda pelayaran / melaut bila ada peringatan cuaca atau gelombang tinggi.']},
- {k:'asap', lbl:'Kabut asap', ic:'😷', t:'Kabut asap kebakaran hutan & lahan', only:'umum', rel:['asap'], src:['kemkesasap'],
+ {k:'asap', lbl:'Kabut asap', ic:'😷', t:'Kabut asap kebakaran hutan & lahan', rel:['asap'], src:['kemkesasap'],
   tag:'terutama Sumatra & Kalimantan saat kemarau',
   quick:['Kurangi aktivitas di luar rumah saat udara buruk.', 'Pakai respirator N95/KN95, bukan masker kain.', 'Ke puskesmas bila sesak napas atau batuk berat.'],
   a:['Pantau kualitas udara (ISPU) dari pemerintah daerah.',
@@ -1520,7 +1527,6 @@ const SOURCES = {
   oillamp: {title:'Mother Earth News — Make an olive oil lamp', url:'https://www.motherearthnews.com/diy/make-olive-oil-lamp/', scope:'Cara membuat lampu minyak nabati dengan sumbu; berbahasa Inggris.'},
   cawstbsf: {title:'CAWST — Biosand Filter Manual (PDF)', url:'https://www3.ctahr.hawaii.edu/hawaiirain/Library/Guides&Manuals/CAWST%20files/Biosand%20Filter%20Manual_Version%2010_Sep%2009%5B1%5D.pdf', scope:'Cara kerja filter biosand dan waktu pematangan lapisan biologis.'},
   scoutstove: {title:'Scouts South Africa — Conservation stoves', url:'https://scoutwiki.scouts.org.za/wiki/Conservation_stoves', scope:'Kompor kaleng hemat bahan bakar; berbahasa Inggris.'},
-  bpbd: {title:'BPBD Kabupaten Malang', url:'https://bpbd.malangkab.go.id/', only:'malang', scope:'Informasi daerah; konfirmasikan jalur evakuasi dan titik aman dengan desa/BPBD.'},
 };
 
 const NUMS = [['112','Darurat terpadu'],['117','BNPB'],['115','Basarnas (SAR)'],['119','Ambulans / SPGDT'],['110','Polisi'],['113','Pemadam kebakaran'],['123','PLN'],['118','Ambulans']];
@@ -1530,7 +1536,7 @@ const INFO = [
  ['titik2','Titik kumpul 2 (di luar lingkungan)','mis. masjid / sekolah / rumah saudara'],
  ['jalur','Jalur evakuasi / tempat aman terdekat','tanyakan ke kantor desa', true],
  ['luar','Kontak keluarga di luar kota ("pusat kabar")','nama & nomor'],
- ['bpbd',{malang:'Nomor BPBD Kab. Malang', umum:'Nomor BPBD kabupaten/kota'},'isi dari sumber resmi'],
+ ['bpbd','Nomor BPBD kabupaten/kota','isi dari sumber resmi'],
  ['rt','Ketua RT / RW','nama & nomor'],
  ['pkm','Puskesmas / RS / bidan terdekat','nama & nomor'],
  ['radio','Radio: kanal HT keluarga & frekuensi RRI/radio lokal','mis. HT PMR kanal 5 (cadangan 9), dengar tiap jam :00 · RRI …', true],
@@ -1698,35 +1704,73 @@ const WMO = {0:'Cerah',1:'Cerah berawan',2:'Berawan',3:'Mendung',45:'Berkabut',4
   61:'Hujan ringan',63:'Hujan sedang',65:'Hujan lebat',66:'Hujan',67:'Hujan lebat',80:'Hujan lokal',81:'Hujan deras lokal',82:'Hujan sangat deras',95:'Badai petir',96:'Badai petir',99:'Badai petir'};
 const wmoText = code => WMO[code] || 'Cuaca tidak diketahui';
 const aqiCat = v => v <= 50 ? ['ok','Baik'] : v <= 100 ? ['ok','Sedang'] : v <= 150 ? ['warn','Tidak sehat bagi kelompok sensitif'] : v <= 200 ? ['bad','Tidak sehat'] : v <= 300 ? ['bad','Sangat tidak sehat'] : ['bad','Berbahaya'];
-const wxPlace = () => S.place && validCoord(S.place.lat, S.place.lon) ? S.place : (S.region === 'malang' ? {name:'Malang Selatan', lat:-8.2, lon:112.6} : null);
+const wxPlace = () => S.place && validCoord(S.place.lat, S.place.lon) ? S.place : null;
 const samePlace = (a, b) => a && b && a.lat === b.lat && a.lon === b.lon;
 // warnings derived from the fetched data; thresholds: AQI > 100, rain ≥ 80% with ≥ 20 mm, M ≥ 5 within 300 km
 function wxAlerts(d){
   const out = [];
   const aqi = d.aq?.current?.us_aqi;
-  if(aqi > 100) out.push(['warn', 'Udara tidak sehat: kurangi aktivitas di luar dan pakai masker N95/KN95, terutama anak, lansia, ibu hamil.', S.region === 'umum' ? 'asap' : 'erupsi']);
+  if(aqi > 100) out.push(['warn', 'Udara tidak sehat: kurangi aktivitas di luar dan pakai masker N95/KN95, terutama anak, lansia, ibu hamil.', 'asap']);
   const dd = d.wx?.daily;
   if(dd && dd.time.some((_, i) => dd.precipitation_probability_max[i] >= 80 && dd.precipitation_sum[i] >= 20)) out.push(['warn', 'Potensi hujan lebat dalam 3 hari: siaga banjir dan longsor, siapkan tas evakuasi.', 'banjir']);
+  if(dd?.wind_gusts_10m_max?.some(v => v >= 60)) out.push(['warn', 'Potensi angin kencang (hembusan ≥ 60 km/jam): amankan benda di luar rumah dan jauhi pohon atau baliho.', 'cuaca']);
+  if(dd?.temperature_2m_max?.some(v => v >= 35)) out.push(['warn', 'Suhu sangat panas (≥ 35°C): minum cukup air, hindari terik siang, perhatikan anak dan lansia.', 'cuaca']);
   if(d.eq){ const [la, lo] = String(d.eq.Coordinates).split(',').map(Number);
     if(+d.eq.Magnitude >= 5 && validCoord(la, lo) && distKm(d.place, {lat:la, lon:lo}) <= 300) out.push(['bad', 'Gempa kuat terjadi di dekat lokasi Anda: waspada gempa susulan, periksa retakan rumah.', 'gempa']); }
   return out;
 }
+const BMKG_NOWCAST = 'https://www.bmkg.go.id/alerts/nowcast/id';   // BMKG blocks cross-origin reads of this feed, so it is linked, not fetched
 async function fetchConditions(place){
   const lat = place.lat.toFixed(2), lon = place.lon.toFixed(2);
   const get = url => fetch(url).then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
   const [wx, aq, eq] = await Promise.allSettled([
-    get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&forecast_days=3&timezone=Asia%2FJakarta`),
+    get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_gusts_10m_max&forecast_days=3&timezone=Asia%2FJakarta`),
     get(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5`),
     get('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json')]);
   if([wx, aq, eq].every(r => r.status !== 'fulfilled')) throw new Error('Tidak bisa mengambil data. Periksa koneksi internet.');
-  return {at:new Date().toISOString(), place:{name:place.name, lat:place.lat, lon:place.lon},
+  return {at:new Date().toISOString(), place:{name:place.name, prov:place.prov || '', lat:place.lat, lon:place.lon},
     wx: wx.value || null, aq: aq.value || null, eq: eq.value?.Infogempa?.gempa || null};
+}
+// Name for a GPS fix (coordinates already rounded to ±1 km). BigDataCloud's client endpoint needs no key.
+async function placeName(lat, lon){
+  try {
+    const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=id`).then(r => r.json());
+    const adm = r.localityInfo?.administrative || [];
+    const prov = adm.find(a => a.adminLevel === 4)?.name || '';
+    const kab = adm.find(a => a.adminLevel === 5)?.name || r.city || '';
+    const kec = adm.filter(a => a.adminLevel === 6).pop()?.name || r.locality || '';
+    return {name:str([kec, kab].filter(Boolean).join(', ') || prov || 'Lokasi saya', 80), prov:str(prov, 60)};
+  } catch { return {name:'Lokasi saya', prov:''}; }
+}
+async function locateMe(){
+  const p = await getPosition(), lat = roundTo(p.lat, 2), lon = roundTo(p.lon, 2);
+  const old = S.place;
+  S.locAt = Date.now();
+  if(!(old?.auto && old.lat === lat && old.lon === lon && old.prov)){
+    const n = navigator.onLine ? await placeName(lat, lon) : {name:'Lokasi saya', prov:''};
+    S.place = {name:n.name, prov:n.prov, lat, lon, auto:true};
+  }
+  save(); renderRegion(); renderMode();
+  return refreshWx(true);
+}
+// Conditions follow the user's location: ask once on first use, then refresh silently when permission is granted.
+// A place the user searched for by hand is kept until they choose "Pakai lokasi saya" again.
+async function autoLocate(){
+  if(!online() || !navigator.onLine || !navigator.geolocation) return;
+  if(S.place && !S.place.auto) return;
+  let state = 'prompt';
+  try { state = (await navigator.permissions.query({name:'geolocation'})).state; } catch {}
+  if(state === 'denied') return;
+  if(state === 'prompt' && S.locAsked) return;
+  if(state === 'granted' && S.place?.auto && Date.now() - (S.locAt || 0) < 30*60e3) return;
+  S.locAsked = true; save();
+  locateMe().catch(() => {});
 }
 async function geocode(name){
   const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=id&countryCode=ID`).then(r => r.json());
   const g = res.results?.[0];
   if(!g) throw new Error(`"${name}" tidak ditemukan. Coba nama kota atau kecamatan lain.`);
-  return {name:[g.name, g.admin2 || g.admin1].filter(Boolean).join(', '), lat:roundTo(g.latitude, 2), lon:roundTo(g.longitude, 2)};
+  return {name:[g.name, g.admin2 || g.admin1].filter(Boolean).join(', '), prov:g.admin1 || '', lat:roundTo(g.latitude, 2), lon:roundTo(g.longitude, 2)};
 }
 
 // ---------- recurring checks ----------
@@ -1778,7 +1822,6 @@ function sanitizeData(o){
     out.fam = {dewasa:o.fam.dewasa, anak:o.fam.anak, balita:o.fam.balita, lansia:o.fam.lansia};
   }
   if('days' in o){ if([3,5,7].includes(o.days)) out.days = o.days; else warn.push('durasi'); }
-  if('region' in o){ if(['malang','umum'].includes(o.region)) out.region = o.region; else warn.push('wilayah'); }
   if(isObj(o.special)) out.special = {hamil:o.special.hamil === true, obat:o.special.obat === true, alatbantu:o.special.alatbantu === true, hewan:int(o.special.hewan, 0, 20) ? o.special.hewan : 0};
   if(isObj(o.risk)) out.risk = Object.fromEntries(RISKS.map(([k]) => [k, o.risk[k] === true]));
   if(isObj(o.info)) out.info = Object.fromEntries(INFO.map(([k]) => [k, str(o.info[k], 1000)]).filter(([, v]) => v));
@@ -1800,7 +1843,7 @@ function sanitizeData(o){
   }
   if(isObj(o.price)) out.price = Object.fromEntries(Object.entries(o.price).filter(([k, v]) => findItem(k) && typeof v === 'number' && v > 0 && v < 1e9));
   if(isObj(o.calc)) out.calc = Object.fromEntries(Object.entries(o.calc).filter(([k, v]) => k in CALC_DEF && typeof v === 'number' && v >= 0 && v < 1e7));
-  if(isObj(o.place) && validCoord(o.place.lat, o.place.lon)) out.place = {name:str(o.place.name, 80), lat:o.place.lat, lon:o.place.lon};
+  if(isObj(o.place) && validCoord(o.place.lat, o.place.lon)) out.place = {name:str(o.place.name, 80), prov:str(o.place.prov, 60), lat:o.place.lat, lon:o.place.lon};
   if('famGroup' in o) out.famGroup = validGid(o.famGroup) ? o.famGroup : '';
   if(Array.isArray(o.videos)) out.videos = o.videos.filter(isObj).slice(0, 30).map(v => ({id:ytId(v.id), t:str(v.t, 100) || 'Video'})).filter(v => v.id);
   if(['online','offline'].includes(o.mode)) out.mode = o.mode;
@@ -1827,7 +1870,6 @@ function summarize(d){
   if(d.info) parts.push(`${Object.keys(d.info).length} isian rencana`);
   const stock = new Set([...Object.keys(d.have || {}), ...Object.keys(d.batches || {})]).size;
   if(stock) parts.push(`${stock} barang tercatat`);
-  if(d.region) parts.push(`wilayah ${d.region === 'malang' ? 'Malang Selatan' : 'Indonesia (umum)'}`);
   return parts.join(', ') || 'data kosong';
 }
 
@@ -1856,8 +1898,7 @@ const shareUrl = code => `${location.origin}${location.pathname}#import=${code}`
 
 // ---------- emergency card ----------
 function hazList(){
-  const list = HAZ.filter(h => !h.only || h.only === S.region);
-  if(S.region !== 'umum') return list;
+  const list = HAZ;
   const rel = h => (h.rel || []).some(k => S.risk[k]);
   return [...list.filter(rel), ...list.filter(h => !rel(h))];
 }
@@ -1868,7 +1909,7 @@ function cardHtml(){
   return `<div class="ecard">
     <h4>Kartu Darurat Keluarga</h4>
     ${row('Alamat', i.alamat)}
-    <div class="grid2">${row('Titik kumpul 1', i.titik1)}${row('Titik kumpul 2', i.titik2)}${row('Pusat kabar (luar kota)', i.luar)}${row(R({malang:'BPBD Kab. Malang', umum:'BPBD'}), i.bpbd)}${row('RT / RW', i.rt)}${row('Puskesmas / RS / bidan', i.pkm)}</div>
+    <div class="grid2">${row('Titik kumpul 1', i.titik1)}${row('Titik kumpul 2', i.titik2)}${row('Pusat kabar (luar kota)', i.luar)}${row(R('BPBD'), i.bpbd)}${row('RT / RW', i.rt)}${row('Puskesmas / RS / bidan', i.pkm)}</div>
     ${i.jalur ? row('Jalur evakuasi', i.jalur) : ''}
     ${i.radio ? row('Radio', i.radio) : ''}
     ${['titik1','titik2'].some(k => S.geo[k]) ? `<div><b>Koordinat titik kumpul:</b> ${['titik1','titik2'].map((k, n) => S.geo[k] ? `${n+1}: ${S.geo[k].lat}, ${S.geo[k].lon}` : '').filter(Boolean).join(' · ')}</div>` : ''}
@@ -1885,17 +1926,9 @@ function cardHtml(){
 
 // ---------- render ----------
 function renderRegion(){
-  document.querySelectorAll('#regionCtl button').forEach(b => b.setAttribute('aria-pressed', b.dataset.region === S.region));
-  $('#subtitle').textContent = R({malang:'Panduan darurat · Malang Selatan', umum:'Panduan darurat · Indonesia'});
-  $('#regionInfo').innerHTML = S.region === 'malang' ? `
-    <h3>Kenapa Malang Selatan perlu siaga?</h3>
-    <ul style="margin:8px 0 0;padding-left:20px">
-      <li><b>Gempa</b> — dekat zona megathrust selatan Jawa (gempa M6,1 tahun 2021).</li>
-      <li><b>Tsunami</b> — Kab. Malang urutan ke-5 potensi tsunami terbesar di Jatim.</li>
-      <li><b>Banjir &amp; longsor</b> — musim hujan November–Maret.</li>
-      <li><b>Abu Semeru</b> — wilayah timur (Ampelgading, Tirtoyudo, Dampit).</li>
-      <li><b>Krisis air</b> — wilayah kapur (karst) saat kemarau.</li>
-    </ul>` : `
+  const pl = wxPlace();
+  $('#subtitle').textContent = 'Panduan darurat · ' + (pl?.name || 'Indonesia');
+  $('#regionInfo').innerHTML = `
     <h3>Kenali risiko lokasi Anda</h3>
     <p class="muted">Cek tingkat ancaman di alamat rumah lewat <a href="https://inarisk.bnpb.go.id/" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">InaRISK BNPB</a> (perlu internet), lalu tandai yang sesuai. Bencana yang relevan akan ditampilkan lebih dulu.</p>
     <div class="checks">${RISKS.map(([k, l]) => `<label><input type="checkbox" data-risk="${k}" ${S.risk[k] ? 'checked' : ''}> ${l}</label>`).join('')}</div>
@@ -2042,7 +2075,7 @@ function renderPlan(){
 
 function renderHaz(){
   const list = hazList();
-  const rel = h => S.region === 'umum' && (h.rel || []).some(k => S.risk[k]);
+  const rel = h => (h.rel || []).some(k => S.risk[k]);
   $('#hazardPicker').innerHTML = list.map((h,i) => `<button type="button" class="btn${rel(h)?' rel':''}" data-hazard="${h.k}" aria-pressed="${i===0}" aria-controls="hazard-${h.k}">${h.lbl}</button>`).join('');
   $('#hazards').innerHTML = list.map((h,i) => `<article class="card hazard-panel" id="hazard-${h.k}" ${i?'hidden':''} style="margin-top:14px">
     <h3 tabindex="-1">${h.ic} ${esc(R(h.t))}</h3>
@@ -2056,7 +2089,7 @@ function renderHaz(){
     ${h.after?`<b>${h.afterT||'Setelah guncangan'}</b><ul>${h.after.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
     </details><p class="src">Rujukan: ${sourceLinks(h.src)}<br>Ditinjau 31 Oktober 2026 · tautan perlu internet.</p>
   </article>`).join('');
-  $('#sourceList').innerHTML = Object.values(SOURCES).filter(s => !s.only || s.only === S.region)
+  $('#sourceList').innerHTML = Object.values(SOURCES)
     .map(source=>`<li><a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a><br>${source.scope}</li>`).join('');
   renderHazReady();
   renderP3k();
@@ -2223,6 +2256,7 @@ function wxHtml(d){
   if(d.eq){ const [la, lo] = String(d.eq.Coordinates).split(',').map(Number);
     const km = validCoord(la, lo) ? ` · ±${Math.round(distKm(d.place, {lat:la, lon:lo}))} km dari lokasi` : '';
     parts.push(`<p style="margin:8px 0">Gempa terbaru (BMKG): <b>M${esc(d.eq.Magnitude)}</b> · ${esc(d.eq.Tanggal)} ${esc(d.eq.Jam)}${km}<br><span class="muted">${esc(d.eq.Wilayah)}. ${esc(d.eq.Potensi)}</span></p>`); }
+  parts.push(`<p class="nowcast">Peringatan dini cuaca resmi${d.place?.prov ? ` untuk <b>${esc(d.place.prov)}</b>` : ''}: buka <a href="${BMKG_NOWCAST}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">daftar peringatan BMKG</a> atau aplikasi InfoBMKG.</p>`);
   wxAlerts(d).forEach(([cls, txt, k]) => parts.push(`<div class="${cls === 'bad' ? 'badbox' : 'warnbox'}">${esc(txt)} <button type="button" class="btn sm" data-hazlink="${k}">Lihat panduan</button></div>`));
   parts.push(`<p class="muted" style="margin:6px 0 0">Diperbarui ${fmtTime(d.at)}${navigator.onLine ? '' : ' · sedang offline, menampilkan data terakhir'}.</p>`);
   return parts.join('');
@@ -2240,7 +2274,10 @@ function renderWx(){
     <div class="tools wx-tools"><button type="button" class="btn sm" id="wxHere">📍 Pakai lokasi saya</button>
       <input type="text" id="wxCity" placeholder="Cari kota / kecamatan" aria-label="Cari lokasi"><button type="button" class="btn sm" id="wxFind">Cari</button>
       ${place ? '<button type="button" class="btn sm" id="wxRefresh">Perbarui</button>' : ''}</div>
-    <small class="muted">Lokasi dibulatkan (±1 km) lalu dikirim ke Open-Meteo untuk cuaca &amp; kualitas udara; data gempa dari BMKG. Ini bukan peringatan resmi — ikuti InfoBMKG dan BPBD.</small>`;
+    <small class="muted">Lokasi diambil dari GPS HP lalu dibulatkan (±1 km) dan dikirim ke Open-Meteo (cuaca &amp; udara) serta BigDataCloud (nama wilayah). Data gempa dari BMKG. Peringatan di kartu ini dihitung aplikasi dari data cuaca, bukan peringatan resmi — ikuti InfoBMKG dan BPBD.</small>`;
+  const urgent = d && samePlace(d.place, place) ? wxAlerts(d).filter(a => a[0] === 'bad') : [];
+  $('#localAlert').hidden = !urgent.length;
+  $('#localAlert').innerHTML = urgent.map(([, txt, k]) => `<div class="badbox">${esc(txt)} <button type="button" class="btn sm" data-hazlink="${k}">Lihat panduan</button></div>`).join('');
 }
 async function refreshWx(force){
   const place = wxPlace();
@@ -2480,13 +2517,15 @@ let myPosCache = null;
 const COMM_KEY = 'siaga-community-v1';
 function cleanCommunity(v){
   const x = isObj(v) ? v : {};
-  return {room:validGid(x.room) ? x.room : '', nick:str(x.nick, 40), mid:/^[A-Za-z0-9_-]{12,40}$/.test(x.mid || '') ? x.mid : randId(12), lastFamily:+x.lastFamily || 0, lastRoom:+x.lastRoom || 0,
+  return {room:validGid(x.room) ? x.room : '', nick:str(x.nick, 40), mid:/^[A-Za-z0-9_-]{12,40}$/.test(x.mid || '') ? x.mid : randId(12), lastFamily:+x.lastFamily || 0, lastRoom:+x.lastRoom || 0, lastFeedback:+x.lastFeedback || 0,
     muted:Array.isArray(x.muted) ? x.muted.filter(m => typeof m === 'string' && m.length <= 40).slice(-200) : []};
 }
 let COMM;
 try { COMM = cleanCommunity(JSON.parse(localStorage.getItem(COMM_KEY) || '{}')); } catch { COMM = cleanCommunity({}); }
 function saveCommunity(){ try { localStorage.setItem(COMM_KEY, JSON.stringify(COMM)); } catch {} }
 const CHAT_KINDS = {chat:'Obrolan', help:'Butuh bantuan', offer:'Bisa membantu', info:'Info warga'};
+const FEEDBACK_KINDS = {saran:'Saran', kritik:'Kritik', bug:'Laporan masalah', apresiasi:'Apresiasi'};
+const KIND_LABEL = {...CHAT_KINDS, ...FEEDBACK_KINDS};
 const FAMILY_TEMPLATES = [
   ['aman','Saya aman.'],
   ['menuju','Saya menuju titik kumpul.'],
@@ -2494,28 +2533,34 @@ const FAMILY_TEMPLATES = [
   ['bantuan','Saya butuh bantuan.'],
   ['obat','Saya membutuhkan obat atau kebutuhan khusus.']
 ];
-const chatText = v => String(v || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 280);
+const chatText = (v, max = 280) => String(v || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 function toChat(m){ return {fields:{name:{stringValue:m.name}, text:{stringValue:m.text}, kind:{stringValue:m.kind}, mid:{stringValue:m.mid}, t:{timestampValue:m.t}, exp:{timestampValue:m.exp}}}; }
 function fromChat(doc){
   const f = doc.fields || {};
   return {id:String(doc.name || '').split('/').pop(), name:f.name?.stringValue || '?', text:f.text?.stringValue || '',
     kind:f.kind?.stringValue || 'chat', mid:f.mid?.stringValue || '', t:f.t?.timestampValue || doc.createTime || ''};
 }
-let familyMessages = null, roomMessages = null, chatBusy = {family:false, room:false}, chatErr = {family:'', room:''};
+let familyMessages = null, roomMessages = null, feedbackMessages = null, feedbackAt = 0;
+const chatBusy = {family:false, room:false, feedback:false}, chatErr = {family:'', room:'', feedback:''};
+// family/room: private rooms keyed by a secret code, 48 h. feedback: one public forum for every user, 30 days.
 const chatConfig = scope => scope === 'family'
-  ? {code:S.famGroup, path:`fam/${S.famGroup}/chat`, list:familyMessages, title:'keluarga'}
-  : {code:COMM.room, path:`community/${COMM.room}/posts`, list:roomMessages, title:'warga'};
+  ? {code:S.famGroup, path:`fam/${S.famGroup}/chat`, list:familyMessages, title:'keluarga', hours:48, max:280, gap:10e3, last:'lastFamily'}
+  : scope === 'feedback'
+  ? {global:true, path:'feedback', list:feedbackMessages, title:'kritik & saran', hours:30*24, max:500, gap:30e3, last:'lastFeedback', kinds:FEEDBACK_KINDS, min:5}
+  : {code:COMM.room, path:`community/${COMM.room}/posts`, list:roomMessages, title:'warga', hours:48, max:280, gap:10e3, last:'lastRoom', kinds:CHAT_KINDS};
+const chatReady = c => c.global || validGid(c.code);
+function setChatList(scope, list){ if(scope === 'family') familyMessages = list; else if(scope === 'feedback') feedbackMessages = list; else roomMessages = list; }
 function messageHtml(m){
-  const kind = CHAT_KINDS[m.kind] ? m.kind : 'chat';
+  const kind = KIND_LABEL[m.kind] ? m.kind : 'chat';
   const mine = m.mid === COMM.mid;
-  return `<div class="msg ${kind}"><div class="msg-head"><span><span class="tag">${esc(CHAT_KINDS[kind])}</span> · ${esc(m.name)}${mine ? ' (Anda)' : ''}</span><time>${esc(agoText(m.t))}</time></div><p>${esc(m.text)}</p>
+  return `<div class="msg ${kind}"><div class="msg-head"><span><span class="tag">${esc(KIND_LABEL[kind])}</span> · ${esc(m.name)}${mine ? ' (Anda)' : ''}</span><time>${esc(agoText(m.t))}</time></div><p>${esc(m.text)}</p>
     ${mine || !m.mid ? '' : `<button type="button" class="linkbtn mute" data-mute="${esc(m.mid)}">Sembunyikan pengirim ini</button>`}</div>`;
 }
 function composeHtml(scope){
   const nick = scope === 'family' ? (S.live.name || COMM.nick) : COMM.nick;
-  return `${scope === 'family' ? `<div class="template-row" aria-label="Pesan cepat keluarga">${FAMILY_TEMPLATES.map(([k,v]) => `<button type="button" class="btn sm" data-chat-template="${k}">${esc(v)}</button>`).join('')}</div>` : ''}<div class="compose"><label>Nama di ruang<input id="${scope}ChatName" maxlength="40" value="${esc(nick)}" placeholder="mis. Budi / Posko RW 03"></label>
-    ${scope === 'room' ? `<label>Kategori<select id="roomChatKind">${Object.entries(CHAT_KINDS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>` : ''}
-    <label>Pesan<textarea id="${scope}ChatText" maxlength="280" placeholder="Tulis kebutuhan, jumlah, area umum, dan waktu. Maks. 280 karakter."></textarea></label>
+  return `${scope === 'family' ? `<div class="template-row" aria-label="Pesan cepat keluarga">${FAMILY_TEMPLATES.map(([k,v]) => `<button type="button" class="btn sm" data-chat-template="${k}">${esc(v)}</button>`).join('')}</div>` : ''}<div class="compose"><label>${scope === 'feedback' ? 'Nama (boleh nama panggilan)' : 'Nama di ruang'}<input id="${scope}ChatName" maxlength="40" value="${esc(nick)}" placeholder="${scope === 'feedback' ? 'mis. Budi, Surabaya' : 'mis. Budi / Posko RW 03'}"></label>
+    ${chatConfig(scope).kinds ? `<label>Kategori<select id="${scope}ChatKind">${Object.entries(chatConfig(scope).kinds).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>` : ''}
+    <label>Pesan<textarea id="${scope}ChatText" maxlength="${chatConfig(scope).max}" placeholder="${scope === 'feedback' ? 'Apa yang perlu diperbaiki atau ditambahkan? Sebutkan menu/fitur yang dimaksud. Maks. 500 karakter.' : 'Tulis kebutuhan, jumlah, area umum, dan waktu. Maks. 280 karakter.'}"></textarea></label>
     <button type="button" class="btn pri" data-chat-send="${scope}">Kirim pesan</button></div>`;
 }
 function chatPanel(scope){
@@ -2523,12 +2568,14 @@ function chatPanel(scope){
   const list = all.filter(m => !COMM.muted.includes(m.mid)), hidden = all.length - list.length;
   return `<div class="tools" style="margin:4px 0"><button type="button" class="btn sm" data-chat-refresh="${scope}">Muat ulang</button></div>
     ${err ? `<div class="badbox">${esc(err)}</div>` : ''}
-    <div class="chat-list" aria-live="polite">${busy && !c.list ? '<div class="chat-empty">Memuat…</div>' : list.length ? list.map(messageHtml).join('') : '<div class="chat-empty">Belum ada pesan dalam 48 jam terakhir.</div>'}</div>
+    <div class="chat-list" aria-live="polite">${busy && !c.list ? '<div class="chat-empty">Memuat…</div>' : list.length ? list.map(messageHtml).join('') : `<div class="chat-empty">Belum ada pesan dalam ${c.hours > 48 ? Math.round(c.hours/24) + ' hari' : c.hours + ' jam'} terakhir.</div>`}</div>
     ${hidden ? `<p class="muted" style="margin:0">${hidden} pesan dari pengirim yang Anda sembunyikan. <button type="button" class="linkbtn" data-unmute>Tampilkan semua lagi</button></p>` : ''}
-    ${composeHtml(scope)}<small class="muted">Pesan hanya tampil 48 jam. Kode ruang adalah kunci masuk; tidak ada verifikasi identitas. Jangan gunakan sebagai sumber peringatan resmi.</small>`;
+    ${composeHtml(scope)}<small class="muted">${scope === 'feedback'
+      ? 'Pesan tampil 30 hari dan dapat dibaca semua pengguna. Jangan tulis nomor HP, alamat, atau data pribadi. Tidak ada verifikasi identitas; gunakan "Sembunyikan pengirim ini" untuk pesan yang mengganggu.'
+      : 'Pesan hanya tampil 48 jam. Kode ruang adalah kunci masuk; tidak ada verifikasi identitas. Jangan gunakan sebagai sumber peringatan resmi.'}</small>`;
 }
 // Chat panels are re-rendered on every refresh (also every 60 s): keep what the user is typing and where the cursor is.
-const CHAT_INPUTS = ['familyChatName','familyChatText','roomChatName','roomChatText','roomChatKind','roomJoinCode'];
+const CHAT_INPUTS = ['familyChatName','familyChatText','roomChatName','roomChatText','roomChatKind','roomJoinCode','feedbackChatName','feedbackChatText','feedbackChatKind'];
 function renderCommunity(){
   const can = online() && navigator.onLine;
   const dot = $('#communityDot'), mode = $('#communityMode');
@@ -2548,34 +2595,37 @@ function renderCommunityPanels(can, dot, mode){
   $('#communityRoom').innerHTML = !can ? '<p class="muted">Aktifkan mode online dan sambungkan internet untuk membuka ruang warga.</p>'
     : !validGid(COMM.room) ? `<div class="tools"><button type="button" class="btn pri" id="roomCreate">Buat ruang warga</button></div><div class="geo-tools"><input id="roomJoinCode" maxlength="40" placeholder="atau masukkan kode ruang" aria-label="Kode ruang warga"><button type="button" class="btn sm" id="roomJoin">Gabung</button></div>`
     : `<p class="room-code">Kode ruang: ${esc(COMM.room)}</p><div class="tools"><button type="button" class="btn sm" id="roomCopy">Salin kode</button><button type="button" class="btn sm" id="roomLeave">Keluar / ganti ruang</button></div>${chatPanel('room')}`;
+  const fb = document.getElementById('feedbackChat');
+  if(fb) fb.innerHTML = !can ? '<p class="muted">Forum kritik &amp; saran perlu mode online dan koneksi internet.</p>' : chatPanel('feedback');
 }
 async function loadChat(scope){
   const c = chatConfig(scope);
-  if(!online() || !navigator.onLine || !validGid(c.code)) return;
+  if(!online() || !navigator.onLine || !chatReady(c)) return;
+  if(scope === 'feedback') feedbackAt = Date.now();
   chatBusy[scope] = true; renderCommunity();
   try {
     const r = await fsReq('GET', `${c.path}?pageSize=50&orderBy=t%20desc`);
-    const docs = r?.documents || [], cutoff = Date.now() - 48*3600e3;
+    const docs = r?.documents || [], cutoff = Date.now() - c.hours*3600e3;
     const fresh = docs.map(fromChat).filter(m => Date.parse(m.t) >= cutoff).sort((a,b) => Date.parse(a.t) - Date.parse(b.t));
     // Best-effort cleanup when someone opens the room; expired messages are also hidden locally.
     docs.filter(d => Date.parse(d.fields?.exp?.timestampValue || d.createTime || '') < Date.now())
       .forEach(d => fsReq('DELETE', d.name.split('/documents/')[1]).catch(() => {}));
-    if(scope === 'family') familyMessages = fresh; else roomMessages = fresh;
+    setChatList(scope, fresh);
     chatErr[scope] = '';
   } catch(err){ chatErr[scope] = err.message; }
   finally { chatBusy[scope] = false; renderCommunity(); }
 }
 async function sendChat(scope){
-  const c = chatConfig(scope), now = Date.now(), lastKey = scope === 'family' ? 'lastFamily' : 'lastRoom';
+  const c = chatConfig(scope), now = Date.now(), lastKey = c.last;
   if(!online() || !navigator.onLine) throw new Error('Chat perlu mode online dan koneksi internet.');
-  if(!validGid(c.code)) throw new Error('Kode ruang belum tersedia.');
-  if(now - COMM[lastKey] < 10000) throw new Error('Tunggu 10 detik sebelum mengirim pesan berikutnya.');
-  const name = str($(`#${scope}ChatName`)?.value, 40).trim(), text = chatText($(`#${scope}ChatText`)?.value);
-  const kind = scope === 'room' && CHAT_KINDS[$('#roomChatKind')?.value] ? $('#roomChatKind').value : 'chat';
+  if(!chatReady(c)) throw new Error('Kode ruang belum tersedia.');
+  if(now - (COMM[lastKey] || 0) < c.gap) throw new Error(`Tunggu ${c.gap/1000} detik sebelum mengirim pesan berikutnya.`);
+  const name = str($(`#${scope}ChatName`)?.value, 40).trim(), text = chatText($(`#${scope}ChatText`)?.value, c.max);
+  const pick = $(`#${scope}ChatKind`)?.value, kind = c.kinds?.[pick] ? pick : c.kinds ? Object.keys(c.kinds)[0] : 'chat';
   if(name.length < 2) throw new Error('Isi nama minimal 2 karakter.');
-  if(text.length < 2) throw new Error('Isi pesan minimal 2 karakter.');
-  // exp stays 1 h under the rules' 48 h cap so phones whose clock runs a little fast are not rejected; messages still show for 48 h
-  const t = new Date(), msg = {name, text, kind, mid:COMM.mid, t:t.toISOString(), exp:new Date(t.getTime()+47*3600e3).toISOString()};
+  if(text.length < (c.min || 2)) throw new Error(`Isi pesan minimal ${c.min || 2} karakter.`);
+  // exp stays 1 h under the rules' cap so phones whose clock runs a little fast are not rejected
+  const t = new Date(), msg = {name, text, kind, mid:COMM.mid, t:t.toISOString(), exp:new Date(t.getTime()+(c.hours-1)*3600e3).toISOString()};
   await fsReq('POST', `${c.path}?documentId=${randId(12)}`, toChat(msg));
   const box = $(`#${scope}ChatText`); if(box) box.value = '';   // sent: clear the draft before the refresh restores inputs
   COMM.nick = name; COMM[lastKey] = now; saveCommunity();
@@ -2872,6 +2922,7 @@ function showTab(id){
   if(id === 't-info'){
     renderCommunity();
     if(online() && navigator.onLine && validGid(S.famGroup)) loadChat('family');
+    if(online() && navigator.onLine && Date.now() - feedbackAt > 5*60e3) loadChat('feedback');
   }
   if(id === 't-community'){
     renderCommunity();
@@ -2943,9 +2994,9 @@ document.addEventListener('click', e => {
   if(t.id === 'svPrev'){ surv.i = Math.max(0, surv.i - 1); return renderSurvival(); }
   if(t.id === 'survClose' || t.closest('#survClose')) return closeSurvival();
   const md = t.closest('[data-mode]');
-  if(md){ S.mode = md.dataset.mode; save(); netStatus(); renderMode(); renderWx(); renderFamily(); renderCommunity(); renderVideos(); if(online()){ refreshWx(); onlineTick(); } return; }
+  if(md){ S.mode = md.dataset.mode; save(); netStatus(); renderMode(); renderWx(); renderFamily(); renderCommunity(); renderVideos(); if(online()){ refreshWx(); autoLocate(); onlineTick(); } return; }
   if(t.id === 'eqClose'){ $('#eqAlert').hidden = true; return; }
-  if(t.id === 'eqTest'){ const ref = eqRef() || {name:'contoh', lat:-8.2, lon:112.6};
+  if(t.id === 'eqTest'){ const ref = eqRef() || {name:'contoh', lat:-6.2, lon:106.8};
     return showQuakeAlert({dt:new Date().toISOString(), lat:ref.lat - 0.4, lon:ref.lon + 0.2, mag:5.4, depth:'10 km', wilayah:'Contoh: 50 km dari lokasi Anda', potensi:'Tidak berpotensi tsunami', dirasakan:'', jam:'', tanggal:'UJI'}, ref, true); }
   if(t.id === 'eqNow'){ return pollQuakes().then(() => toast('Data gempa BMKG diperbarui.')).catch(() => toast('Gagal mengambil data BMKG.', true)); }
   if(t.id === 'eqNotif'){ return Notification.requestPermission().then(() => renderMode()); }
@@ -3024,13 +3075,14 @@ document.addEventListener('click', e => {
       .catch(err => toast(err.message, true)).finally(() => { renderRoutes(); renderCard(); });
     return; }
   if(t.id === 'wxHere'){
-    getPosition().then(p => { S.place = {name:'Lokasi saya', lat:roundTo(p.lat, 2), lon:roundTo(p.lon, 2)}; save(); refreshWx(true); }).catch(err => toast(err.message, true));
+    if(S.place) S.place.auto = true;
+    locateMe().catch(err => toast(err.message, true));
     return; }
   if(t.id === 'wxFind'){
     const q = $('#wxCity').value.trim();
     if(!q) return toast('Ketik nama kota atau kecamatan.', true);
     if(!navigator.onLine) return toast('Pencarian lokasi perlu internet.', true);
-    geocode(q).then(pl => { S.place = pl; save(); refreshWx(true); }).catch(err => toast(err.message || 'Pencarian gagal.', true));
+    geocode(q).then(pl => { S.place = pl; save(); renderRegion(); renderMode(); refreshWx(true); }).catch(err => toast(err.message || 'Pencarian gagal.', true));
     return; }
   if(t.id === 'wxRefresh') return refreshWx(true);
   const sc = t.closest('[data-sc]');
@@ -3050,7 +3102,6 @@ document.addEventListener('click', e => {
   if(st){ S.fam[st.dataset.k] = Math.max(0, Math.min(20, S.fam[st.dataset.k] + +st.dataset.v));
     if(S.fam.dewasa + S.fam.lansia === 0) S.fam.dewasa = 1; save(); return renderAll(); }
   const d = t.closest('#daysCtl button'); if(d){ S.days = +d.dataset.d; save(); return renderAll(); }
-  const rg = t.closest('[data-region]'); if(rg){ S.region = rg.dataset.region; save(); renderAll(); renderHaz(); renderInfo(); return refreshWx(); }
   const v = t.closest('[data-view]'); if(v){ S.view = v.dataset.view; save(); return renderList(); }
   const lc = t.closest('[data-loc]'); if(lc){ S.loc = lc.dataset.loc; save(); return renderList(); }
   const pet = t.closest('[data-pet]'); if(pet){ S.special.hewan = Math.max(0, Math.min(20, (S.special.hewan||0) + +pet.dataset.pet)); save(); return renderAll(); }
@@ -3171,11 +3222,11 @@ async function importFromHash(){
 }
 importFromHash();
 addEventListener('hashchange', importFromHash);
-refreshWx();
-addEventListener('online', () => { refreshWx(); renderCommunity(); onlineTick(); renderVideos(); });
+refreshWx(); autoLocate();
+addEventListener('online', () => { refreshWx(); autoLocate(); renderCommunity(); onlineTick(); renderVideos(); });
 setTimeout(onlineTick, 1500);
 setInterval(onlineTick, 60000);
-document.addEventListener('visibilitychange', () => { if(!document.hidden) onlineTick(); });
+document.addEventListener('visibilitychange', () => { if(!document.hidden){ onlineTick(); autoLocate(); } });
 addEventListener('offline', () => { renderWx(); renderCommunity(); renderVideos(); });
 
 document.addEventListener('visibilitychange', () => { if(!document.hidden){ renderSoon(); renderList(); renderPlan(); progress(); } });

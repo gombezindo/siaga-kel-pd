@@ -16,6 +16,14 @@ node --test tests/readiness.cjs
 
 Buka http://localhost:8765. Service worker memerlukan localhost atau HTTPS.
 
+## Perubahan v3.0 (4 November 2026)
+
+- **Untuk seluruh Indonesia.** Mode khusus Malang Selatan dihapus; semua pengguna memakai satu panduan nasional. Data lama otomatis dipindah ke panduan umum.
+- **Kondisi sekitar mengikuti lokasi pengguna.** Saat pertama dibuka (mode online), aplikasi meminta izin lokasi sekali. Koordinat dibulatkan ±1 km, nama wilayah diambil dari BigDataCloud, lalu cuaca, kualitas udara, jarak gempa BMKG, dan peringatan dihitung untuk lokasi tersebut. Bila izin sudah diberikan, lokasi diperbarui otomatis tiap 30 menit saat aplikasi dibuka. Lokasi yang dicari manual tetap dipakai sampai pengguna menekan "Pakai lokasi saya".
+- **Peringatan lokal tambahan:** angin kencang (hembusan ≥ 60 km/jam) dan suhu ≥ 35°C, selain hujan lebat, udara tidak sehat, dan gempa M5+ dalam 300 km. Peringatan yang mendesak juga tampil di atas Beranda. Feed peringatan dini cuaca BMKG (nowcast) menolak akses lintas-origin dari browser, jadi aplikasi menautkannya, bukan mengambilnya.
+- **Kritik & saran:** forum publik untuk semua pengguna di menu Keluarga (koleksi Firestore `feedback`, pesan 30 hari, batas 1 pesan/30 detik per perangkat, tanpa akun).
+- "Sumber resmi & batas panduan" kini terlipat dan baru terbuka saat diketuk. Cache service worker `siaga-v11`.
+
 ## Perubahan v2.0 — restrukturisasi pengalaman aplikasi (4 November 2026)
 
 - Lima navigasi utama sekarang mengikuti keadaan pengguna: **Beranda, Persiapan, Darurat, Keluarga, Bantuan**. Chat keluarga dipindahkan ke Keluarga; ruang koordinasi warga berada di Bantuan; pustaka darurat diberi nama **Bertahan & Pulih**.

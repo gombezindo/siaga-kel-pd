@@ -87,7 +87,7 @@ test('QR share round-trip keeps plan and contacts only', async ()=>{
   const data = await a.run(`decodeShare(${JSON.stringify(code)})`);
   assert.equal(data.info.titik1, 'Lapangan desa');
   assert.equal(data.members[0].nama, 'Budi');
-  assert.equal(data.region, 'umum');
+  assert.equal('region' in data, false);   // v3: no regional guide to carry
   assert.equal('have' in data, false);
 });
 
@@ -100,14 +100,22 @@ test('calendar export has one recurring event per check', ()=>{
   assert.ok(ics.includes('\r\n'));
 });
 
-test('region switch changes hazards and texts', ()=>{
+test('one nationwide guide: no regional mode, risks reorder hazards', ()=>{
   const a = app();
-  assert.equal(a.run('hazList().some(h => h.k === "asap")'), false);
-  assert.equal(a.run('findItem("selimut").t').includes('Malang'), true);
-  a.run('S.region = "umum"; S.risk.gunung = true');
+  assert.doesNotMatch(html, /Malang|data-region/);
+  assert.equal(a.run('S.region'), 'umum');
   assert.equal(a.run('hazList().some(h => h.k === "asap")'), true);
+  assert.equal(a.run('findItem("selimut").t'), 'Selimut / sarung');
+  a.run('S.risk.gunung = true');
   assert.equal(a.run('hazList()[0].k'), 'erupsi');
-  assert.equal(a.run('findItem("selimut").t').includes('Malang'), false);
+});
+
+test('local alerts follow the user location: wind, heat, rain, distance to quake', ()=>{
+  const a = app();
+  const d = `{place:{lat:-7.26, lon:112.75}, wx:{daily:{time:["2026-11-04"], precipitation_probability_max:[10], precipitation_sum:[0], wind_gusts_10m_max:[72], temperature_2m_max:[36]}}}`;
+  assert.equal(a.run(`wxAlerts(${d}).map(x => x[2]).join()`), 'cuaca,cuaca');
+  assert.equal(a.run(`wxAlerts({place:{lat:-7.26, lon:112.75}, eq:{Coordinates:"-7.5,112.9", Magnitude:"5.2"}}).length`), 1);
+  assert.equal(a.run(`wxAlerts({place:{lat:3.59, lon:98.67}, eq:{Coordinates:"-7.5,112.9", Magnitude:"5.2"}}).length`), 0);
 });
 
 test('every hazard has three quick actions and https sources', ()=>{
@@ -153,7 +161,7 @@ test('hazard readiness scores only that hazard\'s key items', ()=>{
   a.run('["senter","powerbank","radio","surya","chargermotor","cooler","timba","surge","kompor"].forEach(id => S.have[id] = needOf(findItem(id))); S.have.baterai = 1; S.have.korek = 3');
   assert.ok(pct('blackout') > 50);
   assert.ok(pct('tsunami') < 20);
-  assert.equal(a.run('hazardReadiness().some(r => r.h.k === "asap")'), false);   // haze card only in umum mode
+  assert.equal(a.run('hazardReadiness().some(r => r.h.k === "asap")'), true);   // nationwide: haze card always shown
   a.run('S.special.hamil = true');
   assert.equal(a.run('allItems().filter(it => inScenario(it, "tsunami")).some(it => it.id === "taspersalinan")'), true);
 });
@@ -232,7 +240,7 @@ test('coordinates, routes and conditions helpers', ()=>{
   const alerts = a.run(`wxAlerts({place:{lat:-8.2, lon:112.6}, aq:{current:{us_aqi:150}},
     wx:{daily:{time:["2026-11-01"], precipitation_probability_max:[90], precipitation_sum:[35]}},
     eq:{Coordinates:"-8.5,112.4", Magnitude:"5.6"}}).map(x => x[2]).join()`);
-  assert.equal(alerts, 'erupsi,banjir,gempa');
+  assert.equal(alerts, 'asap,banjir,gempa');
   assert.equal(a.run('wxAlerts({place:{lat:-8.2, lon:112.6}, eq:{Coordinates:"4.79,96.20", Magnitude:"6.1"}}).length'), 0);   // far away
 });
 
@@ -430,7 +438,15 @@ test('chat mute list is sanitized; offline messaging guidance is honest and sour
 test('chat timestamps tolerate small phone clock differences', ()=>{
   const html = fs.readFileSync(require('node:path').join(__dirname, '../app/index.html'), 'utf8');
   const rules = fs.readFileSync(require('node:path').join(__dirname, '../firestore.rules'), 'utf8');
-  assert.match(html, /exp:new Date\(t\.getTime\(\)\+47\*3600e3\)/);   // below the 48 h rule cap
+  assert.match(html, /exp:new Date\(t\.getTime\(\)\+\(c\.hours-1\)\*3600e3\)/);   // 1 h below each rule cap
+  const a = app();
+  assert.equal(a.run('chatConfig("family").hours'), 48);   // rules: 2 d
+  assert.equal(a.run('chatConfig("room").hours'), 48);
+  assert.equal(a.run('chatConfig("feedback").hours'), 30*24);   // rules: 31 d
+  assert.match(rules, /match \/feedback\/\{messageId\}/);
+  assert.match(rules, /d\.exp <= request\.time \+ duration\.value\(31, 'd'\)/);
+  assert.match(rules, /d\.kind in \['saran', 'kritik', 'bug', 'apresiasi'\]/);
+  assert.equal(JSON.stringify(a.run('Object.keys(FEEDBACK_KINDS)')), '["saran","kritik","bug","apresiasi"]');
   assert.match(rules, /d\.exp <= request\.time \+ duration\.value\(2, 'd'\)/);
   const chatRule = rules.slice(rules.indexOf('function validChat'));
   assert.match(chatRule, /d\.t > request\.time - duration\.value\(1, 'h'\)/);

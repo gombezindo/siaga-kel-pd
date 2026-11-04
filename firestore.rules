@@ -36,6 +36,27 @@ service cloud.firestore {
         && d.exp > request.time
         && d.exp <= request.time + duration.value(2, 'd');
     }
+    // Public feedback forum ("Kritik & saran"): readable by everyone, append-only, 30-day messages.
+    function validFeedback(d) {
+      return d.keys().hasOnly(['name', 'text', 'kind', 'mid', 't', 'exp'])
+        && d.keys().hasAll(['name', 'text', 'kind', 'mid', 't', 'exp'])
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 40
+        && d.text is string && d.text.size() >= 5 && d.text.size() <= 500
+        && d.kind in ['saran', 'kritik', 'bug', 'apresiasi']
+        && d.mid is string && d.mid.size() >= 12 && d.mid.size() <= 40
+        && d.t is timestamp
+        && d.t > request.time - duration.value(1, 'h')
+        && d.t < request.time + duration.value(1, 'h')
+        && d.exp is timestamp
+        && d.exp > request.time
+        && d.exp <= request.time + duration.value(31, 'd');
+    }
+    match /feedback/{messageId} {
+      allow get, list: if true;
+      allow create: if messageId.size() >= 12 && messageId.size() <= 40
+        && validFeedback(request.resource.data);
+      allow delete: if resource.data.exp < request.time;
+    }
     match /fam/{gid}/m/{mid} {
       allow get, list: if gid.size() >= 20 && gid.size() <= 40;
       allow create, update: if gid.size() >= 20 && gid.size() <= 40
